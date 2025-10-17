@@ -9,7 +9,14 @@
         android:id="@+id/navigation_home"
         android:name="edu.tamu.csce634.smartshop.ui.home.HomeFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_home_to_profile"
+            app:destination="@id/navigation_profile" />
+        <action
+            android:id="@+id/action_home_to_feedback"
+            app:destination="@id/navigation_feedback" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_dashboard"
@@ -22,4 +29,15 @@
         android:name="edu.tamu.csce634.smartshop.ui.recipe.RecipeFragment"
         android:label="@string/title_recipe"
         tools:layout="@layout/fragment_recipe" />
+
+    <fragment
+        android:id="@+id/navigation_profile"
+        android:name="edu.tamu.csce634.smartshop.ui.profile.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/navigation_feedback"
+        android:name="edu.tamu.csce634.smartshop.ui.feedback.FeedbackFragment"
+        android:label="Feedback"
+        tools:layout="@layout/fragment_feedback" />
 </navigation>
