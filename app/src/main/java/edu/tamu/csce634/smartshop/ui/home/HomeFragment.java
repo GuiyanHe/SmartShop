@@ -9,7 +9,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
+import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.databinding.FragmentHomeBinding;
 
 public class HomeFragment extends Fragment {
@@ -23,9 +25,10 @@ public class HomeFragment extends Fragment {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
-        final TextView textView = binding.textHome;
-        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        binding.imageProfile.setOnClickListener(v ->
+                NavHostFragment.findNavController(HomeFragment.this)
+                        .navigate(R.id.action_home_to_profile)
+        );
         return root;
     }
 
