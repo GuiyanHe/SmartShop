@@ -85,3 +85,52 @@ These are best practices that improve code quality but are not strict blockers f
     *   **Readability:** Is the code easy to understand? Should complex logic be simplified or commented?
     *   **Reusability:** Is there duplicated code that could be extracted into a shared function or class?
     *   **Best Practices:** Does the code follow official Kotlin/Android coding conventions?
+
+
+---
+
+## 4. Project Development Requirements
+
+To ensure a smooth and organized development process, please adhere to the following guidelines.
+
+1.  **Maintain Your Code Module:**
+    *   Each team member is the "owner" of their assigned module(s). You are responsible for your module as its Product Manager, Developer, and Tester.
+    *   Take full ownership of its functionality, quality, and maintenance.
+
+2.  **Create an Issue and Define Your Plan Before Coding:**
+    *   Before writing any code for a new feature or a bug fix, you **must** create a corresponding GitHub Issue.
+    *   **In the issue description, you must outline your design and implementation plan.** This includes:
+        *   **Implementation Details:** Clearly define field definitions, interaction logic, and other technical specifics.
+        *   **Cross-Module Impact:** If your plan affects other modules, you must `@mention` the respective owners to review your proposed changes for feasibility and impact.
+    *   This ensures all work, design decisions, and dependencies are tracked, reviewed, and agreed upon before implementation begins.
+
+3.  **Use SharedPreferences for Data Persistence:**
+    *   For the sake of simplicity and consistency across the project, all data persistence must be implemented using `SharedPreferences`.
+    *   Avoid using other persistence methods like Room, SQLite, or Files unless explicitly approved for a specific reason.
+
+4.  **Use JSON for Data Transfer:**
+    *   All data transferred between components or over a network must be in **JSON format**. This ensures a consistent and standardized data structure throughout the application.
+
+---
+
+## 5. Reviewer Assignment
+
+To ensure all code is reviewed effectively, please follow the assignment table below.
+
+#### Default Reviewer Assignments
+
+This table shows the default reviewer for each team member.
+
+| Author (Code Submitter) | Default Reviewer |
+| ------------------ | --------- |
+| Aviral Agarwal     | Qinyao Hou |
+| Lynn Zhou          | Guiyan He |
+| Guiyan He          | Yi-Hsin Chiang |
+| Qinyao Hou         | Lynn Zhou  |
+| Yi-Hsin Chiang     | Aviral Agarwal |
+
+#### Flexibility in Assignment
+
+The assignments above are the default. However, you are encouraged to use your judgment. **If you believe your code is more relevant to another team member's expertise, you may assign that person as the reviewer instead.**
+
+When opening your Pull Request, please select the appropriate reviewer in the "Reviewers" section on GitHub.
