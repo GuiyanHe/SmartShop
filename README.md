@@ -53,3 +53,35 @@ The Pull Request (PR) process is mandatory for all code contributions.
 
 5.  **Merge:**
     * Once the PR is approved by at least one reviewer, it can be merged into `main`.
+
+## 3. Code Review Guidelines
+
+Code review is a critical step to maintain high-quality code and share knowledge. As a reviewer, your responsibility is to ensure the incoming code is correct, maintainable, and adheres to our project standards.
+
+#### Reviewer's Checklist:
+
+When reviewing a Pull Request, please check the following aspects. Use the "Request changes" or "Comment" features for feedback, and "Approve" when you are satisfied.
+
+##### **Required Checks (Blocking)**
+
+These checks must pass before a PR can be merged.
+
+*   **[ ] No Unauthorized Cross-Module Changes:**
+    *   Review the `Files changed` tab to ensure all modifications are strictly confined to the modules or files relevant to the task.
+    *   If the PR unintentionally modifies a module owned by another team member, you **must** `Request changes` and ask the author to remove the unrelated modifications. This prevents conflicts and regressions.
+
+*   **[ ] No Potential Bugs:**
+    *   **Correctness:** Does the code achieve its intended goal? Does it cover all business logic and edge cases?
+    *   **Error Handling:** Are there proper `try-catch` blocks? Are exceptions like network failures or `null` values handled gracefully?
+    *   **Resource Management:** Are there potential memory leaks (e.g., holding a `Context` in a `ViewModel`, not closing streams or cursors)?
+    *   **Concurrency:** Is the code thread-safe in a multi-threaded environment?
+
+##### **Optional Checks (Non-Blocking)**
+
+These are best practices that improve code quality but are not strict blockers for merging.
+
+*   **[ ] Code Style and Quality:**
+    *   **Naming Conventions:** Are variables, functions, and classes named clearly and descriptively?
+    *   **Readability:** Is the code easy to understand? Should complex logic be simplified or commented?
+    *   **Reusability:** Is there duplicated code that could be extracted into a shared function or class?
+    *   **Best Practices:** Does the code follow official Kotlin/Android coding conventions?
