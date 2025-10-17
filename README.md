@@ -135,7 +135,7 @@ The assignments above are the default. However, you are encouraged to use your j
 
 When opening your Pull Request, please select the appropriate reviewer in the "Reviewers" section on GitHub.
 
----## 6. Project Architecture
+## 6. Project Architecture
 
 To help everyone get started quickly, the project has been initialized with a recommended architecture.
 
