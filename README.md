@@ -134,3 +134,33 @@ This table shows the default reviewer for each team member.
 The assignments above are the default. However, you are encouraged to use your judgment. **If you believe your code is more relevant to another team member's expertise, you may assign that person as the reviewer instead.**
 
 When opening your Pull Request, please select the appropriate reviewer in the "Reviewers" section on GitHub.
+
+---## 6. Project Architecture
+
+To help everyone get started quickly, the project has been initialized with a recommended architecture.
+
+#### Default Architecture: MVVM + Jetpack
+
+The project is set up using the **MVVM (Model-View-ViewModel)** architecture, which is Google's recommended standard for modern Android development.
+
+The basic development flow for MVVM is as follows:
+
+1.  **Model (Data Layer):**
+    *   This layer is responsible for all data operations.
+    *   Create a **Repository** class (e.g., `UserRepository`) to handle data logic. This repository will fetch data from a remote source (network) or local source (`SharedPreferences`).
+
+2.  **ViewModel (Logic Layer):**
+    *   The `ViewModel` (e.g., `UserViewModel`) acts as a bridge between the Model and the View.
+    *   It requests data from the `Repository` and exposes it to the View, usually via `LiveData`.
+    *   It should contain all the presentation logic and handle user interactions, but it **never** holds a direct reference to a `View` (Activity/Fragment).
+
+3.  **View (UI Layer):**
+    *   This is your `Activity` or `Fragment`. Its only job is to display data and forward user input to the `ViewModel`.
+    *   The `View` **observes** `LiveData` objects in the `ViewModel` and updates the UI automatically when the data changes.
+
+#### Flexibility in Your Module
+
+While MVVM is the recommended default, you have the freedom to use the architecture you are most comfortable with **within your own assigned module**.
+
+You are free to implement **MVC, MVP, MVI**, or any other standard architecture as long as it does not negatively impact other modules. The key is to keep your module's code clean, maintainable, and well-structured.
+

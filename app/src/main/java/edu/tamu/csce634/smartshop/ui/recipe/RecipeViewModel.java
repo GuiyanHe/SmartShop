@@ -10,7 +10,7 @@ public class RecipeViewModel extends ViewModel {
 
     public RecipeViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is notifications fragment");
+        mText.setValue("This is Recipe fragment");
     }
 
     public LiveData<String> getText() {
