@@ -56,6 +56,47 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
+            <!-- Add/Quantity Controls -->
+            <LinearLayout
+                android:id="@+id/quantity_controls"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:background="@drawable/quantity_control_bg"
+                android:padding="4dp">
+
+                <ImageButton
+                    android:id="@+id/btn_decrease"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_remove"
+                    app:tint="@android:color/white"
+                    android:contentDescription="Decrease" />
+
+                <TextView
+                    android:id="@+id/text_quantity"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:text="1"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <ImageButton
+                    android:id="@+id/btn_increase"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_add"
+                    app:tint="@android:color/white"
+                    android:contentDescription="Increase" />
+            </LinearLayout>
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_add"
                 android:layout_width="wrap_content"

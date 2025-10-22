@@ -21,6 +21,7 @@ import com.google.android.material.button.MaterialButton;
 import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.adapters.IngredientAdapter;
 import edu.tamu.csce634.smartshop.models.Recipe;
+import edu.tamu.csce634.smartshop.utils.CartManager;
 
 public class RecipeDetailFragment extends Fragment {
 
@@ -62,9 +63,14 @@ public class RecipeDetailFragment extends Fragment {
             ingredientsRecyclerView.setAdapter(adapter);
         }
 
-        addToCartBtn.setOnClickListener(v -> 
-            Toast.makeText(getContext(), "Added to cart!", Toast.LENGTH_SHORT).show()
-        );
+        addToCartBtn.setOnClickListener(v -> {
+            if (recipe != null) {
+                CartManager.getInstance().addRecipe(recipe.getTitle());
+                Toast.makeText(getContext(), "Added to cart!", Toast.LENGTH_SHORT).show();
+                // Navigate back to refresh the recipe list
+                NavHostFragment.findNavController(this).navigateUp();
+            }
+        });
 
         return root;
     }

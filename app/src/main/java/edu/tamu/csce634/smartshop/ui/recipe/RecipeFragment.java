@@ -15,24 +15,36 @@ import java.util.List;
 
 import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.adapters.RecipeAdapter;
+import edu.tamu.csce634.smartshop.models.Ingredient;
 import edu.tamu.csce634.smartshop.models.Recipe;
-import edu.tamu.csce634.smartshop.models.Ingredient;  // ADD THIS LINE
 
 public class RecipeFragment extends Fragment {
+
+    private RecyclerView recyclerView;
+    private RecipeAdapter adapter;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_recipe, container, false);
 
-        RecyclerView recyclerView = root.findViewById(R.id.recipes_recycler_view);
+        recyclerView = root.findViewById(R.id.recipes_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         
         List<Recipe> recipes = createSampleRecipes();
-        RecipeAdapter adapter = new RecipeAdapter(recipes);
+        adapter = new RecipeAdapter(recipes);
         recyclerView.setAdapter(adapter);
 
         return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Refresh the adapter when returning to this fragment
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
     }
 
     private List<Recipe> createSampleRecipes() {

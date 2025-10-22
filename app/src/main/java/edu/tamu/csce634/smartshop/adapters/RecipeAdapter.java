@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,6 +19,7 @@ import java.util.List;
 
 import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.models.Recipe;
+import edu.tamu.csce634.smartshop.utils.CartManager;
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
     private List<Recipe> recipes;
@@ -40,6 +43,10 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         holder.description.setText(recipe.getDescription());
         holder.image.setImageResource(recipe.getImageResId());
         
+        // Update UI based on cart status
+        updateButtonState(holder, recipe);
+
+        // Add button click - navigate to detail
         holder.addButton.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putSerializable("recipe", recipe);
@@ -47,6 +54,40 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                 R.id.action_recipe_to_detail, bundle
             );
         });
+
+        // Increase quantity
+        holder.btnIncrease.setOnClickListener(v -> {
+            CartManager.getInstance().addRecipe(recipe.getTitle());
+            updateButtonState(holder, recipe);
+        });
+
+        // Decrease quantity
+        holder.btnDecrease.setOnClickListener(v -> {
+            CartManager.getInstance().removeRecipe(recipe.getTitle());
+            updateButtonState(holder, recipe);
+        });
+
+        // Click on quantity controls also navigates to detail
+        holder.quantityControls.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("recipe", recipe);
+            Navigation.findNavController(v).navigate(
+                R.id.action_recipe_to_detail, bundle
+            );
+        });
+    }
+
+    private void updateButtonState(RecipeViewHolder holder, Recipe recipe) {
+        int quantity = CartManager.getInstance().getQuantity(recipe.getTitle());
+        
+        if (quantity > 0) {
+            holder.addButton.setVisibility(View.GONE);
+            holder.quantityControls.setVisibility(View.VISIBLE);
+            holder.textQuantity.setText(String.valueOf(quantity));
+        } else {
+            holder.addButton.setVisibility(View.VISIBLE);
+            holder.quantityControls.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -59,6 +100,10 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         TextView title;
         TextView description;
         MaterialButton addButton;
+        LinearLayout quantityControls;
+        TextView textQuantity;
+        ImageButton btnIncrease;
+        ImageButton btnDecrease;
 
         RecipeViewHolder(View itemView) {
             super(itemView);
@@ -66,6 +111,10 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             title = itemView.findViewById(R.id.recipe_title);
             description = itemView.findViewById(R.id.recipe_description);
             addButton = itemView.findViewById(R.id.btn_add);
+            quantityControls = itemView.findViewById(R.id.quantity_controls);
+            textQuantity = itemView.findViewById(R.id.text_quantity);
+            btnIncrease = itemView.findViewById(R.id.btn_increase);
+            btnDecrease = itemView.findViewById(R.id.btn_decrease);
         }
     }
 }
