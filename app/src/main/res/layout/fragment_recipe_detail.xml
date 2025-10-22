@@ -15,23 +15,14 @@
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true">
 
-        <com.google.android.material.appbar.CollapsingToolbarLayout
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fitsSystemWindows="true"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:contentScrim="@color/green_fab"
-            app:statusBarScrim="@color/green_fab">
-
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:title="Recipe List"
-                app:titleTextColor="@android:color/white"
-                app:navigationIcon="@drawable/ic_back"
-                app:layout_collapseMode="pin" />
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/green_fab"
+            app:title="Recipe List"
+            app:titleTextColor="@android:color/white"
+            app:navigationIcon="@drawable/ic_back" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -102,23 +93,88 @@
                     android:textSize="16sp"
                     android:lineSpacingExtra="4dp"
                     android:fontFamily="sans-serif-light"
-                    android:textStyle="italic" />
+                    style="italic" />
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Add to Cart Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_add_to_cart"
-                android:layout_width="wrap_content"
+            <!-- Add to Cart Section with Portion Selector -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:layout_marginTop="16dp"
-                android:paddingStart="48dp"
-                android:paddingEnd="48dp"
-                android:text="Add to Cart"
-                android:textColor="@android:color/white"
-                android:textSize="18sp"
-                app:backgroundTint="@color/green_fab"
-                app:cornerRadius="24dp" />
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <!-- Portion Selector -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginEnd="16dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Portions"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="4dp" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:background="@drawable/quantity_control_bg"
+                        android:padding="4dp">
+
+                        <ImageButton
+                            android:id="@+id/btn_decrease_portion"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@drawable/ic_remove"
+                            android:tint="@android:color/white"
+                            android:contentDescription="Decrease portion" />
+
+                        <TextView
+                            android:id="@+id/text_portion"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:gravity="center"
+                            android:text="1"
+                            android:textColor="@android:color/white"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <ImageButton
+                            android:id="@+id/btn_increase_portion"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@drawable/ic_add"
+                            android:tint="@android:color/white"
+                            android:contentDescription="Increase portion" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Add to Cart Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_add_to_cart"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="14dp"
+                    android:text="Add to Cart"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp"
+                    app:backgroundTint="@color/green_fab"
+                    app:cornerRadius="24dp"
+                    app:icon="@drawable/ic_cart"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp" />
+            </LinearLayout>
 
             <!-- Ingredients List -->
             <androidx.recyclerview.widget.RecyclerView
