@@ -16,7 +16,7 @@ import java.util.List;
 import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.adapters.RecipeAdapter;
 import edu.tamu.csce634.smartshop.models.Recipe;
-import edu.tamu.csce634.smartshop.models.Ingredient;  // ADD THIS LINE
+import edu.tamu.csce634.smartshop.models.Ingredient;
 
 public class RecipeFragment extends Fragment {
 
