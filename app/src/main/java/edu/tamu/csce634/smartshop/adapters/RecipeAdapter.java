@@ -14,6 +14,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
@@ -46,13 +47,19 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         // Update UI based on cart status
         updateButtonState(holder, recipe);
 
-        // Add button click - navigate to detail
-        holder.addButton.setOnClickListener(v -> {
+        // Info button - navigate to detail page
+        holder.btnInfo.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putSerializable("recipe", recipe);
             Navigation.findNavController(v).navigate(
                 R.id.action_recipe_to_detail, bundle
             );
+        });
+
+        // Add button - add to cart
+        holder.addButton.setOnClickListener(v -> {
+            CartManager.getInstance().addRecipe(recipe.getTitle());
+            updateButtonState(holder, recipe);
         });
 
         // Increase quantity
@@ -65,15 +72,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         holder.btnDecrease.setOnClickListener(v -> {
             CartManager.getInstance().removeRecipe(recipe.getTitle());
             updateButtonState(holder, recipe);
-        });
-
-        // Click on quantity controls also navigates to detail
-        holder.quantityControls.setOnClickListener(v -> {
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("recipe", recipe);
-            Navigation.findNavController(v).navigate(
-                R.id.action_recipe_to_detail, bundle
-            );
         });
     }
 
@@ -104,6 +102,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         TextView textQuantity;
         ImageButton btnIncrease;
         ImageButton btnDecrease;
+        FloatingActionButton btnInfo;
 
         RecipeViewHolder(View itemView) {
             super(itemView);
@@ -115,6 +114,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             textQuantity = itemView.findViewById(R.id.text_quantity);
             btnIncrease = itemView.findViewById(R.id.btn_increase);
             btnDecrease = itemView.findViewById(R.id.btn_decrease);
+            btnInfo = itemView.findViewById(R.id.btn_info);
         }
     }
 }

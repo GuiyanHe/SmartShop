@@ -24,6 +24,20 @@
             android:layout_height="match_parent"
             android:background="@drawable/gradient_overlay" />
 
+        <!-- Info Button at Top Right -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btn_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_margin="12dp"
+            app:fabSize="mini"
+            app:backgroundTint="@android:color/white"
+            app:tint="@color/green_fab"
+            android:src="@drawable/ic_info"
+            android:contentDescription="Recipe Info"
+            app:elevation="2dp" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -73,7 +87,7 @@
                     android:layout_height="32dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_remove"
-                    app:tint="@android:color/white"
+                    android:tint="@android:color/white"
                     android:contentDescription="Decrease" />
 
                 <TextView
@@ -93,7 +107,7 @@
                     android:layout_height="32dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_add"
-                    app:tint="@android:color/white"
+                    android:tint="@android:color/white"
                     android:contentDescription="Increase" />
             </LinearLayout>
 
