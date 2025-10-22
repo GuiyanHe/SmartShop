@@ -28,7 +28,17 @@
         android:id="@+id/navigation_notifications"
         android:name="edu.tamu.csce634.smartshop.ui.recipe.RecipeFragment"
         android:label="@string/title_recipe"
-        tools:layout="@layout/fragment_recipe" />
+        tools:layout="@layout/fragment_recipe">
+        <action
+            android:id="@+id/action_recipe_to_detail"
+            app:destination="@id/navigation_recipe_detail" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_recipe_detail"
+        android:name="edu.tamu.csce634.smartshop.ui.recipedetail.RecipeDetailFragment"
+        android:label="Recipe Detail"
+        tools:layout="@layout/fragment_recipe_detail" />
 
     <fragment
         android:id="@+id/navigation_profile"
