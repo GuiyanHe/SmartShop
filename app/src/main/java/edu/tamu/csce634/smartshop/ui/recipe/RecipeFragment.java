@@ -50,6 +50,7 @@ public class RecipeFragment extends Fragment {
     private List<Recipe> createSampleRecipes() {
         List<Recipe> recipes = new ArrayList<>();
         
+        // Tofu Power Bowl
         Recipe tofuBowl = new Recipe(
             "Tofu Power Bowl",
             "High fiber, low calorie, and filling",
@@ -63,15 +64,51 @@ public class RecipeFragment extends Fragment {
         tofuBowl.addIngredient(new Ingredient("Purple Cabbage", "1 Oz", R.drawable.avocado_salad));
         recipes.add(tofuBowl);
         
+        // Quinoa Vegetable Stir-fry
         Recipe quinoaStirFry = new Recipe(
             "Quinoa Vegetable Stir-fry",
             "Balanced nutrition, rich in plant protein",
-            "A colorful and nutritious quinoa vegetable stir-fry packed with fresh vegetables and plant-based protein.",
+            "A colorful and nutritious quinoa vegetable stir-fry packed with fresh vegetables and plant-based protein. This wholesome dish combines fluffy quinoa with crisp bell peppers, chickpeas, and fresh herbs for a satisfying meal.",
             R.drawable.quinoa_stir_fry
         );
         quinoaStirFry.addIngredient(new Ingredient("Quinoa", "2 Oz", R.drawable.quinoa_stir_fry));
-        quinoaStirFry.addIngredient(new Ingredient("Mixed Vegetables", "3 Oz", R.drawable.quinoa_stir_fry));
+        quinoaStirFry.addIngredient(new Ingredient("Bell Peppers", "1 Oz", R.drawable.quinoa_stir_fry));
+        quinoaStirFry.addIngredient(new Ingredient("Chickpeas", "2 Oz", R.drawable.quinoa_stir_fry));
+        quinoaStirFry.addIngredient(new Ingredient("Cherry Tomatoes", "1 Oz", R.drawable.quinoa_stir_fry));
+        quinoaStirFry.addIngredient(new Ingredient("Red Cabbage", "1 Oz", R.drawable.quinoa_stir_fry));
         recipes.add(quinoaStirFry);
+        
+        // Salmon Rice Bowl
+        Recipe salmonBowl = new Recipe(
+            "Salmon Rice Bowl",
+            "Flavorful fish, Asian-style",
+            "A delicious and healthy salmon rice bowl featuring perfectly cooked salmon slices on a bed of seasoned brown rice. Topped with fresh vegetables including cucumber, radish, carrots, and cilantro, this Asian-inspired dish is both nutritious and satisfying.",
+            R.drawable.salmon_rice_bowl
+        );
+        salmonBowl.addIngredient(new Ingredient("Salmon", "4 Oz", R.drawable.salmon_rice_bowl));
+        salmonBowl.addIngredient(new Ingredient("Brown Rice", "2 Oz", R.drawable.salmon_rice_bowl));
+        salmonBowl.addIngredient(new Ingredient("Cucumber", "1 Oz", R.drawable.salmon_rice_bowl));
+        salmonBowl.addIngredient(new Ingredient("Radish", "0.5 Oz", R.drawable.salmon_rice_bowl));
+        salmonBowl.addIngredient(new Ingredient("Carrots", "1 Oz", R.drawable.salmon_rice_bowl));
+        salmonBowl.addIngredient(new Ingredient("Cilantro", "0.2 Oz", R.drawable.salmon_rice_bowl));
+        salmonBowl.addIngredient(new Ingredient("Egg", "1", R.drawable.salmon_rice_bowl));
+        recipes.add(salmonBowl);
+        
+        // Steak Taco
+        Recipe steakTaco = new Recipe(
+            "Steak Taco",
+            "Mexican dish, low carb",
+            "A mouthwatering steak taco featuring tender grilled beef strips on a soft flour tortilla. Loaded with sweet corn, diced tomatoes, fresh cilantro, and crumbled queso fresco cheese. This Mexican-inspired dish delivers bold flavors with a balanced nutritional profile.",
+            R.drawable.steak_taco
+        );
+        steakTaco.addIngredient(new Ingredient("Steak", "4 Oz", R.drawable.steak_taco));
+        steakTaco.addIngredient(new Ingredient("Flour Tortilla", "2", R.drawable.steak_taco));
+        steakTaco.addIngredient(new Ingredient("Corn", "2 Oz", R.drawable.steak_taco));
+        steakTaco.addIngredient(new Ingredient("Tomatoes", "1 Oz", R.drawable.steak_taco));
+        steakTaco.addIngredient(new Ingredient("Cilantro", "0.2 Oz", R.drawable.steak_taco));
+        steakTaco.addIngredient(new Ingredient("Queso Fresco", "1 Oz", R.drawable.steak_taco));
+        steakTaco.addIngredient(new Ingredient("Avocado", "1 Oz", R.drawable.steak_taco));
+        recipes.add(steakTaco);
         
         return recipes;
     }
