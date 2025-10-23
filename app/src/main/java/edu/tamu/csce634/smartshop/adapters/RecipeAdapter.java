@@ -1,16 +1,20 @@
 package edu.tamu.csce634.smartshop.adapters;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.navigation.Navigation;
@@ -68,11 +72,72 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             updateButtonState(holder, recipe);
         });
 
+        // Delete button - remove all from cart
+        holder.btnDelete.setOnClickListener(v -> {
+            HapticFeedback.mediumClick(v);
+            // Clear all quantities of this recipe
+            int quantity = CartManager.getInstance().getQuantity(recipe.getTitle());
+            for (int i = 0; i < quantity; i++) {
+                CartManager.getInstance().removeRecipe(recipe.getTitle());
+            }
+            updateButtonState(holder, recipe);
+            Toast.makeText(v.getContext(), "Removed from cart", Toast.LENGTH_SHORT).show();
+        });
+
+        // Click on quantity to manually input
+        holder.textQuantity.setOnClickListener(v -> {
+            showQuantityInputDialog(v, recipe, holder);
+        });
+
         // Setup long press for increase button
         setupLongPressIncrease(holder, recipe);
 
         // Setup long press for decrease button
         setupLongPressDecrease(holder, recipe);
+    }
+
+    private void showQuantityInputDialog(View view, Recipe recipe, RecipeViewHolder holder) {
+        HapticFeedback.lightClick(view);
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+        builder.setTitle("Set Quantity");
+        
+        final EditText input = new EditText(view.getContext());
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        input.setText(String.valueOf(CartManager.getInstance().getQuantity(recipe.getTitle())));
+        input.setSelection(input.getText().length());
+        builder.setView(input);
+        
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            String text = input.getText().toString();
+            if (!text.isEmpty()) {
+                try {
+                    int newQuantity = Integer.parseInt(text);
+                    if (newQuantity >= 0 && newQuantity <= 99) {
+                        // Clear current quantity
+                        int currentQuantity = CartManager.getInstance().getQuantity(recipe.getTitle());
+                        for (int i = 0; i < currentQuantity; i++) {
+                            CartManager.getInstance().removeRecipe(recipe.getTitle());
+                        }
+                        // Set new quantity
+                        for (int i = 0; i < newQuantity; i++) {
+                            CartManager.getInstance().addRecipe(recipe.getTitle());
+                        }
+                        HapticFeedback.mediumClick(view);
+                        updateButtonState(holder, recipe);
+                    } else {
+                        Toast.makeText(view.getContext(), "Please enter a number between 0 and 99", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (NumberFormatException e) {
+                    Toast.makeText(view.getContext(), "Invalid number", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void setupLongPressIncrease(RecipeViewHolder holder, Recipe recipe) {
@@ -182,6 +247,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         TextView textQuantity;
         ImageButton btnIncrease;
         ImageButton btnDecrease;
+        ImageButton btnDelete;
         FloatingActionButton btnInfo;
 
         RecipeViewHolder(View itemView) {
@@ -194,6 +260,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             textQuantity = itemView.findViewById(R.id.text_quantity);
             btnIncrease = itemView.findViewById(R.id.btn_increase);
             btnDecrease = itemView.findViewById(R.id.btn_decrease);
+            btnDelete = itemView.findViewById(R.id.btn_delete);
             btnInfo = itemView.findViewById(R.id.btn_info);
         }
     }

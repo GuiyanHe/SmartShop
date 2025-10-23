@@ -30,6 +30,10 @@ import edu.tamu.csce634.smartshop.models.Recipe;
 import edu.tamu.csce634.smartshop.utils.CartManager;
 import edu.tamu.csce634.smartshop.utils.HapticFeedback;
 
+import android.app.AlertDialog;
+import android.text.InputType;
+import android.widget.EditText;
+
 public class RecipeDetailFragment extends Fragment {
 
     private Recipe recipe;
@@ -112,6 +116,11 @@ public class RecipeDetailFragment extends Fragment {
                 NavHostFragment.findNavController(this).navigateUp();
             }
         });
+
+        textPortion.setOnClickListener(v -> {
+            showPortionInputDialog(v);
+        });
+
 
         return root;
     }
@@ -218,5 +227,41 @@ public class RecipeDetailFragment extends Fragment {
             Window window = getActivity().getWindow();
             window.setStatusBarColor(ContextCompat.getColor(requireContext(), android.R.color.transparent));
         }
+    }
+
+    private void showPortionInputDialog(View view) {
+        HapticFeedback.lightClick(view);
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Set Portions");
+        
+        final EditText input = new EditText(requireContext());
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        input.setText(String.valueOf(portionCount));
+        input.setSelection(input.getText().length());
+        builder.setView(input);
+        
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            String text = input.getText().toString();
+            if (!text.isEmpty()) {
+                try {
+                    int newPortion = Integer.parseInt(text);
+                    if (newPortion >= 1 && newPortion <= 10) {
+                        portionCount = newPortion;
+                        HapticFeedback.mediumClick(view);
+                        updatePortionDisplay();
+                    } else {
+                        Toast.makeText(requireContext(), "Please enter a number between 1 and 10", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (NumberFormatException e) {
+                    Toast.makeText(requireContext(), "Invalid number", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }
