@@ -1,5 +1,6 @@
 package edu.tamu.csce634.smartshop.ui.recipe;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +8,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,6 +19,9 @@ import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.adapters.RecipeAdapter;
 import edu.tamu.csce634.smartshop.models.Ingredient;
 import edu.tamu.csce634.smartshop.models.Recipe;
+import edu.tamu.csce634.smartshop.utils.CartManager;
+import edu.tamu.csce634.smartshop.utils.HapticFeedback;
+import edu.tamu.csce634.smartshop.utils.SwipeHelper;
 
 public class RecipeFragment extends Fragment {
 
@@ -35,13 +40,78 @@ public class RecipeFragment extends Fragment {
         adapter = new RecipeAdapter(recipes);
         recyclerView.setAdapter(adapter);
 
+        // Setup swipe to delete
+        setupSwipeToDelete();
+
         return root;
+    }
+
+    private void setupSwipeToDelete() {
+        SwipeHelper swipeHelper = new SwipeHelper(requireContext()) {
+            @Override
+            public boolean canSwipe(int position) {
+                // Only allow swipe if item is in cart
+                Recipe recipe = adapter.getRecipeAt(position);
+                return CartManager.getInstance().getQuantity(recipe.getTitle()) > 0;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                Recipe recipe = adapter.getRecipeAt(position);
+                
+                int quantity = CartManager.getInstance().getQuantity(recipe.getTitle());
+                if (quantity > 0) {
+                    // Show confirmation dialog
+                    showDeleteConfirmation(recipe, position);
+                } else {
+                    // This shouldn't happen, but reset the view just in case
+                    adapter.notifyItemChanged(position);
+                }
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(swipeHelper);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    private void showDeleteConfirmation(Recipe recipe, int position) {
+        int quantity = CartManager.getInstance().getQuantity(recipe.getTitle());
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Remove from Cart");
+        builder.setMessage("Remove " + quantity + (quantity == 1 ? " portion" : " portions") + 
+                          " of " + recipe.getTitle() + " from cart?");
+        
+        builder.setPositiveButton("Remove", (dialog, which) -> {
+            HapticFeedback.mediumClick(recyclerView);
+            
+            // Remove all quantities
+            for (int i = 0; i < quantity; i++) {
+                CartManager.getInstance().removeRecipe(recipe.getTitle());
+            }
+            
+            // Refresh the item
+            adapter.notifyItemChanged(position);
+        });
+        
+        builder.setNegativeButton("Cancel", (dialog, which) -> {
+            // Reset the swipe
+            adapter.notifyItemChanged(position);
+        });
+        
+        builder.setOnCancelListener(dialog -> {
+            // Reset the swipe if dialog is cancelled
+            adapter.notifyItemChanged(position);
+        });
+        
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // Refresh the adapter when returning to this fragment
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }

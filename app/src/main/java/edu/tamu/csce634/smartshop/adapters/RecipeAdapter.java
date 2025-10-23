@@ -72,18 +72,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             updateButtonState(holder, recipe);
         });
 
-        // Delete button - remove all from cart
-        holder.btnDelete.setOnClickListener(v -> {
-            HapticFeedback.mediumClick(v);
-            // Clear all quantities of this recipe
-            int quantity = CartManager.getInstance().getQuantity(recipe.getTitle());
-            for (int i = 0; i < quantity; i++) {
-                CartManager.getInstance().removeRecipe(recipe.getTitle());
-            }
-            updateButtonState(holder, recipe);
-            Toast.makeText(v.getContext(), "Removed from cart", Toast.LENGTH_SHORT).show();
-        });
-
         // Click on quantity to manually input
         holder.textQuantity.setOnClickListener(v -> {
             showQuantityInputDialog(v, recipe, holder);
@@ -159,15 +147,14 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                             HapticFeedback.lightClick(v);
                             CartManager.getInstance().addRecipe(recipe.getTitle());
                             updateButtonState(holder, recipe);
-                            handler.postDelayed(this, 150); // Repeat every 150ms
+                            handler.postDelayed(this, 150);
                         }
                     };
-                    handler.postDelayed(runnable[0], 500); // Start after 500ms hold
+                    handler.postDelayed(runnable[0], 500);
                     return true;
                     
                 case MotionEvent.ACTION_UP:
                 case MotionEvent.ACTION_CANCEL:
-                    // Stop continuous increment
                     if (runnable[0] != null) {
                         handler.removeCallbacks(runnable[0]);
                     }
@@ -198,18 +185,17 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                                 HapticFeedback.lightClick(v);
                                 CartManager.getInstance().removeRecipe(recipe.getTitle());
                                 updateButtonState(holder, recipe);
-                                handler.postDelayed(this, 150); // Repeat every 150ms
+                                handler.postDelayed(this, 150);
                             } else {
                                 handler.removeCallbacks(this);
                             }
                         }
                     };
-                    handler.postDelayed(runnable[0], 500); // Start after 500ms hold
+                    handler.postDelayed(runnable[0], 500);
                     return true;
                     
                 case MotionEvent.ACTION_UP:
                 case MotionEvent.ACTION_CANCEL:
-                    // Stop continuous decrement
                     if (runnable[0] != null) {
                         handler.removeCallbacks(runnable[0]);
                     }
@@ -238,6 +224,10 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         return recipes.size();
     }
 
+    public Recipe getRecipeAt(int position) {
+        return recipes.get(position);
+    }
+
     static class RecipeViewHolder extends RecyclerView.ViewHolder {
         ImageView image;
         TextView title;
@@ -247,7 +237,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         TextView textQuantity;
         ImageButton btnIncrease;
         ImageButton btnDecrease;
-        ImageButton btnDelete;
         FloatingActionButton btnInfo;
 
         RecipeViewHolder(View itemView) {
@@ -260,7 +249,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             textQuantity = itemView.findViewById(R.id.text_quantity);
             btnIncrease = itemView.findViewById(R.id.btn_increase);
             btnDecrease = itemView.findViewById(R.id.btn_decrease);
-            btnDelete = itemView.findViewById(R.id.btn_delete);
             btnInfo = itemView.findViewById(R.id.btn_info);
         }
     }
