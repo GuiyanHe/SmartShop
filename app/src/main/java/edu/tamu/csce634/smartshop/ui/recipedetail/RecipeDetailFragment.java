@@ -25,6 +25,7 @@ import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.adapters.IngredientAdapter;
 import edu.tamu.csce634.smartshop.models.Recipe;
 import edu.tamu.csce634.smartshop.utils.CartManager;
+import edu.tamu.csce634.smartshop.utils.HapticFeedback;
 
 public class RecipeDetailFragment extends Fragment {
 
@@ -52,9 +53,10 @@ public class RecipeDetailFragment extends Fragment {
 
         // Setup toolbar
         Toolbar toolbar = root.findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(v -> 
-            NavHostFragment.findNavController(this).navigateUp()
-        );
+        toolbar.setNavigationOnClickListener(v -> {
+            HapticFeedback.lightClick(v);
+            NavHostFragment.findNavController(this).navigateUp();
+        });
 
         // Set recipe data
         TextView title = root.findViewById(R.id.recipe_title);
@@ -82,6 +84,7 @@ public class RecipeDetailFragment extends Fragment {
         // Portion decrease button
         btnDecreasePortion.setOnClickListener(v -> {
             if (portionCount > 1) {
+                HapticFeedback.lightClick(v);
                 portionCount--;
                 updatePortionDisplay();
             }
@@ -90,6 +93,7 @@ public class RecipeDetailFragment extends Fragment {
         // Portion increase button
         btnIncreasePortion.setOnClickListener(v -> {
             if (portionCount < 10) { // Max 10 portions
+                HapticFeedback.lightClick(v);
                 portionCount++;
                 updatePortionDisplay();
             }
@@ -98,6 +102,9 @@ public class RecipeDetailFragment extends Fragment {
         // Add to cart button
         addToCartBtn.setOnClickListener(v -> {
             if (recipe != null) {
+                // Success haptic feedback
+                HapticFeedback.success(requireContext());
+                
                 // Add the recipe multiple times based on portion count
                 for (int i = 0; i < portionCount; i++) {
                     CartManager.getInstance().addRecipe(recipe.getTitle());

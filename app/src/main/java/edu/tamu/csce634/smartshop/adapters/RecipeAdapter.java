@@ -21,6 +21,7 @@ import java.util.List;
 import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.models.Recipe;
 import edu.tamu.csce634.smartshop.utils.CartManager;
+import edu.tamu.csce634.smartshop.utils.HapticFeedback;
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
     private List<Recipe> recipes;
@@ -49,6 +50,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
         // Info button - navigate to detail page
         holder.btnInfo.setOnClickListener(v -> {
+            HapticFeedback.lightClick(v);
             Bundle bundle = new Bundle();
             bundle.putSerializable("recipe", recipe);
             Navigation.findNavController(v).navigate(
@@ -58,18 +60,21 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
         // Add button - add to cart
         holder.addButton.setOnClickListener(v -> {
+            HapticFeedback.mediumClick(v);
             CartManager.getInstance().addRecipe(recipe.getTitle());
             updateButtonState(holder, recipe);
         });
 
         // Increase quantity
         holder.btnIncrease.setOnClickListener(v -> {
+            HapticFeedback.lightClick(v);
             CartManager.getInstance().addRecipe(recipe.getTitle());
             updateButtonState(holder, recipe);
         });
 
         // Decrease quantity
         holder.btnDecrease.setOnClickListener(v -> {
+            HapticFeedback.lightClick(v);
             CartManager.getInstance().removeRecipe(recipe.getTitle());
             updateButtonState(holder, recipe);
         });
