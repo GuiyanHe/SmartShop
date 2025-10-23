@@ -1,7 +1,10 @@
 package edu.tamu.csce634.smartshop.adapters;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -65,18 +68,90 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             updateButtonState(holder, recipe);
         });
 
-        // Increase quantity
-        holder.btnIncrease.setOnClickListener(v -> {
-            HapticFeedback.lightClick(v);
-            CartManager.getInstance().addRecipe(recipe.getTitle());
-            updateButtonState(holder, recipe);
-        });
+        // Setup long press for increase button
+        setupLongPressIncrease(holder, recipe);
 
-        // Decrease quantity
-        holder.btnDecrease.setOnClickListener(v -> {
-            HapticFeedback.lightClick(v);
-            CartManager.getInstance().removeRecipe(recipe.getTitle());
-            updateButtonState(holder, recipe);
+        // Setup long press for decrease button
+        setupLongPressDecrease(holder, recipe);
+    }
+
+    private void setupLongPressIncrease(RecipeViewHolder holder, Recipe recipe) {
+        final Handler handler = new Handler(Looper.getMainLooper());
+        final Runnable[] runnable = new Runnable[1];
+        
+        holder.btnIncrease.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    // Single click
+                    HapticFeedback.lightClick(v);
+                    CartManager.getInstance().addRecipe(recipe.getTitle());
+                    updateButtonState(holder, recipe);
+                    
+                    // Start continuous increment after delay
+                    runnable[0] = new Runnable() {
+                        @Override
+                        public void run() {
+                            HapticFeedback.lightClick(v);
+                            CartManager.getInstance().addRecipe(recipe.getTitle());
+                            updateButtonState(holder, recipe);
+                            handler.postDelayed(this, 150); // Repeat every 150ms
+                        }
+                    };
+                    handler.postDelayed(runnable[0], 500); // Start after 500ms hold
+                    return true;
+                    
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    // Stop continuous increment
+                    if (runnable[0] != null) {
+                        handler.removeCallbacks(runnable[0]);
+                    }
+                    v.performClick();
+                    return true;
+            }
+            return false;
+        });
+    }
+
+    private void setupLongPressDecrease(RecipeViewHolder holder, Recipe recipe) {
+        final Handler handler = new Handler(Looper.getMainLooper());
+        final Runnable[] runnable = new Runnable[1];
+        
+        holder.btnDecrease.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    // Single click
+                    HapticFeedback.lightClick(v);
+                    CartManager.getInstance().removeRecipe(recipe.getTitle());
+                    updateButtonState(holder, recipe);
+                    
+                    // Start continuous decrement after delay
+                    runnable[0] = new Runnable() {
+                        @Override
+                        public void run() {
+                            if (CartManager.getInstance().getQuantity(recipe.getTitle()) > 0) {
+                                HapticFeedback.lightClick(v);
+                                CartManager.getInstance().removeRecipe(recipe.getTitle());
+                                updateButtonState(holder, recipe);
+                                handler.postDelayed(this, 150); // Repeat every 150ms
+                            } else {
+                                handler.removeCallbacks(this);
+                            }
+                        }
+                    };
+                    handler.postDelayed(runnable[0], 500); // Start after 500ms hold
+                    return true;
+                    
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    // Stop continuous decrement
+                    if (runnable[0] != null) {
+                        handler.removeCallbacks(runnable[0]);
+                    }
+                    v.performClick();
+                    return true;
+            }
+            return false;
         });
     }
 

@@ -1,7 +1,10 @@
 package edu.tamu.csce634.smartshop.ui.recipedetail;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -32,6 +35,7 @@ public class RecipeDetailFragment extends Fragment {
     private Recipe recipe;
     private int portionCount = 1;
     private TextView textPortion;
+    private Handler handler = new Handler(Looper.getMainLooper());
 
     @Nullable
     @Override
@@ -81,23 +85,11 @@ public class RecipeDetailFragment extends Fragment {
             ingredientsRecyclerView.setAdapter(adapter);
         }
 
-        // Portion decrease button
-        btnDecreasePortion.setOnClickListener(v -> {
-            if (portionCount > 1) {
-                HapticFeedback.lightClick(v);
-                portionCount--;
-                updatePortionDisplay();
-            }
-        });
+        // Setup long press for portion decrease button
+        setupLongPressDecrease(btnDecreasePortion);
 
-        // Portion increase button
-        btnIncreasePortion.setOnClickListener(v -> {
-            if (portionCount < 10) { // Max 10 portions
-                HapticFeedback.lightClick(v);
-                portionCount++;
-                updatePortionDisplay();
-            }
-        });
+        // Setup long press for portion increase button
+        setupLongPressIncrease(btnIncreasePortion);
 
         // Add to cart button
         addToCartBtn.setOnClickListener(v -> {
@@ -124,6 +116,92 @@ public class RecipeDetailFragment extends Fragment {
         return root;
     }
 
+    private void setupLongPressDecrease(ImageButton button) {
+        final Runnable[] runnable = new Runnable[1];
+        
+        button.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    // Single click
+                    if (portionCount > 1) {
+                        HapticFeedback.lightClick(v);
+                        portionCount--;
+                        updatePortionDisplay();
+                    }
+                    
+                    // Start continuous decrement after delay
+                    runnable[0] = new Runnable() {
+                        @Override
+                        public void run() {
+                            if (portionCount > 1) {
+                                HapticFeedback.lightClick(v);
+                                portionCount--;
+                                updatePortionDisplay();
+                                handler.postDelayed(this, 150); // Repeat every 150ms
+                            } else {
+                                handler.removeCallbacks(this);
+                            }
+                        }
+                    };
+                    handler.postDelayed(runnable[0], 500); // Start after 500ms hold
+                    return true;
+                    
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    // Stop continuous decrement
+                    if (runnable[0] != null) {
+                        handler.removeCallbacks(runnable[0]);
+                    }
+                    v.performClick();
+                    return true;
+            }
+            return false;
+        });
+    }
+
+    private void setupLongPressIncrease(ImageButton button) {
+        final Runnable[] runnable = new Runnable[1];
+        
+        button.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    // Single click
+                    if (portionCount < 10) {
+                        HapticFeedback.lightClick(v);
+                        portionCount++;
+                        updatePortionDisplay();
+                    }
+                    
+                    // Start continuous increment after delay
+                    runnable[0] = new Runnable() {
+                        @Override
+                        public void run() {
+                            if (portionCount < 10) { // Max 10 portions
+                                HapticFeedback.lightClick(v);
+                                portionCount++;
+                                updatePortionDisplay();
+                                handler.postDelayed(this, 150); // Repeat every 150ms
+                            } else {
+                                handler.removeCallbacks(this);
+                            }
+                        }
+                    };
+                    handler.postDelayed(runnable[0], 500); // Start after 500ms hold
+                    return true;
+                    
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    // Stop continuous increment
+                    if (runnable[0] != null) {
+                        handler.removeCallbacks(runnable[0]);
+                    }
+                    v.performClick();
+                    return true;
+            }
+            return false;
+        });
+    }
+
     private void updatePortionDisplay() {
         textPortion.setText(String.valueOf(portionCount));
     }
@@ -131,6 +209,9 @@ public class RecipeDetailFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        
+        // Clean up handler callbacks
+        handler.removeCallbacksAndMessages(null);
         
         // Reset status bar to transparent when leaving this fragment
         if (getActivity() != null && getActivity().getWindow() != null) {
