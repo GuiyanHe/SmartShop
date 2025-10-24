@@ -1,0 +1,1084 @@
+{
+  "options": [
+    {
+      "optionId": "opt_milk_greenvalley_500ml",
+      "ingredientId": "ing_milk",
+      "displayName": "GreenValley Milk",
+      "brand": "GreenValley",
+      "size": "500ml",
+      "unitPrice": 2.86,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_milk_storebrand_1l",
+      "ingredientId": "ing_milk",
+      "displayName": "StoreBrand Milk",
+      "brand": "StoreBrand",
+      "size": "1L",
+      "unitPrice": 2.66,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_milk_naturebest_2l",
+      "ingredientId": "ing_milk",
+      "displayName": "NatureBest Milk",
+      "brand": "NatureBest",
+      "size": "2L",
+      "unitPrice": 3.26,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_milk_sunharvest_3l",
+      "ingredientId": "ing_milk",
+      "displayName": "SunHarvest Milk",
+      "brand": "SunHarvest",
+      "size": "3L",
+      "unitPrice": 3.01,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_eggs_greenvalley_6_eggs",
+      "ingredientId": "ing_eggs",
+      "displayName": "GreenValley Eggs",
+      "brand": "GreenValley",
+      "size": "6 eggs",
+      "unitPrice": 3.44,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_eggs_storebrand_12_eggs",
+      "ingredientId": "ing_eggs",
+      "displayName": "StoreBrand Eggs",
+      "brand": "StoreBrand",
+      "size": "12 eggs",
+      "unitPrice": 3.2,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_eggs_naturebest_18_eggs",
+      "ingredientId": "ing_eggs",
+      "displayName": "NatureBest Eggs",
+      "brand": "NatureBest",
+      "size": "18 eggs",
+      "unitPrice": 3.92,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_eggs_sunharvest_18_eggs",
+      "ingredientId": "ing_eggs",
+      "displayName": "SunHarvest Eggs",
+      "brand": "SunHarvest",
+      "size": "18 eggs",
+      "unitPrice": 3.62,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_bread_greenvalley_small_loaf",
+      "ingredientId": "ing_bread",
+      "displayName": "GreenValley Bread",
+      "brand": "GreenValley",
+      "size": "small loaf",
+      "unitPrice": 3.21,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_bread_storebrand_regular_loaf",
+      "ingredientId": "ing_bread",
+      "displayName": "StoreBrand Bread",
+      "brand": "StoreBrand",
+      "size": "regular loaf",
+      "unitPrice": 2.99,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_bread_naturebest_family_loaf",
+      "ingredientId": "ing_bread",
+      "displayName": "NatureBest Bread",
+      "brand": "NatureBest",
+      "size": "family loaf",
+      "unitPrice": 3.66,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_bread_sunharvest_family_loaf",
+      "ingredientId": "ing_bread",
+      "displayName": "SunHarvest Bread",
+      "brand": "SunHarvest",
+      "size": "family loaf",
+      "unitPrice": 3.38,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_butter_greenvalley_200g",
+      "ingredientId": "ing_butter",
+      "displayName": "GreenValley Butter",
+      "brand": "GreenValley",
+      "size": "200g",
+      "unitPrice": 4.01,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_butter_storebrand_400g",
+      "ingredientId": "ing_butter",
+      "displayName": "StoreBrand Butter",
+      "brand": "StoreBrand",
+      "size": "400g",
+      "unitPrice": 3.73,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_butter_naturebest_800g",
+      "ingredientId": "ing_butter",
+      "displayName": "NatureBest Butter",
+      "brand": "NatureBest",
+      "size": "800g",
+      "unitPrice": 4.58,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_butter_sunharvest_800g",
+      "ingredientId": "ing_butter",
+      "displayName": "SunHarvest Butter",
+      "brand": "SunHarvest",
+      "size": "800g",
+      "unitPrice": 4.22,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_yogurt_greenvalley_150g_cup",
+      "ingredientId": "ing_yogurt",
+      "displayName": "GreenValley Yogurt",
+      "brand": "GreenValley",
+      "size": "150g cup",
+      "unitPrice": 1.38,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_yogurt_storebrand_500g_tub",
+      "ingredientId": "ing_yogurt",
+      "displayName": "StoreBrand Yogurt",
+      "brand": "StoreBrand",
+      "size": "500g tub",
+      "unitPrice": 1.28,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_yogurt_naturebest_500g_tub",
+      "ingredientId": "ing_yogurt",
+      "displayName": "NatureBest Yogurt",
+      "brand": "NatureBest",
+      "size": "500g tub",
+      "unitPrice": 1.57,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_yogurt_sunharvest_500g_tub",
+      "ingredientId": "ing_yogurt",
+      "displayName": "SunHarvest Yogurt",
+      "brand": "SunHarvest",
+      "size": "500g tub",
+      "unitPrice": 1.45,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_cheddar_greenvalley_200g",
+      "ingredientId": "ing_cheddar",
+      "displayName": "GreenValley Cheddar Cheese",
+      "brand": "GreenValley",
+      "size": "200g",
+      "unitPrice": 5.17,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_cheddar_storebrand_400g",
+      "ingredientId": "ing_cheddar",
+      "displayName": "StoreBrand Cheddar Cheese",
+      "brand": "StoreBrand",
+      "size": "400g",
+      "unitPrice": 4.82,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_cheddar_naturebest_800g",
+      "ingredientId": "ing_cheddar",
+      "displayName": "NatureBest Cheddar Cheese",
+      "brand": "NatureBest",
+      "size": "800g",
+      "unitPrice": 5.9,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_cheddar_sunharvest_800g",
+      "ingredientId": "ing_cheddar",
+      "displayName": "SunHarvest Cheddar Cheese",
+      "brand": "SunHarvest",
+      "size": "800g",
+      "unitPrice": 5.45,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_lettuce_greenvalley_1_head",
+      "ingredientId": "ing_lettuce",
+      "displayName": "GreenValley Lettuce",
+      "brand": "GreenValley",
+      "size": "1 head",
+      "unitPrice": 1.71,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_lettuce_storebrand_1_head",
+      "ingredientId": "ing_lettuce",
+      "displayName": "StoreBrand Lettuce",
+      "brand": "StoreBrand",
+      "size": "1 head",
+      "unitPrice": 1.59,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_lettuce_naturebest_1_head",
+      "ingredientId": "ing_lettuce",
+      "displayName": "NatureBest Lettuce",
+      "brand": "NatureBest",
+      "size": "1 head",
+      "unitPrice": 1.95,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_lettuce_sunharvest_1_head",
+      "ingredientId": "ing_lettuce",
+      "displayName": "SunHarvest Lettuce",
+      "brand": "SunHarvest",
+      "size": "1 head",
+      "unitPrice": 1.8,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_spinach_greenvalley_200g_bag",
+      "ingredientId": "ing_spinach",
+      "displayName": "GreenValley Spinach",
+      "brand": "GreenValley",
+      "size": "200g bag",
+      "unitPrice": 2.88,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_spinach_storebrand_500g_bag",
+      "ingredientId": "ing_spinach",
+      "displayName": "StoreBrand Spinach",
+      "brand": "StoreBrand",
+      "size": "500g bag",
+      "unitPrice": 2.68,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_spinach_naturebest_500g_bag",
+      "ingredientId": "ing_spinach",
+      "displayName": "NatureBest Spinach",
+      "brand": "NatureBest",
+      "size": "500g bag",
+      "unitPrice": 3.28,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_spinach_sunharvest_500g_bag",
+      "ingredientId": "ing_spinach",
+      "displayName": "SunHarvest Spinach",
+      "brand": "SunHarvest",
+      "size": "500g bag",
+      "unitPrice": 3.02,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_tomato_greenvalley_each",
+      "ingredientId": "ing_tomato",
+      "displayName": "GreenValley Tomatoes",
+      "brand": "GreenValley",
+      "size": "each",
+      "unitPrice": 0.8,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_tomato_storebrand_pack_of_3",
+      "ingredientId": "ing_tomato",
+      "displayName": "StoreBrand Tomatoes",
+      "brand": "StoreBrand",
+      "size": "pack of 3",
+      "unitPrice": 0.75,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_tomato_naturebest_pack_of_6",
+      "ingredientId": "ing_tomato",
+      "displayName": "NatureBest Tomatoes",
+      "brand": "NatureBest",
+      "size": "pack of 6",
+      "unitPrice": 0.92,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_tomato_sunharvest_pack_of_6",
+      "ingredientId": "ing_tomato",
+      "displayName": "SunHarvest Tomatoes",
+      "brand": "SunHarvest",
+      "size": "pack of 6",
+      "unitPrice": 0.85,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_cucumber_greenvalley_each",
+      "ingredientId": "ing_cucumber",
+      "displayName": "GreenValley Cucumbers",
+      "brand": "GreenValley",
+      "size": "each",
+      "unitPrice": 1.03,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_cucumber_storebrand_pack_of_3",
+      "ingredientId": "ing_cucumber",
+      "displayName": "StoreBrand Cucumbers",
+      "brand": "StoreBrand",
+      "size": "pack of 3",
+      "unitPrice": 0.96,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_cucumber_naturebest_pack_of_6",
+      "ingredientId": "ing_cucumber",
+      "displayName": "NatureBest Cucumbers",
+      "brand": "NatureBest",
+      "size": "pack of 6",
+      "unitPrice": 1.18,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_cucumber_sunharvest_pack_of_6",
+      "ingredientId": "ing_cucumber",
+      "displayName": "SunHarvest Cucumbers",
+      "brand": "SunHarvest",
+      "size": "pack of 6",
+      "unitPrice": 1.09,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_carrot_greenvalley_200g_bag",
+      "ingredientId": "ing_carrot",
+      "displayName": "GreenValley Carrots",
+      "brand": "GreenValley",
+      "size": "200g bag",
+      "unitPrice": 2.07,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_carrot_storebrand_500g_bag",
+      "ingredientId": "ing_carrot",
+      "displayName": "StoreBrand Carrots",
+      "brand": "StoreBrand",
+      "size": "500g bag",
+      "unitPrice": 1.93,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_carrot_naturebest_500g_bag",
+      "ingredientId": "ing_carrot",
+      "displayName": "NatureBest Carrots",
+      "brand": "NatureBest",
+      "size": "500g bag",
+      "unitPrice": 2.36,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_carrot_sunharvest_500g_bag",
+      "ingredientId": "ing_carrot",
+      "displayName": "SunHarvest Carrots",
+      "brand": "SunHarvest",
+      "size": "500g bag",
+      "unitPrice": 2.18,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_potato_greenvalley_0_5kg",
+      "ingredientId": "ing_potato",
+      "displayName": "GreenValley Potatoes",
+      "brand": "GreenValley",
+      "size": "0.5kg",
+      "unitPrice": 2.53,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_potato_storebrand_1kg",
+      "ingredientId": "ing_potato",
+      "displayName": "StoreBrand Potatoes",
+      "brand": "StoreBrand",
+      "size": "1kg",
+      "unitPrice": 2.35,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_potato_naturebest_2kg",
+      "ingredientId": "ing_potato",
+      "displayName": "NatureBest Potatoes",
+      "brand": "NatureBest",
+      "size": "2kg",
+      "unitPrice": 2.88,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_potato_sunharvest_2kg",
+      "ingredientId": "ing_potato",
+      "displayName": "SunHarvest Potatoes",
+      "brand": "SunHarvest",
+      "size": "2kg",
+      "unitPrice": 2.66,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_onion_greenvalley_0_5kg",
+      "ingredientId": "ing_onion",
+      "displayName": "GreenValley Onions",
+      "brand": "GreenValley",
+      "size": "0.5kg",
+      "unitPrice": 1.84,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_onion_storebrand_1kg",
+      "ingredientId": "ing_onion",
+      "displayName": "StoreBrand Onions",
+      "brand": "StoreBrand",
+      "size": "1kg",
+      "unitPrice": 1.71,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_onion_naturebest_2kg",
+      "ingredientId": "ing_onion",
+      "displayName": "NatureBest Onions",
+      "brand": "NatureBest",
+      "size": "2kg",
+      "unitPrice": 2.1,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_onion_sunharvest_2kg",
+      "ingredientId": "ing_onion",
+      "displayName": "SunHarvest Onions",
+      "brand": "SunHarvest",
+      "size": "2kg",
+      "unitPrice": 1.94,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_garlic_greenvalley_1_bulb",
+      "ingredientId": "ing_garlic",
+      "displayName": "GreenValley Garlic",
+      "brand": "GreenValley",
+      "size": "1 bulb",
+      "unitPrice": 0.92,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_garlic_storebrand_3_bulbs",
+      "ingredientId": "ing_garlic",
+      "displayName": "StoreBrand Garlic",
+      "brand": "StoreBrand",
+      "size": "3 bulbs",
+      "unitPrice": 0.86,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_garlic_naturebest_3_bulbs",
+      "ingredientId": "ing_garlic",
+      "displayName": "NatureBest Garlic",
+      "brand": "NatureBest",
+      "size": "3 bulbs",
+      "unitPrice": 1.05,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_garlic_sunharvest_3_bulbs",
+      "ingredientId": "ing_garlic",
+      "displayName": "SunHarvest Garlic",
+      "brand": "SunHarvest",
+      "size": "3 bulbs",
+      "unitPrice": 0.97,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_chicken_greenvalley_0_5kg",
+      "ingredientId": "ing_chicken",
+      "displayName": "GreenValley Chicken Breast",
+      "brand": "GreenValley",
+      "size": "0.5kg",
+      "unitPrice": 9.2,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_chicken_storebrand_1kg",
+      "ingredientId": "ing_chicken",
+      "displayName": "StoreBrand Chicken Breast",
+      "brand": "StoreBrand",
+      "size": "1kg",
+      "unitPrice": 8.56,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_chicken_naturebest_2kg",
+      "ingredientId": "ing_chicken",
+      "displayName": "NatureBest Chicken Breast",
+      "brand": "NatureBest",
+      "size": "2kg",
+      "unitPrice": 10.49,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_chicken_sunharvest_2kg",
+      "ingredientId": "ing_chicken",
+      "displayName": "SunHarvest Chicken Breast",
+      "brand": "SunHarvest",
+      "size": "2kg",
+      "unitPrice": 9.68,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_beef_greenvalley_0_5kg",
+      "ingredientId": "ing_beef",
+      "displayName": "GreenValley Ground Beef",
+      "brand": "GreenValley",
+      "size": "0.5kg",
+      "unitPrice": 10.92,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_beef_storebrand_1kg",
+      "ingredientId": "ing_beef",
+      "displayName": "StoreBrand Ground Beef",
+      "brand": "StoreBrand",
+      "size": "1kg",
+      "unitPrice": 10.17,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_beef_naturebest_2kg",
+      "ingredientId": "ing_beef",
+      "displayName": "NatureBest Ground Beef",
+      "brand": "NatureBest",
+      "size": "2kg",
+      "unitPrice": 12.45,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_beef_sunharvest_2kg",
+      "ingredientId": "ing_beef",
+      "displayName": "SunHarvest Ground Beef",
+      "brand": "SunHarvest",
+      "size": "2kg",
+      "unitPrice": 11.49,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_salmon_greenvalley_0_5kg",
+      "ingredientId": "ing_salmon",
+      "displayName": "GreenValley Salmon Fillet",
+      "brand": "GreenValley",
+      "size": "0.5kg",
+      "unitPrice": 13.8,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_salmon_storebrand_1kg",
+      "ingredientId": "ing_salmon",
+      "displayName": "StoreBrand Salmon Fillet",
+      "brand": "StoreBrand",
+      "size": "1kg",
+      "unitPrice": 12.84,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_salmon_naturebest_2kg",
+      "ingredientId": "ing_salmon",
+      "displayName": "NatureBest Salmon Fillet",
+      "brand": "NatureBest",
+      "size": "2kg",
+      "unitPrice": 15.73,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_salmon_sunharvest_2kg",
+      "ingredientId": "ing_salmon",
+      "displayName": "SunHarvest Salmon Fillet",
+      "brand": "SunHarvest",
+      "size": "2kg",
+      "unitPrice": 14.52,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_rice_greenvalley_0_5kg",
+      "ingredientId": "ing_rice",
+      "displayName": "GreenValley Rice",
+      "brand": "GreenValley",
+      "size": "0.5kg",
+      "unitPrice": 3.45,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_rice_storebrand_1kg",
+      "ingredientId": "ing_rice",
+      "displayName": "StoreBrand Rice",
+      "brand": "StoreBrand",
+      "size": "1kg",
+      "unitPrice": 3.21,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_rice_naturebest_2kg",
+      "ingredientId": "ing_rice",
+      "displayName": "NatureBest Rice",
+      "brand": "NatureBest",
+      "size": "2kg",
+      "unitPrice": 3.93,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_rice_sunharvest_2kg",
+      "ingredientId": "ing_rice",
+      "displayName": "SunHarvest Rice",
+      "brand": "SunHarvest",
+      "size": "2kg",
+      "unitPrice": 3.63,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_pasta_greenvalley_200g",
+      "ingredientId": "ing_pasta",
+      "displayName": "GreenValley Pasta",
+      "brand": "GreenValley",
+      "size": "200g",
+      "unitPrice": 2.3,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_pasta_storebrand_400g",
+      "ingredientId": "ing_pasta",
+      "displayName": "StoreBrand Pasta",
+      "brand": "StoreBrand",
+      "size": "400g",
+      "unitPrice": 2.14,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_pasta_naturebest_800g",
+      "ingredientId": "ing_pasta",
+      "displayName": "NatureBest Pasta",
+      "brand": "NatureBest",
+      "size": "800g",
+      "unitPrice": 2.62,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_pasta_sunharvest_800g",
+      "ingredientId": "ing_pasta",
+      "displayName": "SunHarvest Pasta",
+      "brand": "SunHarvest",
+      "size": "800g",
+      "unitPrice": 2.42,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_olive_oil_greenvalley_500ml",
+      "ingredientId": "ing_olive_oil",
+      "displayName": "GreenValley Olive Oil",
+      "brand": "GreenValley",
+      "size": "500ml",
+      "unitPrice": 8.05,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_olive_oil_storebrand_1l",
+      "ingredientId": "ing_olive_oil",
+      "displayName": "StoreBrand Olive Oil",
+      "brand": "StoreBrand",
+      "size": "1L",
+      "unitPrice": 7.49,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_olive_oil_naturebest_2l",
+      "ingredientId": "ing_olive_oil",
+      "displayName": "NatureBest Olive Oil",
+      "brand": "NatureBest",
+      "size": "2L",
+      "unitPrice": 9.18,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_olive_oil_sunharvest_3l",
+      "ingredientId": "ing_olive_oil",
+      "displayName": "SunHarvest Olive Oil",
+      "brand": "SunHarvest",
+      "size": "3L",
+      "unitPrice": 8.47,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_flour_greenvalley_0_5kg",
+      "ingredientId": "ing_flour",
+      "displayName": "GreenValley Flour",
+      "brand": "GreenValley",
+      "size": "0.5kg",
+      "unitPrice": 2.88,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_flour_storebrand_1kg",
+      "ingredientId": "ing_flour",
+      "displayName": "StoreBrand Flour",
+      "brand": "StoreBrand",
+      "size": "1kg",
+      "unitPrice": 2.68,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_flour_naturebest_2kg",
+      "ingredientId": "ing_flour",
+      "displayName": "NatureBest Flour",
+      "brand": "NatureBest",
+      "size": "2kg",
+      "unitPrice": 3.28,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_flour_sunharvest_2kg",
+      "ingredientId": "ing_flour",
+      "displayName": "SunHarvest Flour",
+      "brand": "SunHarvest",
+      "size": "2kg",
+      "unitPrice": 3.02,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_sugar_greenvalley_0_5kg",
+      "ingredientId": "ing_sugar",
+      "displayName": "GreenValley Sugar",
+      "brand": "GreenValley",
+      "size": "0.5kg",
+      "unitPrice": 2.3,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_sugar_storebrand_1kg",
+      "ingredientId": "ing_sugar",
+      "displayName": "StoreBrand Sugar",
+      "brand": "StoreBrand",
+      "size": "1kg",
+      "unitPrice": 2.14,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_sugar_naturebest_2kg",
+      "ingredientId": "ing_sugar",
+      "displayName": "NatureBest Sugar",
+      "brand": "NatureBest",
+      "size": "2kg",
+      "unitPrice": 2.62,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_sugar_sunharvest_2kg",
+      "ingredientId": "ing_sugar",
+      "displayName": "SunHarvest Sugar",
+      "brand": "SunHarvest",
+      "size": "2kg",
+      "unitPrice": 2.42,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_salt_greenvalley_200g",
+      "ingredientId": "ing_salt",
+      "displayName": "GreenValley Salt",
+      "brand": "GreenValley",
+      "size": "200g",
+      "unitPrice": 1.38,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_salt_storebrand_400g",
+      "ingredientId": "ing_salt",
+      "displayName": "StoreBrand Salt",
+      "brand": "StoreBrand",
+      "size": "400g",
+      "unitPrice": 1.28,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_salt_naturebest_800g",
+      "ingredientId": "ing_salt",
+      "displayName": "NatureBest Salt",
+      "brand": "NatureBest",
+      "size": "800g",
+      "unitPrice": 1.57,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_salt_sunharvest_800g",
+      "ingredientId": "ing_salt",
+      "displayName": "SunHarvest Salt",
+      "brand": "SunHarvest",
+      "size": "800g",
+      "unitPrice": 1.45,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_pepper_greenvalley_200g",
+      "ingredientId": "ing_pepper",
+      "displayName": "GreenValley Black Pepper",
+      "brand": "GreenValley",
+      "size": "200g",
+      "unitPrice": 4.02,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_pepper_storebrand_400g",
+      "ingredientId": "ing_pepper",
+      "displayName": "StoreBrand Black Pepper",
+      "brand": "StoreBrand",
+      "size": "400g",
+      "unitPrice": 3.75,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_pepper_naturebest_800g",
+      "ingredientId": "ing_pepper",
+      "displayName": "NatureBest Black Pepper",
+      "brand": "NatureBest",
+      "size": "800g",
+      "unitPrice": 4.59,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_pepper_sunharvest_800g",
+      "ingredientId": "ing_pepper",
+      "displayName": "SunHarvest Black Pepper",
+      "brand": "SunHarvest",
+      "size": "800g",
+      "unitPrice": 4.23,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_coffee_greenvalley_200g",
+      "ingredientId": "ing_coffee",
+      "displayName": "GreenValley Coffee Beans",
+      "brand": "GreenValley",
+      "size": "200g",
+      "unitPrice": 9.2,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_coffee_storebrand_400g",
+      "ingredientId": "ing_coffee",
+      "displayName": "StoreBrand Coffee Beans",
+      "brand": "StoreBrand",
+      "size": "400g",
+      "unitPrice": 8.56,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_coffee_naturebest_800g",
+      "ingredientId": "ing_coffee",
+      "displayName": "NatureBest Coffee Beans",
+      "brand": "NatureBest",
+      "size": "800g",
+      "unitPrice": 10.49,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_coffee_sunharvest_800g",
+      "ingredientId": "ing_coffee",
+      "displayName": "SunHarvest Coffee Beans",
+      "brand": "SunHarvest",
+      "size": "800g",
+      "unitPrice": 9.68,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_tea_greenvalley_10_ct",
+      "ingredientId": "ing_tea",
+      "displayName": "GreenValley Tea",
+      "brand": "GreenValley",
+      "size": "10 ct",
+      "unitPrice": 4.6,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_tea_storebrand_20_ct",
+      "ingredientId": "ing_tea",
+      "displayName": "StoreBrand Tea",
+      "brand": "StoreBrand",
+      "size": "20 ct",
+      "unitPrice": 4.28,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_tea_naturebest_40_ct",
+      "ingredientId": "ing_tea",
+      "displayName": "NatureBest Tea",
+      "brand": "NatureBest",
+      "size": "40 ct",
+      "unitPrice": 5.24,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_tea_sunharvest_40_ct",
+      "ingredientId": "ing_tea",
+      "displayName": "SunHarvest Tea",
+      "brand": "SunHarvest",
+      "size": "40 ct",
+      "unitPrice": 4.84,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_cereal_greenvalley_10_ct",
+      "ingredientId": "ing_cereal",
+      "displayName": "GreenValley Cereal",
+      "brand": "GreenValley",
+      "size": "10 ct",
+      "unitPrice": 4.37,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_cereal_storebrand_20_ct",
+      "ingredientId": "ing_cereal",
+      "displayName": "StoreBrand Cereal",
+      "brand": "StoreBrand",
+      "size": "20 ct",
+      "unitPrice": 4.07,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_cereal_naturebest_40_ct",
+      "ingredientId": "ing_cereal",
+      "displayName": "NatureBest Cereal",
+      "brand": "NatureBest",
+      "size": "40 ct",
+      "unitPrice": 4.98,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_cereal_sunharvest_40_ct",
+      "ingredientId": "ing_cereal",
+      "displayName": "SunHarvest Cereal",
+      "brand": "SunHarvest",
+      "size": "40 ct",
+      "unitPrice": 4.6,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_oatmeal_greenvalley_200g",
+      "ingredientId": "ing_oatmeal",
+      "displayName": "GreenValley Oatmeal",
+      "brand": "GreenValley",
+      "size": "200g",
+      "unitPrice": 3.45,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_oatmeal_storebrand_400g",
+      "ingredientId": "ing_oatmeal",
+      "displayName": "StoreBrand Oatmeal",
+      "brand": "StoreBrand",
+      "size": "400g",
+      "unitPrice": 3.21,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_oatmeal_naturebest_800g",
+      "ingredientId": "ing_oatmeal",
+      "displayName": "NatureBest Oatmeal",
+      "brand": "NatureBest",
+      "size": "800g",
+      "unitPrice": 3.93,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_oatmeal_sunharvest_800g",
+      "ingredientId": "ing_oatmeal",
+      "displayName": "SunHarvest Oatmeal",
+      "brand": "SunHarvest",
+      "size": "800g",
+      "unitPrice": 3.63,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_banana_greenvalley_each",
+      "ingredientId": "ing_banana",
+      "displayName": "GreenValley Bananas",
+      "brand": "GreenValley",
+      "size": "each",
+      "unitPrice": 0.34,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_banana_storebrand_pack_of_3",
+      "ingredientId": "ing_banana",
+      "displayName": "StoreBrand Bananas",
+      "brand": "StoreBrand",
+      "size": "pack of 3",
+      "unitPrice": 0.32,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_banana_naturebest_pack_of_6",
+      "ingredientId": "ing_banana",
+      "displayName": "NatureBest Bananas",
+      "brand": "NatureBest",
+      "size": "pack of 6",
+      "unitPrice": 0.39,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_banana_sunharvest_pack_of_6",
+      "ingredientId": "ing_banana",
+      "displayName": "SunHarvest Bananas",
+      "brand": "SunHarvest",
+      "size": "pack of 6",
+      "unitPrice": 0.36,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_apple_greenvalley_each",
+      "ingredientId": "ing_apple",
+      "displayName": "GreenValley Apples",
+      "brand": "GreenValley",
+      "size": "each",
+      "unitPrice": 0.69,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_apple_storebrand_pack_of_3",
+      "ingredientId": "ing_apple",
+      "displayName": "StoreBrand Apples",
+      "brand": "StoreBrand",
+      "size": "pack of 3",
+      "unitPrice": 0.64,
+      "isOrganic": false
+    },
+    {
+      "optionId": "opt_apple_naturebest_pack_of_6",
+      "ingredientId": "ing_apple",
+      "displayName": "NatureBest Apples",
+      "brand": "NatureBest",
+      "size": "pack of 6",
+      "unitPrice": 0.79,
+      "isOrganic": true
+    },
+    {
+      "optionId": "opt_apple_sunharvest_pack_of_6",
+      "ingredientId": "ing_apple",
+      "displayName": "SunHarvest Apples",
+      "brand": "SunHarvest",
+      "size": "pack of 6",
+      "unitPrice": 0.73,
+      "isOrganic": false
+    }
+  ]
+}

@@ -1,0 +1,274 @@
+{
+  "items": [
+    {
+      "ingredientId": "ing_milk",
+      "name": "Milk",
+      "unit": "L",
+      "aisle": "Dairy Aisle 3",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_milk_greenvalley_500ml",
+      "imageUrl": "asset:milk.webp"
+    },
+    {
+      "ingredientId": "ing_eggs",
+      "name": "Eggs",
+      "unit": "dozen",
+      "aisle": "Dairy Aisle 2",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_eggs_greenvalley_6_eggs",
+      "imageUrl": "asset:eggs.webp"
+    },
+    {
+      "ingredientId": "ing_bread",
+      "name": "Bread",
+      "unit": "loaf",
+      "aisle": "Bakery Aisle 1",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_bread_greenvalley_small_loaf",
+      "imageUrl": "asset:bread.jpeg"
+    },
+    {
+      "ingredientId": "ing_butter",
+      "name": "Butter",
+      "unit": "g",
+      "aisle": "Dairy Aisle 3",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_butter_greenvalley_200g",
+      "imageUrl": "asset:butter.webp"
+    },
+    {
+      "ingredientId": "ing_yogurt",
+      "name": "Yogurt",
+      "unit": "cup",
+      "aisle": "Dairy Aisle 4",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_yogurt_greenvalley_150g_cup",
+      "imageUrl": "asset:yogurt.webp"
+    },
+    {
+      "ingredientId": "ing_cheddar",
+      "name": "Cheddar Cheese",
+      "unit": "g",
+      "aisle": "Dairy Aisle 5",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_cheddar_greenvalley_200g",
+      "imageUrl": "asset:cheddar.webp"
+    },
+    {
+      "ingredientId": "ing_lettuce",
+      "name": "Lettuce",
+      "unit": "head",
+      "aisle": "Produce Aisle 1",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_lettuce_greenvalley_1_head",
+      "imageUrl": "asset:lettuce.webp"
+    },
+    {
+      "ingredientId": "ing_spinach",
+      "name": "Spinach",
+      "unit": "bag",
+      "aisle": "Produce Aisle 1",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_spinach_greenvalley_200g_bag",
+      "imageUrl": "asset:spinach.webp"
+    },
+    {
+      "ingredientId": "ing_tomato",
+      "name": "Tomatoes",
+      "unit": "each",
+      "aisle": "Produce Aisle 2",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_tomato_greenvalley_each",
+      "imageUrl": "asset:tomato.webp"
+    },
+    {
+      "ingredientId": "ing_cucumber",
+      "name": "Cucumbers",
+      "unit": "each",
+      "aisle": "Produce Aisle 2",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_cucumber_greenvalley_each",
+      "imageUrl": "asset:cucumber.webp"
+    },
+    {
+      "ingredientId": "ing_carrot",
+      "name": "Carrots",
+      "unit": "bag",
+      "aisle": "Produce Aisle 2",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_carrot_greenvalley_200g_bag",
+      "imageUrl": "asset:carrot.webp"
+    },
+    {
+      "ingredientId": "ing_potato",
+      "name": "Potatoes",
+      "unit": "kg",
+      "aisle": "Produce Aisle 3",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_potato_greenvalley_0_5kg",
+      "imageUrl": "asset:potato.webp"
+    },
+    {
+      "ingredientId": "ing_onion",
+      "name": "Onions",
+      "unit": "kg",
+      "aisle": "Produce Aisle 3",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_onion_greenvalley_0_5kg",
+      "imageUrl": "asset:onion.webp"
+    },
+    {
+      "ingredientId": "ing_garlic",
+      "name": "Garlic",
+      "unit": "bulb",
+      "aisle": "Produce Aisle 3",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_garlic_greenvalley_1_bulb",
+      "imageUrl": "asset:garlic.webp"
+    },
+    {
+      "ingredientId": "ing_chicken",
+      "name": "Chicken Breast",
+      "unit": "kg",
+      "aisle": "Meat Aisle 1",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_chicken_greenvalley_0_5kg",
+      "imageUrl": "asset:chicken.webp"
+    },
+    {
+      "ingredientId": "ing_beef",
+      "name": "Ground Beef",
+      "unit": "kg",
+      "aisle": "Meat Aisle 1",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_beef_greenvalley_0_5kg",
+      "imageUrl": "asset:beef.webp"
+    },
+    {
+      "ingredientId": "ing_salmon",
+      "name": "Salmon Fillet",
+      "unit": "kg",
+      "aisle": "Seafood Aisle",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_salmon_greenvalley_0_5kg",
+      "imageUrl": "asset:salmon.webp"
+    },
+    {
+      "ingredientId": "ing_rice",
+      "name": "Rice",
+      "unit": "kg",
+      "aisle": "Grains Aisle",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_rice_greenvalley_0_5kg",
+      "imageUrl": "asset:rice.webp"
+    },
+    {
+      "ingredientId": "ing_pasta",
+      "name": "Pasta",
+      "unit": "g",
+      "aisle": "Grains Aisle",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_pasta_greenvalley_200g",
+      "imageUrl": "asset:pasta.webp"
+    },
+    {
+      "ingredientId": "ing_olive_oil",
+      "name": "Olive Oil",
+      "unit": "L",
+      "aisle": "Condiments Aisle",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_olive_oil_greenvalley_500ml",
+      "imageUrl": "asset:olive_oil.webp"
+    },
+    {
+      "ingredientId": "ing_flour",
+      "name": "Flour",
+      "unit": "kg",
+      "aisle": "Baking Aisle",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_flour_greenvalley_0_5kg",
+      "imageUrl": "asset:flour.webp"
+    },
+    {
+      "ingredientId": "ing_sugar",
+      "name": "Sugar",
+      "unit": "kg",
+      "aisle": "Baking Aisle",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_sugar_greenvalley_0_5kg",
+      "imageUrl": "asset:sugar.webp"
+    },
+    {
+      "ingredientId": "ing_salt",
+      "name": "Salt",
+      "unit": "g",
+      "aisle": "Spices Aisle",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_salt_greenvalley_200g",
+      "imageUrl": "asset:salt.webp"
+    },
+    {
+      "ingredientId": "ing_pepper",
+      "name": "Black Pepper",
+      "unit": "g",
+      "aisle": "Spices Aisle",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_pepper_greenvalley_200g",
+      "imageUrl": "asset:pepper.webp"
+    },
+    {
+      "ingredientId": "ing_coffee",
+      "name": "Coffee Beans",
+      "unit": "g",
+      "aisle": "Beverages Aisle",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_coffee_greenvalley_200g",
+      "imageUrl": "asset:coffee.webp"
+    },
+    {
+      "ingredientId": "ing_tea",
+      "name": "Tea",
+      "unit": "box",
+      "aisle": "Beverages Aisle",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_tea_greenvalley_10_ct",
+      "imageUrl": "asset:tea.webp"
+    },
+    {
+      "ingredientId": "ing_cereal",
+      "name": "Cereal",
+      "unit": "box",
+      "aisle": "Breakfast Aisle",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_cereal_greenvalley_10_ct",
+      "imageUrl": "asset:cereal.webp"
+    },
+    {
+      "ingredientId": "ing_oatmeal",
+      "name": "Oatmeal",
+      "unit": "g",
+      "aisle": "Breakfast Aisle",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_oatmeal_greenvalley_200g",
+      "imageUrl": "asset:oatmeal.webp"
+    },
+    {
+      "ingredientId": "ing_banana",
+      "name": "Bananas",
+      "unit": "each",
+      "aisle": "Produce Aisle 1",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_banana_greenvalley_each",
+      "imageUrl": "asset:banana.webp"
+    },
+    {
+      "ingredientId": "ing_apple",
+      "name": "Apples",
+      "unit": "each",
+      "aisle": "Produce Aisle 1",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_apple_greenvalley_each",
+      "imageUrl": "asset:apple.webp"
+    }
+  ]
+}

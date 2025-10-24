@@ -12,7 +12,10 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import org.json.JSONObject;
+
 import edu.tamu.csce634.smartshop.R;
+import edu.tamu.csce634.smartshop.data.PresetRepository;
 
 // BottomSheet 弹窗，用于选择替换的商品类型
 public class ProductOptionsBottomSheet extends BottomSheetDialogFragment {
@@ -33,29 +36,54 @@ public class ProductOptionsBottomSheet extends BottomSheetDialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        // 复用原 layout 作为容器（顶层是 LinearLayout）
         View root = inflater.inflate(R.layout.sheet_product_options, container, false);
+        android.widget.LinearLayout containerView = (android.widget.LinearLayout) root;
 
-        Button btnOrganic = root.findViewById(R.id.optionOrganic);
-        Button btnRegular = root.findViewById(R.id.optionRegular);
-
-        // 获取传入的 ingredientId
         String ingredientId = getArguments() != null ? getArguments().getString(ARG_ING_ID) : "";
-
-        // 通过 Activity 获取共享的 ViewModel
         ListViewModel vm = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
+        PresetRepository repo = new PresetRepository(requireContext());
 
-        // 有机商品选项
-        btnOrganic.setOnClickListener(v -> {
-            vm.replaceSku(ingredientId, "Organic Option", 3.99);
-            dismiss();
-        });
+        try {
+            java.util.List<JSONObject> options = repo.getOptionsFor(ingredientId);
 
-        // 普通商品选项
-        btnRegular.setOnClickListener(v -> {
-            vm.replaceSku(ingredientId, "Regular Option", 2.49);
-            dismiss();
-        });
+            // 清空容器中原有的两个固定按钮
+            containerView.removeAllViews();
+
+            // 动态添加“品牌+规格+是否有机+价格”的选项按钮
+            for (JSONObject o : options) {
+                String display = o.optString("displayName");
+                String size    = o.optString("size");
+                boolean org    = o.optBoolean("isOrganic", false);
+                double price   = o.optDouble("unitPrice", 0.0);
+                String img     = o.optString("imageUrl", "");
+
+                String label = display + " • " + size + (org ? " • Organic" : "") + " • ¥" + String.format("%.2f", price);
+
+                android.widget.Button btn = new android.widget.Button(requireContext());
+                btn.setAllCaps(false);
+                btn.setText(label);
+                btn.setTextColor(0xFFFFFFFF);
+                btn.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFF4CAF50));
+
+                android.widget.LinearLayout.LayoutParams lp = new android.widget.LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                lp.topMargin = (int) (8 * getResources().getDisplayMetrics().density);
+                btn.setLayoutParams(lp);
+
+                btn.setOnClickListener(v -> {
+                    // ✅ 一次性更新 名称 / 价格 / 规格 / 图片
+                    vm.replaceSkuFull(ingredientId, display, price, size, img);
+                    dismiss();
+                });
+
+                containerView.addView(btn);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return root;
     }
+
 }

@@ -42,16 +42,30 @@ public class ListViewModel extends ViewModel {
 
     // 替换商品 SKU
     public void replaceSku(String ingredientId, String newSkuName, double newPrice) {
-        List<ShoppingItem> updatedList = new ArrayList<>(itemList);
-        for (ShoppingItem item : updatedList) {
-            if (item.ingredientId.equals(ingredientId)) {
-                item.selectedSkuName = newSkuName;
-                item.unitPrice = newPrice;
+        // 兼容旧签名：只改名+价，其他不动
+        replaceSkuFull(ingredientId, newSkuName, newPrice, null, null);
+    }
+
+    /** 新签名：一次性更新 名称 / 价格 / 规格 / 图片 */
+    public void replaceSkuFull(String ingredientId,
+                               String newSkuName,
+                               double newPrice,
+                               String newSkuSpec,
+                               String newImageUrl) {
+        List<ShoppingItem> updated = new ArrayList<>(itemList);
+        for (ShoppingItem it : updated) {
+            if (ingredientId.equals(it.ingredientId)) {
+                if (newSkuName != null) it.selectedSkuName = newSkuName;
+                it.unitPrice = newPrice;
+                if (newSkuSpec != null) it.skuSpec = newSkuSpec;
+                if (newImageUrl != null && !newImageUrl.isEmpty()) it.imageUrl = newImageUrl;
                 break;
             }
         }
-        updateItemList(updatedList);
+        updateItemList(updated);
     }
+
+
 
     // 计算总价
     private void recalculateTotal(List<ShoppingItem> updatedList) {
