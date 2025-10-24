@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+单个购物项卡片布局
+包括：图片占位、商品名、SKU、Options、数量气泡
+-->
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="#FFFFFF">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <!-- 左侧：图片占位方块 -->
+        <View
+            android:id="@+id/itemImage"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="#D8F3DC"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="12dp"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_alignWithParentIfMissing="true"
+            android:layout_marginLeft="12dp" />
+
+        <!-- 商品名 -->
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cauliflower (Organic)"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:layout_toEndOf="@id/itemImage"
+            android:layout_alignParentTop="true" />
+
+        <!-- SKU 描述 -->
+        <TextView
+            android:id="@+id/sub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SKU: Organic Cauliflower 500g"
+            android:textColor="#777777"
+            android:textSize="13sp"
+            android:layout_below="@id/title"
+            android:layout_toEndOf="@id/itemImage"
+            android:layout_marginTop="4dp" />
+
+        <!-- Options 链接 -->
+        <TextView
+            android:id="@+id/btnReplace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Options ›"
+            android:textColor="#4CAF50"
+            android:textSize="14sp"
+            android:layout_below="@id/sub"
+            android:layout_toEndOf="@id/itemImage"
+            android:layout_marginTop="8dp" />
+
+        <!-- 数量气泡 -->
+        <TextView
+            android:id="@+id/qtyBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Qty: 1"
+            android:background="@drawable/bg_qty_badge"
+            android:padding="6dp"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true" />
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>
