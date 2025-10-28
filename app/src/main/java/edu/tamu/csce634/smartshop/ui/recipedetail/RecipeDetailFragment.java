@@ -103,7 +103,7 @@ public class RecipeDetailFragment extends Fragment {
                 
                 // Add the recipe multiple times based on portion count
                 for (int i = 0; i < portionCount; i++) {
-                    CartManager.getInstance().addRecipe(recipe.getTitle());
+                    CartManager.getInstance(requireContext()).addRecipe(recipe.getTitle());
                 }
                 
                 String message = portionCount == 1 

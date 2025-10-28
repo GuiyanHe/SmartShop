@@ -32,9 +32,19 @@ import edu.tamu.csce634.smartshop.utils.HapticFeedback;
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
     private List<Recipe> recipes;
+    public interface OnCartChangedListener { void onCartChanged(); }
+    private OnCartChangedListener cartChangedListener;
 
     public RecipeAdapter(List<Recipe> recipes) {
         this.recipes = recipes;
+    }
+
+    public void setOnCartChangedListener(OnCartChangedListener listener) {
+        this.cartChangedListener = listener;
+    }
+
+    private void notifyCartChanged() {
+        if (cartChangedListener != null) cartChangedListener.onCartChanged();
     }
 
     @NonNull
@@ -68,8 +78,9 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         // Add button - add to cart
         holder.addButton.setOnClickListener(v -> {
             HapticFeedback.mediumClick(v);
-            CartManager.getInstance().addRecipe(recipe.getTitle());
+            CartManager.getInstance(v.getContext()).addRecipe(recipe.getTitle());
             updateButtonState(holder, recipe);
+            notifyCartChanged();
         });
 
         // Click on quantity to manually input
@@ -92,7 +103,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         
         final EditText input = new EditText(view.getContext());
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        input.setText(String.valueOf(CartManager.getInstance().getQuantity(recipe.getTitle())));
+        input.setText(String.valueOf(CartManager.getInstance(view.getContext()).getQuantity(recipe.getTitle())));
         input.setSelection(input.getText().length());
         builder.setView(input);
         
@@ -103,16 +114,17 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                     int newQuantity = Integer.parseInt(text);
                     if (newQuantity >= 0 && newQuantity <= 99) {
                         // Clear current quantity
-                        int currentQuantity = CartManager.getInstance().getQuantity(recipe.getTitle());
+                        int currentQuantity = CartManager.getInstance(view.getContext()).getQuantity(recipe.getTitle());
                         for (int i = 0; i < currentQuantity; i++) {
-                            CartManager.getInstance().removeRecipe(recipe.getTitle());
+                            CartManager.getInstance(view.getContext()).removeRecipe(recipe.getTitle());
                         }
                         // Set new quantity
                         for (int i = 0; i < newQuantity; i++) {
-                            CartManager.getInstance().addRecipe(recipe.getTitle());
+                            CartManager.getInstance(view.getContext()).addRecipe(recipe.getTitle());
                         }
                         HapticFeedback.mediumClick(view);
                         updateButtonState(holder, recipe);
+                        notifyCartChanged();
                     } else {
                         Toast.makeText(view.getContext(), "Please enter a number between 0 and 99", Toast.LENGTH_SHORT).show();
                     }
@@ -137,16 +149,18 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                 case MotionEvent.ACTION_DOWN:
                     // Single click
                     HapticFeedback.lightClick(v);
-                    CartManager.getInstance().addRecipe(recipe.getTitle());
+                    CartManager.getInstance(v.getContext()).addRecipe(recipe.getTitle());
                     updateButtonState(holder, recipe);
+                    notifyCartChanged();
                     
                     // Start continuous increment after delay
                     runnable[0] = new Runnable() {
                         @Override
                         public void run() {
                             HapticFeedback.lightClick(v);
-                            CartManager.getInstance().addRecipe(recipe.getTitle());
+                            CartManager.getInstance(v.getContext()).addRecipe(recipe.getTitle());
                             updateButtonState(holder, recipe);
+                            notifyCartChanged();
                             handler.postDelayed(this, 150);
                         }
                     };
@@ -174,17 +188,19 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                 case MotionEvent.ACTION_DOWN:
                     // Single click
                     HapticFeedback.lightClick(v);
-                    CartManager.getInstance().removeRecipe(recipe.getTitle());
+                    CartManager.getInstance(v.getContext()).removeRecipe(recipe.getTitle());
                     updateButtonState(holder, recipe);
+                    notifyCartChanged();
                     
                     // Start continuous decrement after delay
                     runnable[0] = new Runnable() {
                         @Override
                         public void run() {
-                            if (CartManager.getInstance().getQuantity(recipe.getTitle()) > 0) {
+                            if (CartManager.getInstance(v.getContext()).getQuantity(recipe.getTitle()) > 0) {
                                 HapticFeedback.lightClick(v);
-                                CartManager.getInstance().removeRecipe(recipe.getTitle());
+                                CartManager.getInstance(v.getContext()).removeRecipe(recipe.getTitle());
                                 updateButtonState(holder, recipe);
+                                notifyCartChanged();
                                 handler.postDelayed(this, 150);
                             } else {
                                 handler.removeCallbacks(this);
@@ -207,7 +223,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     }
 
     private void updateButtonState(RecipeViewHolder holder, Recipe recipe) {
-        int quantity = CartManager.getInstance().getQuantity(recipe.getTitle());
+        int quantity = CartManager.getInstance(holder.itemView.getContext()).getQuantity(recipe.getTitle());
         
         if (quantity > 0) {
             holder.addButton.setVisibility(View.GONE);
