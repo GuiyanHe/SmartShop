@@ -68,7 +68,7 @@ When reviewing a Pull Request, please check the following aspects. Use the "Requ
 These checks must pass before a PR can be merged.
 
 * **[ ] No Unauthorized Cross-Module Changes:**
-  * view the `Files changed` tab to ensure all modifications are strictly confined to the modules or files relevant to the task.
+  * Review the `Files changed` tab to ensure all modifications are strictly confined to the modules or files relevant to the task.
   * If the PR unintentionally modifies a module owned by another team member, you **must** `Request changes` and ask the author to remove the unrelated modifications. This prevents conflicts and regressions.
 
 * **[ ] No Potential Bugs:**
