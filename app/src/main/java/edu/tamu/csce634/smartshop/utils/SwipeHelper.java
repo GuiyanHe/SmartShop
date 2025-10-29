@@ -2,30 +2,26 @@ package edu.tamu.csce634.smartshop.utils;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import edu.tamu.csce634.smartshop.R;
 
-public abstract class SwipeHelper extends ItemTouchHelper.Callback {
+public abstract class SwipeHelper extends ItemTouchHelper.SimpleCallback {
     private Context context;
-    private Drawable deleteIcon;
     private int swipedPosition = -1;
-    private static final float DELETE_BUTTON_WIDTH = 250f;
+    private static final float DELETE_BUTTON_WIDTH_DP = 100f;
+    private float deleteButtonWidth;
+    private boolean isAnimating = false;
 
     public SwipeHelper(Context context) {
+        super(0, ItemTouchHelper.LEFT);
         this.context = context;
-        deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_delete);
-        if (deleteIcon != null) {
-            deleteIcon.setTint(ContextCompat.getColor(context, android.R.color.holo_red_dark));
-        }
+        // Convert dp to pixels
+        deleteButtonWidth = DELETE_BUTTON_WIDTH_DP * context.getResources().getDisplayMetrics().density;
     }
 
     @Override
@@ -44,7 +40,7 @@ public abstract class SwipeHelper extends ItemTouchHelper.Callback {
 
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-        // Not used
+        // Never called due to high threshold
     }
 
     @Override
@@ -54,113 +50,110 @@ public abstract class SwipeHelper extends ItemTouchHelper.Callback {
         
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
             View itemView = viewHolder.itemView;
-            int position = viewHolder.getAdapterPosition();
-
-            // Limit swipe distance
-            float translationX = Math.max(dX, -DELETE_BUTTON_WIDTH);
+            View foregroundView = itemView.findViewById(R.id.foreground_card);
             
-            // Draw delete icon
-            if (translationX < 0) {
-                drawDeleteIcon(c, itemView);
-            }
-            
-            // Apply translation
-            itemView.setTranslationX(translationX);
-
-            // When user releases finger
-            if (!isCurrentlyActive) {
-                if (Math.abs(translationX) > DELETE_BUTTON_WIDTH * 0.3f) {
-                    // Keep it open
-                    itemView.animate()
-                            .translationX(-DELETE_BUTTON_WIDTH)
-                            .setDuration(200)
-                            .withEndAction(() -> {
-                                swipedPosition = position;
-                                setupTouchListener(itemView, position);
-                            })
-                            .start();
-                } else {
-                    // Close it
-                    itemView.animate()
-                            .translationX(0)
-                            .setDuration(200)
-                            .start();
+            if (foregroundView != null) {
+                int position = viewHolder.getAdapterPosition();
+                
+                // If this position is already swiped open and we're not actively swiping, keep it open
+                if (position == swipedPosition && !isCurrentlyActive && !isAnimating) {
+                    foregroundView.setTranslationX(-deleteButtonWidth);
+                    return;
                 }
-            }
-        } else {
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-        }
-    }
-
-    @Override
-    public void onChildDrawOver(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
-                                RecyclerView.ViewHolder viewHolder, float dX, float dY,
-                                int actionState, boolean isCurrentlyActive) {
-        // Draw delete icon on top when item is swiped
-        if (viewHolder.getAdapterPosition() == swipedPosition && viewHolder.itemView.getTranslationX() != 0) {
-            drawDeleteIcon(c, viewHolder.itemView);
-        }
-    }
-
-    private void drawDeleteIcon(Canvas c, View itemView) {
-        if (deleteIcon != null) {
-            int itemHeight = itemView.getHeight();
-            int iconSize = 80;
-            int iconMargin = (itemHeight - iconSize) / 2;
-
-            int iconTop = itemView.getTop() + iconMargin;
-            int iconBottom = iconTop + iconSize;
-            int iconLeft = itemView.getRight() - iconMargin - iconSize;
-            int iconRight = itemView.getRight() - iconMargin;
-
-            deleteIcon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
-            deleteIcon.draw(c);
-        }
-    }
-
-    private void setupTouchListener(View itemView, int position) {
-        GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-                float x = e.getX();
-                float itemWidth = itemView.getWidth();
-
-                // Check if tap is in delete button area
-                if (x > itemWidth - DELETE_BUTTON_WIDTH) {
-                    onDeleteClick(position);
-                    return true;
-                } else {
-                    // Tap elsewhere - close
-                    closeSwipe(itemView, position);
-                    return true;
-                }
-            }
-        });
-
-        itemView.setOnTouchListener((v, event) -> {
-            gestureDetector.onTouchEvent(event);
-            return true;
-        });
-    }
-
-    private void closeSwipe(View itemView, int position) {
-        itemView.animate()
-                .translationX(0)
-                .setDuration(200)
-                .withEndAction(() -> {
-                    if (swipedPosition == position) {
-                        swipedPosition = -1;
+                
+                // Limit swipe distance to delete button width
+                float translationX = Math.max(dX, -deleteButtonWidth);
+                
+                // Apply translation to foreground card only
+                foregroundView.setTranslationX(translationX);
+                
+                // When user releases finger
+                if (!isCurrentlyActive && !isAnimating) {
+                    isAnimating = true;
+                    if (Math.abs(translationX) > deleteButtonWidth * 0.3f) {
+                        // Keep it open at delete button width
+                        foregroundView.animate()
+                                .translationX(-deleteButtonWidth)
+                                .setDuration(200)
+                                .withEndAction(() -> {
+                                    swipedPosition = position;
+                                    isAnimating = false;
+                                    setupDeleteListener(itemView, foregroundView, position);
+                                })
+                                .start();
+                    } else {
+                        // Close it
+                        foregroundView.animate()
+                                .translationX(0)
+                                .setDuration(200)
+                                .withEndAction(() -> {
+                                    isAnimating = false;
+                                    if (swipedPosition == position) {
+                                        swipedPosition = -1;
+                                    }
+                                })
+                                .start();
                     }
-                    itemView.setOnTouchListener(null);
-                })
-                .start();
+                }
+            }
+        }
+    }
+
+    private void setupDeleteListener(View itemView, View foregroundView, int position) {
+        View deleteBackground = itemView.findViewById(R.id.delete_background);
+        View deleteIcon = itemView.findViewById(R.id.delete_icon);
+        
+        if (deleteBackground != null) {
+            View.OnClickListener deleteListener = v -> {
+                HapticFeedback.mediumClick(v);
+                onDeleteClick(position);
+                // Close the swipe after delete
+                closeSwipe(foregroundView, position);
+            };
+            
+            deleteBackground.setOnClickListener(deleteListener);
+            if (deleteIcon != null) {
+                deleteIcon.setOnClickListener(deleteListener);
+            }
+        }
+        
+        // Close swipe when tapping the foreground card
+        foregroundView.setOnClickListener(v -> {
+            closeSwipe(foregroundView, position);
+        });
+    }
+
+    private void closeSwipe(View foregroundView, int position) {
+        if (foregroundView != null && !isAnimating) {
+            isAnimating = true;
+            foregroundView.animate()
+                    .translationX(0)
+                    .setDuration(200)
+                    .withEndAction(() -> {
+                        isAnimating = false;
+                        if (swipedPosition == position) {
+                            swipedPosition = -1;
+                        }
+                        // Remove click listeners
+                        foregroundView.setOnClickListener(null);
+                        View parent = (View) foregroundView.getParent();
+                        if (parent != null) {
+                            View deleteBackground = parent.findViewById(R.id.delete_background);
+                            View deleteIcon = parent.findViewById(R.id.delete_icon);
+                            if (deleteBackground != null) deleteBackground.setOnClickListener(null);
+                            if (deleteIcon != null) deleteIcon.setOnClickListener(null);
+                        }
+                    })
+                    .start();
+        }
     }
 
     public void closeOpenItem(RecyclerView recyclerView) {
         if (swipedPosition != -1) {
             RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(swipedPosition);
             if (viewHolder != null) {
-                closeSwipe(viewHolder.itemView, swipedPosition);
+                View foregroundView = viewHolder.itemView.findViewById(R.id.foreground_card);
+                closeSwipe(foregroundView, swipedPosition);
             } else {
                 swipedPosition = -1;
             }
@@ -169,22 +162,37 @@ public abstract class SwipeHelper extends ItemTouchHelper.Callback {
 
     @Override
     public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-        // Don't call super to prevent automatic snap back
-        // The animation is handled in onChildDraw
+        // Critical: Don't call super and don't reset the view
+        // We maintain the swiped state ourselves
+        int position = viewHolder.getAdapterPosition();
+        View foregroundView = viewHolder.itemView.findViewById(R.id.foreground_card);
+        
+        if (foregroundView != null) {
+            // If this is the swiped item, keep it at the swiped position
+            if (position == swipedPosition) {
+                foregroundView.setTranslationX(-deleteButtonWidth);
+            } else {
+                // Otherwise ensure it's closed
+                foregroundView.setTranslationX(0);
+            }
+        }
     }
 
     @Override
     public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
-        return 0.99f;
+        // Return a value greater than 1.0 to prevent onSwiped from ever being called
+        return 2.0f;
     }
 
     @Override
     public float getSwipeEscapeVelocity(float defaultValue) {
+        // Prevent fling from triggering swipe
         return Float.MAX_VALUE;
     }
 
     @Override
     public float getSwipeVelocityThreshold(float defaultValue) {
+        // Prevent fast swipe from triggering delete
         return Float.MAX_VALUE;
     }
 

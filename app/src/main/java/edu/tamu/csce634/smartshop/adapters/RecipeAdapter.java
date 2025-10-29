@@ -254,9 +254,11 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         ImageButton btnIncrease;
         ImageButton btnDecrease;
         FloatingActionButton btnInfo;
+        View foregroundCard;
 
         RecipeViewHolder(View itemView) {
             super(itemView);
+            foregroundCard = itemView.findViewById(R.id.foreground_card);
             image = itemView.findViewById(R.id.recipe_image);
             title = itemView.findViewById(R.id.recipe_title);
             description = itemView.findViewById(R.id.recipe_description);
