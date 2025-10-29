@@ -93,7 +93,7 @@
                     android:textSize="16sp"
                     android:lineSpacingExtra="4dp"
                     android:fontFamily="sans-serif-light"
-                    style="italic" />
+                    android:textStyle="italic" />
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Add to Cart Section with Portion Selector -->
