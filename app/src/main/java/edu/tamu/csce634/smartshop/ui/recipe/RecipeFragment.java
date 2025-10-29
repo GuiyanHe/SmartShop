@@ -51,6 +51,30 @@ public class RecipeFragment extends Fragment {
             recyclerView.setAdapter(adapter);
         });
 
+        // Show aggregated required ingredients
+        View fab = root.findViewById(R.id.fab_show_ingredients);
+        if (fab != null) {
+            fab.setOnClickListener(v -> {
+                viewModel.refreshRequiredIngredients(requireContext());
+                java.util.Map<String, String> map = viewModel.getRequiredIngredients().getValue();
+                String message;
+                if (map == null || map.isEmpty()) {
+                    message = "Your cart is empty. Add some recipes to see required ingredients.";
+                } else {
+                    StringBuilder sb = new StringBuilder();
+                    for (java.util.Map.Entry<String, String> e : map.entrySet()) {
+                        sb.append("• ").append(e.getKey()).append(": ").append(e.getValue()).append("\n");
+                    }
+                    message = sb.toString();
+                }
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("All Required Ingredients")
+                        .setMessage(message)
+                        .setPositiveButton("OK", (d, w) -> d.dismiss())
+                        .show();
+            });
+        }
+
         // Setup swipe to delete
         setupSwipeToDelete();
 

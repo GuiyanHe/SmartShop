@@ -36,4 +36,13 @@
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+    <!-- show required ingredients REMOVE THIS AFTER TESTING with RECIPE page -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_show_ingredients"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:contentDescription="Show required ingredients"
+        android:layout_gravity="bottom|end"
+        app:srcCompat="@drawable/ic_add" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
