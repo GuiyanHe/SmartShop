@@ -55,22 +55,24 @@ public abstract class SwipeHelper extends ItemTouchHelper.SimpleCallback {
             if (foregroundView != null) {
                 int position = viewHolder.getAdapterPosition();
                 
-                // If this position is already swiped open and we're not actively swiping, keep it open
-                if (position == swipedPosition && !isCurrentlyActive && !isAnimating) {
-                    foregroundView.setTranslationX(-deleteButtonWidth);
+                // If we're animating or if this position is already swiped open and user is not actively swiping
+                if (isAnimating || (position == swipedPosition && !isCurrentlyActive)) {
+                    // Don't update the position - either animation is in progress or it's already open
                     return;
                 }
                 
                 // Limit swipe distance to delete button width
                 float translationX = Math.max(dX, -deleteButtonWidth);
                 
-                // Apply translation to foreground card only
-                foregroundView.setTranslationX(translationX);
-                
-                // When user releases finger
-                if (!isCurrentlyActive && !isAnimating) {
+                // Apply translation to foreground card only (only when actively swiping)
+                if (isCurrentlyActive) {
+                    foregroundView.setTranslationX(translationX);
+                } else {
+                    // User just released - start animation based on threshold
                     isAnimating = true;
-                    if (Math.abs(translationX) > deleteButtonWidth * 0.3f) {
+                    float currentTranslation = foregroundView.getTranslationX();
+                    
+                    if (Math.abs(currentTranslation) > deleteButtonWidth * 0.3f) {
                         // Keep it open at delete button width
                         foregroundView.animate()
                                 .translationX(-deleteButtonWidth)
