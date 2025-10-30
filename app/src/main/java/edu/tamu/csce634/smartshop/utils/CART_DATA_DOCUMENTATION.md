@@ -77,6 +77,59 @@ if (cartJson != null) {
 }
 ```
 
+## Aggregating Required Ingredients Across Cart
+
+There are two ways to get a merged list of all ingredients required by the recipes currently in the cart.
+
+### Option A (MVVM Recommended): Via `RecipeViewModel`
+
+The `RecipeViewModel` exposes a `LiveData<Map<String, String>>` that contains the aggregated ingredients. Keys are ingredient names and values are human-readable totals (e.g., `"6 Oz"`, `"3 × 1 bag"`, or a combination when parsing is mixed).
+
+Usage in a Fragment:
+
+```java
+RecipeViewModel viewModel = new ViewModelProvider(this).get(RecipeViewModel.class);
+viewModel.init(requireContext()); // ensure recipes are loaded and initial aggregation is computed
+
+viewModel.getRequiredIngredients().observe(getViewLifecycleOwner(), merged -> {
+  // merged is a Map<String, String> of ingredient name -> total quantity string
+  StringBuilder sb = new StringBuilder();
+  for (Map.Entry<String, String> e : merged.entrySet()) {
+    sb.append(e.getKey()).append(": ").append(e.getValue()).append("\n");
+  }
+  // e.g., show in a dialog or TextView
+});
+```
+
+To keep the aggregation in sync, use `viewModel.addToCart(context, recipe)` and `viewModel.removeFromCart(context, recipe)`; they automatically refresh `requiredIngredients`.
+
+### Option B: Directly via `CartManager`
+
+The `CartManager` provides a utility method that merges ingredients across all items in the cart:
+
+```java
+// Prepare/obtain the list of Recipe objects available in the UI. The recipe title
+// must match the keys stored in the cart (typically Recipe.getTitle()).
+List<Recipe> allRecipes = ...; // e.g., from your ViewModel or repository
+
+// Compute the merged ingredient list
+Map<String, String> merged = CartManager.getInstance(context).getAllRequiredIngredients(allRecipes);
+
+// Example: iterate and display
+for (Map.Entry<String, String> e : merged.entrySet()) {
+  String ingredientName = e.getKey();
+  String totalQuantity  = e.getValue(); // e.g., "6 Oz", "3 × 1", or "2.5 L"
+}
+```
+
+### Aggregation Rules (Contract)
+
+- Input: a `List<Recipe>` containing the available recipes. Each recipe's `title` must match the names stored in the cart.
+- Output: `Map<String, String>` where keys are ingredient names and values are total quantities.
+- If an ingredient quantity is numeric with an optional unit (e.g., `"2 Oz"`, `"0.5 Oz"`, or `"1"`), values are multiplied by the cart quantity and summed per ingredient name (unit-aware).
+- If parsing fails (e.g., complex text like `"1 bag"`), the output uses a fallback like `"3 × 1 bag"` and may combine with numeric totals as a note.
+- Units are preserved in a best-effort manner. Mixed units for the same ingredient are not auto-converted; the first non-empty unit is preferred.
+
 ## Important Notes
 
 1. Cart data persists across app restarts
