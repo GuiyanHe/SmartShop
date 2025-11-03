@@ -11,6 +11,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +27,9 @@ public class MapFragment extends Fragment {
     private TextView tvItemName;
     private TextView tvInstruction;
     private TextView tvProgress;
-    private Button btnMarkDone;
+
+    // 新加的两个按钮
+    private Button btnCurrentItem;
     private Button btnNext;
 
     private final List<ShoppingItem> shoppingList = new ArrayList<>();
@@ -50,29 +56,47 @@ public class MapFragment extends Fragment {
         tvItemName = view.findViewById(R.id.tv_item_name);
         tvInstruction = view.findViewById(R.id.tv_instruction);
         tvProgress = view.findViewById(R.id.tv_progress);
-        btnMarkDone = view.findViewById(R.id.btn_mark_done);
+
+        // 这两个是你刚才要加回来的按钮
+        btnCurrentItem = view.findViewById(R.id.btn_current_item);
         btnNext = view.findViewById(R.id.btn_next);
 
-        // 1. 先准备一份假的 shopping list，后面你再替换成真正的数据
+        // 1. 假数据
         initFakeShoppingList();
 
-        // 2. 显示第一个 item
+        // 2. 显示第一个
         showCurrentItem();
 
-        // 3. 点击“Use” → 可以先简单标记一下
-        btnMarkDone.setOnClickListener(v -> {
-            shoppingList.get(currentIndex).done = true;
-            showCurrentItem();   // 刷新一下，让你能看到 done 的效果（下面你想变颜色也行）
-        });
+        // 3. 底部列表
+        RecyclerView rv = view.findViewById(R.id.rv_shopping_list);
+        rv.setLayoutManager(new LinearLayoutManager(getContext()));
+        rv.setAdapter(new ShoppingAdapter(shoppingList));
 
-        // 4. 点击“Next Item” → 切下一个
-        btnNext.setOnClickListener(v -> {
-            currentIndex++;
-            if (currentIndex >= shoppingList.size()) {
-                currentIndex = 0; // 简单处理：回到开头
-            }
-            showCurrentItem();
-        });
+        // 4. bottom sheet 行为
+        View bottomSheet = view.findViewById(R.id.bottom_sheet);
+        BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(bottomSheet);
+        // behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+        // 5. 按钮逻辑
+        // 左边按钮：先当成“标记完成/取消完成”
+        if (btnCurrentItem != null) {
+            btnCurrentItem.setOnClickListener(v -> {
+                ShoppingItem cur = shoppingList.get(currentIndex);
+                cur.done = !cur.done;
+                showCurrentItem();
+            });
+        }
+
+        // 右边按钮：Next Item
+        if (btnNext != null) {
+            btnNext.setOnClickListener(v -> {
+                currentIndex++;
+                if (currentIndex >= shoppingList.size()) {
+                    currentIndex = 0;
+                }
+                showCurrentItem();
+            });
+        }
     }
 
     private void initFakeShoppingList() {
@@ -94,9 +118,15 @@ public class MapFragment extends Fragment {
             progress += " (done)";
         }
         tvProgress.setText(progress);
+
+        // 同步到左边的按钮上：Broccoli Crown (2/5)
+        if (btnCurrentItem != null) {
+            String btnText = item.name + " (" + (currentIndex + 1) + "/" + shoppingList.size() + ")";
+            btnCurrentItem.setText(btnText);
+        }
     }
 
-    // 简单的数据结构，后面你要加 aisle、坐标、route id 都可以往这里塞
+    // -------- 数据结构 --------
     private static class ShoppingItem {
         String name;
         String instruction;
@@ -106,6 +136,53 @@ public class MapFragment extends Fragment {
             this.name = name;
             this.instruction = instruction;
             this.done = done;
+        }
+    }
+
+    // -------- RecyclerView 适配器 --------
+    private class ShoppingAdapter extends RecyclerView.Adapter<ShoppingAdapter.VH> {
+
+        private final List<ShoppingItem> items;
+
+        ShoppingAdapter(List<ShoppingItem> items) {
+            this.items = items;
+        }
+
+        @NonNull
+        @Override
+        public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_shopping, parent, false);
+            return new VH(v);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull VH holder, int position) {
+            ShoppingItem item = items.get(position);
+            holder.name.setText(item.name);
+
+            holder.btnUse.setOnClickListener(v -> {
+                int pos = holder.getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION) {
+                    currentIndex = pos;
+                    showCurrentItem();
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return items.size();
+        }
+
+        class VH extends RecyclerView.ViewHolder {
+            TextView name;
+            Button btnUse;
+            VH(@NonNull View itemView) {
+                super(itemView);
+                name = itemView.findViewById(R.id.tv_name);
+                btnUse = itemView.findViewById(R.id.btn_use);
+            }
         }
     }
 }
