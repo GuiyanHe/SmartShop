@@ -41,16 +41,16 @@ public class ListFragment extends Fragment {
     private ShoppingItemAdapter adapter;
     private PresetRepository repo;
 
-    // 三套示例配方（ingredientId 与 preset_items.json 对应）
-    private static final List<String> RECIPE_BREAKFAST = Arrays.asList(
-            "ing_milk","ing_eggs","ing_bread","ing_butter","ing_coffee","ing_banana"
-    );
-    private static final List<String> RECIPE_FAMILY_DINNER = Arrays.asList(
-            "ing_chicken","ing_rice","ing_tomato","ing_onion","ing_garlic","ing_lettuce","ing_olive_oil"
-    );
-    private static final List<String> RECIPE_VEGAN = Arrays.asList(
-            "ing_spinach","ing_potato","ing_carrot","ing_cucumber","ing_rice","ing_oatmeal","ing_apple"
-    );
+//    // 三套示例配方（ingredientId 与 preset_items.json 对应）
+//    private static final List<String> RECIPE_BREAKFAST = Arrays.asList(
+//            "ing_milk","ing_eggs","ing_bread","ing_butter","ing_coffee","ing_banana"
+//    );
+//    private static final List<String> RECIPE_FAMILY_DINNER = Arrays.asList(
+//            "ing_chicken","ing_rice","ing_tomato","ing_onion","ing_garlic","ing_lettuce","ing_olive_oil"
+//    );
+//    private static final List<String> RECIPE_VEGAN = Arrays.asList(
+//            "ing_spinach","ing_potato","ing_carrot","ing_cucumber","ing_rice","ing_oatmeal","ing_apple"
+//    );
 
     @Nullable
     @Override
@@ -95,12 +95,13 @@ public class ListFragment extends Fragment {
         });
 
         // 6) 默认加载：Breakfast 配方
-        loadRecipe(RECIPE_BREAKFAST);
+//        loadRecipe(RECIPE_BREAKFAST);
+        listViewModel.updateItemList(new ArrayList<>());
 
         // 7) 配方切换按钮
-        binding.btnRecipeBreakfast.setOnClickListener(v -> loadRecipe(RECIPE_BREAKFAST));
-        binding.btnRecipeDinner.setOnClickListener(v -> loadRecipe(RECIPE_FAMILY_DINNER));
-        binding.btnRecipeVegan.setOnClickListener(v -> loadRecipe(RECIPE_VEGAN));
+//        binding.btnRecipeBreakfast.setOnClickListener(v -> loadRecipe(RECIPE_BREAKFAST));
+//        binding.btnRecipeDinner.setOnClickListener(v -> loadRecipe(RECIPE_FAMILY_DINNER));
+//        binding.btnRecipeVegan.setOnClickListener(v -> loadRecipe(RECIPE_VEGAN));
 
         // 8) 底部“Proceed to Map”（示例：给个反馈）
         binding.btnProceed.setOnClickListener(v ->
