@@ -22,6 +22,7 @@ import java.util.List;
 import edu.tamu.csce634.smartshop.databinding.FragmentListBinding;
 import edu.tamu.csce634.smartshop.data.DataSeeder;
 import edu.tamu.csce634.smartshop.data.PresetRepository;
+import edu.tamu.csce634.smartshop.ui.recipe.RecipeViewModel;
 
 /**
  * 购物清单页面：
@@ -38,6 +39,7 @@ public class ListFragment extends Fragment {
 
     // VM / 适配器 / 数据仓库
     private ListViewModel listViewModel;
+    private RecipeViewModel recipeViewModel;
     private ShoppingItemAdapter adapter;
     private PresetRepository repo;
 
@@ -73,7 +75,9 @@ public class ListFragment extends Fragment {
 
         // 2) 获取 ViewModel（使用 Activity 作用域便于 BottomSheet 共享）
         listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
+        recipeViewModel = new ViewModelProvider(requireActivity()).get(RecipeViewModel.class);
 
+        recipeViewModel.init(requireContext());
         // 3) RecyclerView 基本配置
         RecyclerView recyclerView = binding.recycler;
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -92,6 +96,14 @@ public class ListFragment extends Fragment {
         listViewModel.getItemList().observe(getViewLifecycleOwner(), list -> {
             adapter = new ShoppingItemAdapter(list, listViewModel);
             recyclerView.setAdapter(adapter);
+        });
+        recipeViewModel.getRequiredIngredients().observe(getViewLifecycleOwner(), merged -> {
+            if (merged != null && !merged.isEmpty()) {
+                // TODO: 下一步实现转换逻辑
+                android.util.Log.d("ListFragment", "Cart ingredients: " + merged.size());
+            } else {
+                android.util.Log.d("ListFragment", "Cart is empty");
+            }
         });
 
         // 6) 默认加载：Breakfast 配方
