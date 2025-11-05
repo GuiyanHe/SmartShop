@@ -24,6 +24,7 @@ import edu.tamu.csce634.smartshop.data.DataSeeder;
 import edu.tamu.csce634.smartshop.data.PresetRepository;
 import edu.tamu.csce634.smartshop.models.ShoppingItem;
 import edu.tamu.csce634.smartshop.ui.recipe.RecipeViewModel;
+import edu.tamu.csce634.smartshop.utils.QuantityParser;
 
 /**
  * 购物清单页面：
@@ -86,7 +87,7 @@ public class ListFragment extends Fragment {
         adapter = new ShoppingItemAdapter(new ArrayList<>(), listViewModel);
         recyclerView.setAdapter(adapter);
 
-// 4) 绑定总价显示
+        // 4) 绑定总价显示
         TextView totalText = binding.totalText;
         listViewModel.getTotal().observe(getViewLifecycleOwner(), total -> {
             // 获取当前购物车商品数量
@@ -203,6 +204,21 @@ public class ListFragment extends Fragment {
                 ShoppingItem item = new ShoppingItem();
                 item.name = ingredientName;
                 item.selectedSkuName = ingredientName;
+
+                // === 新增：保存Recipe需求量 ===
+                item.recipeNeededStr = quantityStr; // 保存原始字符串用于显示
+
+                // 解析需求量
+                QuantityParser.ParsedQuantity parsed = QuantityParser.parse(quantityStr);
+                if (parsed.success) {
+                    item.recipeNeededValue = parsed.value;
+                    item.recipeNeededUnit = parsed.unit;
+                } else {
+                    item.recipeNeededValue = 1.0;
+                    item.recipeNeededUnit = "";
+                }
+
+                // 暂时用旧逻辑设置quantity（下一步会改进）
                 item.quantity = parseQuantityFromString(quantityStr);
 
                 // 从预置数据获取价格等信息
