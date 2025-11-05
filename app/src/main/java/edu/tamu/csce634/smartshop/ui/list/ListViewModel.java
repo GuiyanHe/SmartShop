@@ -117,4 +117,14 @@ public class ListViewModel extends ViewModel {
 
         updateItemList(updated);
     }
+
+    /**
+     * 只重新计算总价，不触发列表LiveData更新（避免滚动重置）
+     */
+    public void recalculateTotalOnly() {
+        List<ShoppingItem> currentList = itemListLiveData.getValue();
+        if (currentList != null) {
+            recalculateTotal(currentList);
+        }
+    }
 }

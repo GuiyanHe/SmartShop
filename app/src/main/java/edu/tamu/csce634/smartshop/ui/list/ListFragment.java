@@ -101,10 +101,16 @@ public class ListFragment extends Fragment {
                 totalText.setText("Estimated Total: ¥0.00");
             }
         });
-        // 5) 观察列表变化，刷新适配器
+        // 5) 观察列表变化
         listViewModel.getItemList().observe(getViewLifecycleOwner(), list -> {
-            adapter = new ShoppingItemAdapter(list, listViewModel);
-            recyclerView.setAdapter(adapter);
+            if (adapter == null) {
+                // ✅ 首次创建adapter
+                adapter = new ShoppingItemAdapter(list, listViewModel);
+                recyclerView.setAdapter(adapter);
+            } else {
+                // ✅ 后续只更新数据，不重建adapter
+                adapter.updateData(list);
+            }
         });
 
         // 6) 观察购物车聚合食材数据

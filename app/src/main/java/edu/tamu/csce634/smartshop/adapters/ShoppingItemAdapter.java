@@ -25,12 +25,17 @@ import edu.tamu.csce634.smartshop.ui.list.ProductOptionsBottomSheet;
  */
 public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapter.VH> {
 
-    private final List<ShoppingItem> itemList;   // 数据源
+    private List<ShoppingItem> itemList;   // 数据源
     private final ListViewModel listViewModel;   // 通知 VM 更新总价等
 
     public ShoppingItemAdapter(List<ShoppingItem> list, ListViewModel vm) {
         this.itemList = list;
         this.listViewModel = vm;
+    }
+
+    public void updateData(List<ShoppingItem> newList) {
+        this.itemList = newList;
+        notifyDataSetChanged(); // 全量刷新（后续可优化为DiffUtil）
     }
 
     @NonNull
@@ -120,7 +125,7 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
             if (it.quantity > 0) {
                 it.quantity -= 1;
                 h.qtyBadge.setText(String.format("Qty: %s", formatQty(it.quantity)));
-                listViewModel.updateItemList(itemList); // 通知 VM 重新计算总价
+                listViewModel.recalculateTotalOnly();
             }
         });
 
@@ -128,7 +133,7 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
         h.btnPlus.setOnClickListener(v -> {
             it.quantity += 1;
             h.qtyBadge.setText(String.format("Qty: %s", formatQty(it.quantity)));
-            listViewModel.updateItemList(itemList);
+            listViewModel.recalculateTotalOnly();
         });
     }
 
