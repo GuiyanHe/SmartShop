@@ -185,15 +185,29 @@ public class ListFragment extends Fragment {
                 }
             }
 
-            // 获取预置数据作为价格等信息的参考
+// 获取预置数据作为价格等信息的参考
             List<ShoppingItem> presetItems = repo.loadInitialItems();
             Map<String, ShoppingItem> presetMap = new HashMap<>();
+
+// 建立多种映射方式
             for (ShoppingItem preset : presetItems) {
-                presetMap.put(preset.name.toLowerCase().trim(), preset);
+                String normalizedName = preset.name.toLowerCase().trim();
+
+                // 方式1：直接名称匹配
+                presetMap.put(normalizedName, preset);
+
+                // 方式2：移除空格后匹配（如 "Brown Rice" -> "brownrice"）
+                presetMap.put(normalizedName.replaceAll("\\s+", ""), preset);
+
+                // 方式3：使用 selectedSkuName
                 if (preset.selectedSkuName != null) {
-                    presetMap.put(preset.selectedSkuName.toLowerCase().trim(), preset);
+                    String normalizedSku = preset.selectedSkuName.toLowerCase().trim();
+                    presetMap.put(normalizedSku, preset);
+                    presetMap.put(normalizedSku.replaceAll("\\s+", ""), preset);
                 }
             }
+
+            android.util.Log.d("ListFragment", "Built preset map with " + presetMap.size() + " entries");
 
             List<ShoppingItem> cartItems = new ArrayList<>();
             for (Map.Entry<String, String> entry : mergedIngredients.entrySet()) {
@@ -218,23 +232,59 @@ public class ListFragment extends Fragment {
                     item.recipeNeededUnit = "";
                 }
 
-                // 暂时用旧逻辑设置quantity（下一步会改进）
-                item.quantity = parseQuantityFromString(quantityStr);
 
-                // 从预置数据获取价格等信息
-                ShoppingItem preset = presetMap.get(ingredientName.toLowerCase().trim());
+                // 从预置数据获取价格等信息（尝试多种匹配方式）
+                String normalizedName = ingredientName.toLowerCase().trim();
+                ShoppingItem preset = presetMap.get(normalizedName);
+
+                // 如果直接匹配失败，尝试移除空格
+                if (preset == null) {
+                    preset = presetMap.get(normalizedName.replaceAll("\\s+", ""));
+                }
+
+                android.util.Log.d("ListFragment", "Ingredient: " + ingredientName +
+                        ", Preset found: " + (preset != null ? preset.name : "NOT FOUND"));
                 if (preset != null) {
                     item.unitPrice = preset.unitPrice;
                     item.unit = preset.unit;
                     item.aisle = preset.aisle;
                     item.ingredientId = preset.ingredientId;
                     item.skuSpec = preset.skuSpec;
+
+                    // === 智能计算购买件数 ===
+                    // 解析商品包装规格（如 "5 Oz"）
+                    QuantityParser.ParsedQuantity packageParsed = QuantityParser.parse(preset.skuSpec);
+
+                    if (packageParsed.success && item.recipeNeededValue > 0) {
+                        // 检查单位是否匹配
+                        boolean unitMatch = item.recipeNeededUnit.isEmpty() ||
+                                packageParsed.unit.isEmpty() ||
+                                item.recipeNeededUnit.equalsIgnoreCase(packageParsed.unit);
+
+                        if (unitMatch) {
+                            // 单位匹配，计算需要买几件
+                            item.quantity = QuantityParser.calculatePackageCount(
+                                    item.recipeNeededValue,
+                                    packageParsed.value
+                            );
+                        } else {
+                            // 单位不匹配，默认买1件
+                            item.quantity = 1;
+                            android.util.Log.w("ListFragment", "Unit mismatch: need " +
+                                    item.recipeNeededUnit + " but package is " + packageParsed.unit);
+                        }
+                    } else {
+                        // 无法解析包装规格或需求量，默认买1件
+                        item.quantity = 1;
+                    }
+
                 } else {
                     // 使用默认值
                     item.unitPrice = 2.99;
                     item.unit = "unit";
                     item.aisle = "General";
                     item.ingredientId = "cart_" + ingredientName.toLowerCase().replaceAll("[^a-z0-9]", "_");
+                    item.quantity = 1; // 默认1件
                 }
 
                 // 优先使用Recipe模块的图片资源ID
@@ -263,6 +313,7 @@ public class ListFragment extends Fragment {
             listViewModel.updateItemList(new ArrayList<>());
         }
     }
+
     /**
      * 从数量字符串解析数字 (例如: "6 Oz" -> 6.0)
      */
