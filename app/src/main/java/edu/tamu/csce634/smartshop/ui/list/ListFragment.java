@@ -17,7 +17,9 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.tamu.csce634.smartshop.databinding.FragmentListBinding;
 import edu.tamu.csce634.smartshop.data.DataSeeder;
@@ -99,10 +101,13 @@ public class ListFragment extends Fragment {
         });
         recipeViewModel.getRequiredIngredients().observe(getViewLifecycleOwner(), merged -> {
             if (merged != null && !merged.isEmpty()) {
-                // TODO: 下一步实现转换逻辑
-                android.util.Log.d("ListFragment", "Cart ingredients: " + merged.size());
+                // 转换聚合食材为购物清单
+                convertCartToShoppingList(merged);
+                android.util.Log.d("ListFragment", "Loaded " + merged.size() + " ingredients from cart");
             } else {
-                android.util.Log.d("ListFragment", "Cart is empty");
+                // 购物车为空，显示空列表
+                listViewModel.updateItemList(new ArrayList<>());
+                android.util.Log.d("ListFragment", "Cart is empty, showing empty list");
             }
         });
 
@@ -138,6 +143,85 @@ public class ListFragment extends Fragment {
             e.printStackTrace();
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 将购物车聚合食材转换为ShoppingItem列表
+     */
+    private void convertCartToShoppingList(Map<String, String> mergedIngredients) {
+        try {
+            // 获取预置数据作为参考
+            List<ShoppingItem> presetItems = repo.loadInitialItems();
+
+            // 创建名称映射，用于匹配图片和价格信息
+            Map<String, ShoppingItem> presetMap = new HashMap<>();
+            for (ShoppingItem preset : presetItems) {
+                // 支持多种匹配方式
+                presetMap.put(preset.name.toLowerCase().trim(), preset);
+                if (preset.selectedSkuName != null) {
+                    presetMap.put(preset.selectedSkuName.toLowerCase().trim(), preset);
+                }
+            }
+
+            List<ShoppingItem> cartItems = new ArrayList<>();
+            for (Map.Entry<String, String> entry : mergedIngredients.entrySet()) {
+                String ingredientName = entry.getKey();
+                String quantityStr = entry.getValue();
+
+                // 创建新的购物项
+                ShoppingItem item = new ShoppingItem();
+                item.name = ingredientName;
+                item.selectedSkuName = ingredientName;
+                item.quantity = parseQuantityFromString(quantityStr);
+
+                // 尝试从预置数据获取详细信息
+                ShoppingItem preset = presetMap.get(ingredientName.toLowerCase().trim());
+                if (preset != null) {
+                    item.imageUrl = preset.imageUrl;
+                    item.unitPrice = preset.unitPrice;
+                    item.unit = preset.unit;
+                    item.aisle = preset.aisle;
+                    item.ingredientId = preset.ingredientId;
+                    item.skuSpec = preset.skuSpec;
+                } else {
+                    // 使用默认值
+                    item.unitPrice = 2.99;
+                    item.unit = "unit";
+                    item.aisle = "General";
+                    item.ingredientId = "cart_" + ingredientName.toLowerCase().replaceAll("[^a-z0-9]", "_");
+                    item.imageUrl = "";
+                }
+
+                cartItems.add(item);
+            }
+
+            // 更新列表
+            listViewModel.updateItemList(cartItems);
+
+        } catch (Exception e) {
+            android.util.Log.e("ListFragment", "Error converting cart data: " + e.getMessage());
+            e.printStackTrace();
+            // 出错时显示空列表
+            listViewModel.updateItemList(new ArrayList<>());
+        }
+    }
+
+    /**
+     * 从数量字符串解析数字 (例如: "6 Oz" -> 6.0)
+     */
+    private double parseQuantityFromString(String quantityStr) {
+        try {
+            String[] parts = quantityStr.trim().split("\\s+");
+            if (parts.length > 0) {
+                String numPart = parts[0].replaceAll("[^\\d.]", "");
+                if (!numPart.isEmpty()) {
+                    return Double.parseDouble(numPart);
+                }
+            }
+            return 1.0; // 默认数量
+        } catch (Exception e) {
+            return 1.0; // 解析失败时默认为1
         }
     }
 
