@@ -72,11 +72,14 @@ public class ProductOptionsBottomSheet extends BottomSheetDialogFragment {
                 btn.setLayoutParams(lp);
 
                 btn.setOnClickListener(v -> {
-                    // ✅ 一次性更新 名称 / 价格 / 规格 / 图片
+                    // 更新 SKU 信息（名称、价格、规格、图片）
                     vm.replaceSkuFull(ingredientId, display, price, size, img);
+
+                    // ✅ 重新计算购买数量（基于新的包装规格）
+                    vm.recalculateQuantityForItem(ingredientId);
+
                     dismiss();
                 });
-
                 containerView.addView(btn);
             }
         } catch (Exception e) {
@@ -85,5 +88,6 @@ public class ProductOptionsBottomSheet extends BottomSheetDialogFragment {
 
         return root;
     }
+
 
 }

@@ -102,6 +102,21 @@
             android:layout_marginStart="12dp"
             android:layout_marginTop="4dp" />
 
+        <!-- 新增：Recipe需求量标签 -->
+        <TextView
+            android:id="@+id/neededLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Recipe needs: 0.2 Oz"
+            android:textColor="#4CAF50"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_below="@id/sub"
+            android:layout_toEndOf="@id/itemImage"
+            android:layout_toStartOf="@id/qtyGroup"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp" />
+
         <!-- Options 链接 -->
         <TextView
             android:id="@+id/btnReplace"
@@ -110,10 +125,9 @@
             android:text="Options ›"
             android:textColor="#4CAF50"
             android:textSize="14sp"
-            android:layout_below="@id/sub"
+            android:layout_below="@id/neededLabel"
             android:layout_toEndOf="@id/itemImage"
             android:layout_marginStart="12dp"
-            android:layout_marginTop="8dp" />
-
+            android:layout_marginTop="4dp" />
     </RelativeLayout>
 </androidx.cardview.widget.CardView>

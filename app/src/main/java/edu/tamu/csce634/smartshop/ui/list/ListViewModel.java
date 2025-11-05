@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.tamu.csce634.smartshop.models.ShoppingItem;
+
 // ViewModel 层：负责保存购物数据、计算总价
 public class ListViewModel extends ViewModel {
 
@@ -74,5 +76,55 @@ public class ListViewModel extends ViewModel {
             sum += item.unitPrice * item.quantity;
         }
         setTotal(sum);
+    }
+
+    /**
+     * 重新计算某个商品的购买数量（切换Option后调用）
+     */
+    public void recalculateQuantityForItem(String ingredientId) {
+        List<ShoppingItem> updated = new ArrayList<>(itemList);
+
+        for (ShoppingItem item : updated) {
+            if (ingredientId.equals(item.ingredientId)) {
+                // 解析新的包装规格
+                edu.tamu.csce634.smartshop.utils.QuantityParser.ParsedQuantity packageParsed =
+                        edu.tamu.csce634.smartshop.utils.QuantityParser.parse(item.skuSpec);
+
+                if (packageParsed.success && item.recipeNeededValue > 0) {
+                    // 检查单位是否匹配
+                    boolean unitMatch = item.recipeNeededUnit.isEmpty() ||
+                            packageParsed.unit.isEmpty() ||
+                            item.recipeNeededUnit.equalsIgnoreCase(packageParsed.unit);
+
+                    if (unitMatch) {
+                        // 重新计算需要买几件
+                        item.quantity = edu.tamu.csce634.smartshop.utils.QuantityParser.calculatePackageCount(
+                                item.recipeNeededValue,
+                                packageParsed.value
+                        );
+                    } else {
+                        // 单位不匹配，默认买1件
+                        item.quantity = 1;
+                    }
+                } else {
+                    // 无法解析，默认1件
+                    item.quantity = 1;
+                }
+
+                break;
+            }
+        }
+
+        updateItemList(updated);
+    }
+
+    /**
+     * 只重新计算总价，不触发列表LiveData更新（避免滚动重置）
+     */
+    public void recalculateTotalOnly() {
+        List<ShoppingItem> currentList = itemListLiveData.getValue();
+        if (currentList != null) {
+            recalculateTotal(currentList);
+        }
     }
 }

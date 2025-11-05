@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import edu.tamu.csce634.smartshop.ui.list.ShoppingItem;
+import edu.tamu.csce634.smartshop.models.ShoppingItem;
 
 /**
  * 从 SharedPreferences 读取预置 items/options
