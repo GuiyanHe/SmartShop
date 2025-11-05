@@ -1,4 +1,4 @@
-package edu.tamu.csce634.smartshop.ui.list;
+package edu.tamu.csce634.smartshop.models;
 
 // 数据类：描述一个购物条目的所有信息
 public class ShoppingItem {

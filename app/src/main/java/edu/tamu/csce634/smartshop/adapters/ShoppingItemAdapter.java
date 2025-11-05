@@ -1,4 +1,4 @@
-package edu.tamu.csce634.smartshop.ui.list;
+package edu.tamu.csce634.smartshop.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +14,9 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 import edu.tamu.csce634.smartshop.R;
+import edu.tamu.csce634.smartshop.models.ShoppingItem;
+import edu.tamu.csce634.smartshop.ui.list.ListViewModel;
+import edu.tamu.csce634.smartshop.ui.list.ProductOptionsBottomSheet;
 
 /**
  * 适配器：将 ShoppingItem 渲染成 “卡片项”（对应 item_shopping.xml）

@@ -13,17 +13,16 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.json.JSONException;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.tamu.csce634.smartshop.adapters.ShoppingItemAdapter;
 import edu.tamu.csce634.smartshop.databinding.FragmentListBinding;
 import edu.tamu.csce634.smartshop.data.DataSeeder;
 import edu.tamu.csce634.smartshop.data.PresetRepository;
+import edu.tamu.csce634.smartshop.models.ShoppingItem;
 import edu.tamu.csce634.smartshop.ui.recipe.RecipeViewModel;
 
 /**

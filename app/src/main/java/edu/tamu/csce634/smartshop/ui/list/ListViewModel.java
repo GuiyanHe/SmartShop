@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.tamu.csce634.smartshop.models.ShoppingItem;
+
 // ViewModel 层：负责保存购物数据、计算总价
 public class ListViewModel extends ViewModel {
 
