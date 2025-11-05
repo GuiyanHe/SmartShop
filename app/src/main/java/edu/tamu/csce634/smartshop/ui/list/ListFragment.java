@@ -116,14 +116,14 @@ public class ListFragment extends Fragment {
 
                 // 转换聚合食材为购物清单
                 convertCartToShoppingList(merged);
-                android.util.Log.d("ListFragment", "Loaded " + merged.size() + " ingredients from cart");
+//                android.util.Log.d("ListFragment", "Loaded " + merged.size() + " ingredients from cart");
             } else {
                 // 购物车为空：显示空状态，隐藏列表
                 binding.emptyStateLayout.setVisibility(View.VISIBLE);
                 binding.recycler.setVisibility(View.GONE);
 
                 listViewModel.updateItemList(new ArrayList<>());
-                android.util.Log.d("ListFragment", "Cart is empty, showing empty state");
+//                android.util.Log.d("ListFragment", "Cart is empty, showing empty state");
             }
         });
 
@@ -187,6 +187,12 @@ public class ListFragment extends Fragment {
 
 // 获取预置数据作为价格等信息的参考
             List<ShoppingItem> presetItems = repo.loadInitialItems();
+//            for (ShoppingItem p : presetItems) {
+//                android.util.Log.d("ListFragment", "Preset loaded: " + p.name +
+//                        " | SKU: " + p.selectedSkuName +
+//                        " | Spec: " + p.skuSpec +
+//                        " | Price: " + p.unitPrice);
+//            }
             Map<String, ShoppingItem> presetMap = new HashMap<>();
 
 // 建立多种映射方式
@@ -207,7 +213,7 @@ public class ListFragment extends Fragment {
                 }
             }
 
-            android.util.Log.d("ListFragment", "Built preset map with " + presetMap.size() + " entries");
+//            android.util.Log.d("ListFragment", "Built preset map with " + presetMap.size() + " entries");
 
             List<ShoppingItem> cartItems = new ArrayList<>();
             for (Map.Entry<String, String> entry : mergedIngredients.entrySet()) {
@@ -237,22 +243,29 @@ public class ListFragment extends Fragment {
                 String normalizedName = ingredientName.toLowerCase().trim();
                 ShoppingItem preset = presetMap.get(normalizedName);
 
-                // 如果直接匹配失败，尝试移除空格
+// 如果直接匹配失败，尝试移除空格
                 if (preset == null) {
                     preset = presetMap.get(normalizedName.replaceAll("\\s+", ""));
                 }
 
-                android.util.Log.d("ListFragment", "Ingredient: " + ingredientName +
-                        ", Preset found: " + (preset != null ? preset.name : "NOT FOUND"));
+//                android.util.Log.d("ListFragment", "Ingredient: " + ingredientName +
+//                        ", Preset found: " + (preset != null ? preset.name : "NOT FOUND"));
+
+//                android.util.Log.d("ListFragment", "Converting: " + ingredientName +
+//                        " | normalizedName: " + normalizedName +
+//                        " | preset found: " + (preset != null));
                 if (preset != null) {
+                    item.selectedSkuName = preset.selectedSkuName; // 这个字段是repo.loadInitialItems已经填充好的
                     item.unitPrice = preset.unitPrice;
                     item.unit = preset.unit;
                     item.aisle = preset.aisle;
                     item.ingredientId = preset.ingredientId;
                     item.skuSpec = preset.skuSpec;
 
+//                    android.util.Log.d("ListFragment", "  -> Using SKU: " + item.selectedSkuName +
+//                            ", Spec: " + item.skuSpec + ", Price: " + item.unitPrice);
+
                     // === 智能计算购买件数 ===
-                    // 解析商品包装规格（如 "5 Oz"）
                     QuantityParser.ParsedQuantity packageParsed = QuantityParser.parse(preset.skuSpec);
 
                     if (packageParsed.success && item.recipeNeededValue > 0) {
@@ -281,10 +294,12 @@ public class ListFragment extends Fragment {
                 } else {
                     // 使用默认值
                     item.unitPrice = 2.99;
-                    item.unit = "unit";
+                    item.unit = "Oz";
                     item.aisle = "General";
                     item.ingredientId = "cart_" + ingredientName.toLowerCase().replaceAll("[^a-z0-9]", "_");
-                    item.quantity = 1; // 默认1件
+                    item.quantity = 1;
+                    item.selectedSkuName = ingredientName; // 回退到食材名
+                    item.skuSpec = ""; // 无规格信息
                 }
 
                 // 优先使用Recipe模块的图片资源ID
