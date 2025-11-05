@@ -87,31 +87,47 @@ public class ListFragment extends Fragment {
         adapter = new ShoppingItemAdapter(new ArrayList<>(), listViewModel);
         recyclerView.setAdapter(adapter);
 
-        // 4) 绑定总价显示（底部卡片 + 顶部右侧）
-        TextView totalText = binding.totalText;  // 底部白卡里的总价文字
-        listViewModel.getTotal().observe(getViewLifecycleOwner(), t -> {
-            String priceText = String.format("Estimated Total: ¥%.2f", t);
-            totalText.setText(priceText);
-        });
+// 4) 绑定总价显示
+        TextView totalText = binding.totalText;
+        listViewModel.getTotal().observe(getViewLifecycleOwner(), total -> {
+            // 获取当前购物车商品数量
+            int itemCount = listViewModel.getItemList().getValue() != null ?
+                    listViewModel.getItemList().getValue().size() : 0;
 
+            if (itemCount > 0) {
+                String priceText = String.format("Estimated Total: ¥%.2f (%d items)", total, itemCount);
+                totalText.setText(priceText);
+            } else {
+                totalText.setText("Estimated Total: ¥0.00");
+            }
+        });
         // 5) 观察列表变化，刷新适配器
         listViewModel.getItemList().observe(getViewLifecycleOwner(), list -> {
             adapter = new ShoppingItemAdapter(list, listViewModel);
             recyclerView.setAdapter(adapter);
         });
+
+        // 6) 观察购物车聚合食材数据
         recipeViewModel.getRequiredIngredients().observe(getViewLifecycleOwner(), merged -> {
             if (merged != null && !merged.isEmpty()) {
+                // 有数据：隐藏空状态，显示列表
+                binding.emptyStateLayout.setVisibility(View.GONE);
+                binding.recycler.setVisibility(View.VISIBLE);
+
                 // 转换聚合食材为购物清单
                 convertCartToShoppingList(merged);
                 android.util.Log.d("ListFragment", "Loaded " + merged.size() + " ingredients from cart");
             } else {
-                // 购物车为空，显示空列表
+                // 购物车为空：显示空状态，隐藏列表
+                binding.emptyStateLayout.setVisibility(View.VISIBLE);
+                binding.recycler.setVisibility(View.GONE);
+
                 listViewModel.updateItemList(new ArrayList<>());
-                android.util.Log.d("ListFragment", "Cart is empty, showing empty list");
+                android.util.Log.d("ListFragment", "Cart is empty, showing empty state");
             }
         });
 
-        // 6) 默认加载：Breakfast 配方
+        // 7) 默认加载：Breakfast 配方
 //        loadRecipe(RECIPE_BREAKFAST);
         listViewModel.updateItemList(new ArrayList<>());
 
@@ -120,7 +136,7 @@ public class ListFragment extends Fragment {
 //        binding.btnRecipeDinner.setOnClickListener(v -> loadRecipe(RECIPE_FAMILY_DINNER));
 //        binding.btnRecipeVegan.setOnClickListener(v -> loadRecipe(RECIPE_VEGAN));
 
-        // 8) 底部“Proceed to Map”（示例：给个反馈）
+        // 8) 底部“Proceed to Map”
         binding.btnProceed.setOnClickListener(v ->
                 totalText.setText("Navigating to Store Map… (demo)")
         );
