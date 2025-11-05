@@ -54,6 +54,14 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
         String spec = (it.skuSpec != null && !it.skuSpec.isEmpty()) ? " " + it.skuSpec : "";
         h.sub.setText("SKU: " + title + spec);
 
+        // 显示Recipe需求量
+        if (it.recipeNeededStr != null && !it.recipeNeededStr.isEmpty()) {
+            h.neededLabel.setVisibility(View.VISIBLE);
+            h.neededLabel.setText("Recipe needs: " + it.recipeNeededStr);
+        } else {
+            h.neededLabel.setVisibility(View.GONE);
+        }
+
         // Qty 显示
         h.qtyBadge.setText(String.format("Qty: %s", formatQty(it.quantity)));
 
@@ -142,6 +150,7 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
         TextView qtyBadge;    // R.id/qtyBadge（中间的 Qty: x）
         TextView btnMinus;    // R.id/btnMinus（左侧 -）
         TextView btnPlus;     // R.id/btnPlus（右侧 +）
+        TextView neededLabel;
 
         VH(@NonNull View itemView) {
             super(itemView);
@@ -152,6 +161,7 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
             qtyBadge = itemView.findViewById(R.id.qtyBadge);
             btnMinus = itemView.findViewById(R.id.btnMinus);
             btnPlus = itemView.findViewById(R.id.btnPlus);
+            neededLabel = itemView.findViewById(R.id.neededLabel);
         }
     }
 }
