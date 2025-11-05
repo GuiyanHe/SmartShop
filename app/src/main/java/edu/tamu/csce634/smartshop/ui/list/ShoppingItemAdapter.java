@@ -54,21 +54,47 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
         // Qty 显示
         h.qtyBadge.setText(String.format("Qty: %s", formatQty(it.quantity)));
 
-        // 加载图片
-        if (it.imageUrl != null && it.imageUrl.startsWith("asset:")) {
-            String fileName = it.imageUrl.substring(6); // e.g. "milk.jpeg"
-            String uri = "file:///android_asset/items/" + fileName;
-            Glide.with(h.itemView.getContext())
-                    .load(uri)
-                    .centerCrop()
-                    .placeholder(android.R.color.darker_gray)
-                    .into(h.image);
+//        // 加载图片
+//        if (it.imageUrl != null && it.imageUrl.startsWith("asset:")) {
+//            String fileName = it.imageUrl.substring(6); // e.g. "milk.jpeg"
+//            String uri = "file:///android_asset/items/" + fileName;
+//            Glide.with(h.itemView.getContext())
+//                    .load(uri)
+//                    .centerCrop()
+//                    .placeholder(android.R.color.darker_gray)
+//                    .into(h.image);
+//        } else {
+//            Glide.with(h.itemView.getContext())
+//                    .load(it.imageUrl)
+//                    .centerCrop()
+//                    .placeholder(android.R.color.darker_gray)
+//                    .into(h.image);
+//        }
+        // 加载图片（支持：drawable资源ID / 网络链接）
+        if (it.imageUrl != null && !it.imageUrl.isEmpty()) {
+            if (it.imageUrl.startsWith("res:")) {
+                // Recipe模块的drawable资源ID
+                try {
+                    int resId = Integer.parseInt(it.imageUrl.substring(4));
+                    Glide.with(h.itemView.getContext())
+                            .load(resId)
+                            .centerCrop()
+                            .placeholder(android.R.color.darker_gray)
+                            .into(h.image);
+                } catch (NumberFormatException e) {
+                    h.image.setImageResource(android.R.color.darker_gray);
+                }
+            } else {
+                // HTTP/HTTPS网络链接
+                Glide.with(h.itemView.getContext())
+                        .load(it.imageUrl)
+                        .centerCrop()
+                        .placeholder(android.R.color.darker_gray)
+                        .into(h.image);
+            }
         } else {
-            Glide.with(h.itemView.getContext())
-                    .load(it.imageUrl)
-                    .centerCrop()
-                    .placeholder(android.R.color.darker_gray)
-                    .into(h.image);
+            // 无图片时显示默认占位图
+            h.image.setImageResource(android.R.color.darker_gray);
         }
 
         // Options：弹出 BottomSheet

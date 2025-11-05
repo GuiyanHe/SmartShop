@@ -128,36 +128,51 @@ public class ListFragment extends Fragment {
 
     }
 
-    /** 按配方筛选 items 并交给 ViewModel（会自动重算总价并刷新 UI） */
-    private void loadRecipe(List<String> ingredientIds) {
-        try {
-            List<ShoppingItem> all = repo.loadInitialItems();  // 带默认 option
-            List<ShoppingItem> filtered = new ArrayList<>();
-            for (ShoppingItem it : all) {
-                if (ingredientIds.contains(it.ingredientId)) {
-                    filtered.add(it);
-                }
-            }
-            listViewModel.updateItemList(filtered);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    /** 按配方筛选 items 并交给 ViewModel（会自动重算总价并刷新 UI） */
+//    private void loadRecipe(List<String> ingredientIds) {
+//        try {
+//            List<ShoppingItem> all = repo.loadInitialItems();  // 带默认 option
+//            List<ShoppingItem> filtered = new ArrayList<>();
+//            for (ShoppingItem it : all) {
+//                if (ingredientIds.contains(it.ingredientId)) {
+//                    filtered.add(it);
+//                }
+//            }
+//            listViewModel.updateItemList(filtered);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     /**
      * 将购物车聚合食材转换为ShoppingItem列表
+     * 使用Recipe模块中定义的食材图片
      */
     private void convertCartToShoppingList(Map<String, String> mergedIngredients) {
         try {
-            // 获取预置数据作为参考
-            List<ShoppingItem> presetItems = repo.loadInitialItems();
+            // 获取所有Recipe对象
+            List<edu.tamu.csce634.smartshop.models.Recipe> recipes =
+                    recipeViewModel.getRecipes().getValue();
 
-            // 创建名称映射，用于匹配图片和价格信息
+            if (recipes == null) {
+                recipes = new ArrayList<>();
+            }
+
+            // 构建食材名称到图片资源的映射
+            Map<String, Integer> ingredientImageMap = new HashMap<>();
+            for (edu.tamu.csce634.smartshop.models.Recipe recipe : recipes) {
+                for (edu.tamu.csce634.smartshop.models.Ingredient ingredient : recipe.getIngredients()) {
+                    String name = ingredient.getName().toLowerCase().trim();
+                    ingredientImageMap.put(name, ingredient.getImageResId());
+                }
+            }
+
+            // 获取预置数据作为价格等信息的参考
+            List<ShoppingItem> presetItems = repo.loadInitialItems();
             Map<String, ShoppingItem> presetMap = new HashMap<>();
             for (ShoppingItem preset : presetItems) {
-                // 支持多种匹配方式
                 presetMap.put(preset.name.toLowerCase().trim(), preset);
                 if (preset.selectedSkuName != null) {
                     presetMap.put(preset.selectedSkuName.toLowerCase().trim(), preset);
@@ -175,10 +190,9 @@ public class ListFragment extends Fragment {
                 item.selectedSkuName = ingredientName;
                 item.quantity = parseQuantityFromString(quantityStr);
 
-                // 尝试从预置数据获取详细信息
+                // 从预置数据获取价格等信息
                 ShoppingItem preset = presetMap.get(ingredientName.toLowerCase().trim());
                 if (preset != null) {
-                    item.imageUrl = preset.imageUrl;
                     item.unitPrice = preset.unitPrice;
                     item.unit = preset.unit;
                     item.aisle = preset.aisle;
@@ -190,6 +204,18 @@ public class ListFragment extends Fragment {
                     item.unit = "unit";
                     item.aisle = "General";
                     item.ingredientId = "cart_" + ingredientName.toLowerCase().replaceAll("[^a-z0-9]", "_");
+                }
+
+                // 优先使用Recipe模块的图片资源ID
+                Integer imageResId = ingredientImageMap.get(ingredientName.toLowerCase().trim());
+                if (imageResId != null && imageResId != 0) {
+                    // 将资源ID转换为URL格式供Glide使用
+                    item.imageUrl = "res:" + imageResId;
+                } else if (preset != null && preset.imageUrl != null) {
+                    // 回退到预置数据的图片
+                    item.imageUrl = preset.imageUrl;
+                } else {
+                    // 无图片
                     item.imageUrl = "";
                 }
 
@@ -198,15 +224,14 @@ public class ListFragment extends Fragment {
 
             // 更新列表
             listViewModel.updateItemList(cartItems);
+            android.util.Log.d("ListFragment", "Converted " + cartItems.size() + " items from cart");
 
         } catch (Exception e) {
             android.util.Log.e("ListFragment", "Error converting cart data: " + e.getMessage());
             e.printStackTrace();
-            // 出错时显示空列表
             listViewModel.updateItemList(new ArrayList<>());
         }
     }
-
     /**
      * 从数量字符串解析数字 (例如: "6 Oz" -> 6.0)
      */
