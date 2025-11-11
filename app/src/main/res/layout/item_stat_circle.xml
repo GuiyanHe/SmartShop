@@ -1,28 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_weight="1"
     android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="4dp">
 
-    <FrameLayout
+    <edu.tamu.csce634.smartshop.ui.home.CircularProgressView
+        android:id="@+id/progress_view"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:background="@drawable/profile_icon_background">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="112g"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </FrameLayout>
+        app:progress="0"
+        app:progressText="0"
+        app:progressColor="@color/green_500"
+        app:progressWidth="8dp" />
 
     <TextView
+        android:id="@+id/text_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="Protein" />
+        android:layout_marginTop="8dp"
+        android:text="Label"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        tools:text="Calories" />
 </LinearLayout>

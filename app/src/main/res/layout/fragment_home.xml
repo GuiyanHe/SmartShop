@@ -50,7 +50,7 @@
                 android:src="@drawable/ic_person"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/text_date"
-                app:tint="@color/purple_500" />
+                app:tint="@color/green_500" />
 
 
             <LinearLayout
@@ -58,16 +58,67 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
+                android:baselineAligned="false"
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/text_greeting">
 
-                <include layout="@layout/item_stat_circle" />
-                <include layout="@layout/item_stat_circle" />
-                <include layout="@layout/item_stat_circle" />
-                <include layout="@layout/item_stat_circle" />
+                <include
+                    android:id="@+id/stat_protein"
+                    layout="@layout/item_stat_circle" />
+                <include
+                    android:id="@+id/stat_fat"
+                    layout="@layout/item_stat_circle" />
+                <include
+                    android:id="@+id/stat_calories"
+                    layout="@layout/item_stat_circle" />
+                <include
+                    android:id="@+id/stat_water"
+                    layout="@layout/item_stat_circle" />
             </LinearLayout>
+
+            <GridLayout
+                android:id="@+id/test_buttons"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:columnCount="2"
+                android:rowCount="2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/stats_layout">
+
+                <Button
+                    android:id="@+id/button_add_protein"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_marginEnd="8dp"
+                    android:text="Add 10g Pro" />
+                <Button
+                    android:id="@+id/button_add_fat"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Add 5g Fat" />
+                <Button
+                    android:id="@+id/button_add_calories"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_marginEnd="8dp"
+                    android:text="Add 100 Cal" />
+                <Button
+                    android:id="@+id/button_add_water"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Add 1 Cup" />
+            </GridLayout>
+
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_height"
@@ -80,23 +131,22 @@
                 app:cardElevation="2dp"
                 app:layout_constraintEnd_toStartOf="@id/card_weight"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/stats_layout">
-                <LinearLayout
-                    android:layout_width="match_parent"
+                app:layout_constraintTop_toBottomOf="@id/test_buttons"> <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="16dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Height"/>
+                <TextView
+                    android:id="@+id/text_height_value"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Height"/>
-                    <TextView
-                        android:id="@+id/text_height_value"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        tools:text="175 cm"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@android:color/black"/>
-                </LinearLayout>
+                    tools:text="175 cm"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black"/>
+            </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
