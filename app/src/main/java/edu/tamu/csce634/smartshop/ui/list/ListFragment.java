@@ -95,10 +95,10 @@ public class ListFragment extends Fragment {
                     listViewModel.getItemList().getValue().size() : 0;
 
             if (itemCount > 0) {
-                String priceText = String.format("Estimated Total: ¥%.2f (%d items)", total, itemCount);
+                String priceText = String.format("Estimated Total: $%.2f (%d items)", total, itemCount);
                 totalText.setText(priceText);
             } else {
-                totalText.setText("Estimated Total: ¥0.00");
+                totalText.setText("Estimated Total: $0.00");
             }
         });
         // 5) 观察列表变化

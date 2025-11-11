@@ -54,7 +54,7 @@ SmartShop - Shopping List 页面
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Estimated Total: ¥0.00"
+            android:text="Estimated Total: $0.00"
             android:textColor="#000000"
             android:textSize="16sp"
             android:textStyle="bold" />
