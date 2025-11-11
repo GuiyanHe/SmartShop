@@ -10,6 +10,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+// ⭐️ 导入 1, 2, 3
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.graphics.Insets; // 注意是这个 Insets
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
@@ -59,6 +63,31 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // 1. 保存原始的 padding
+        final int originalPaddingLeft = binding.homeScrollView.getPaddingLeft();
+        final int originalPaddingTop = binding.homeScrollView.getPaddingTop();
+        final int originalPaddingRight = binding.homeScrollView.getPaddingRight();
+        final int originalPaddingBottom = binding.homeScrollView.getPaddingBottom();
+
+        // 2. 设置 Insets 监听器
+        ViewCompat.setOnApplyWindowInsetsListener(binding.homeScrollView, (v, windowInsets) -> {
+            // 获取系统栏（主要是状态栏）的顶部边距
+            Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+
+            // 3. 将原始 padding 和系统栏的顶部 padding 相加
+            // 这样既保留了你在XML中设置的 padding (如果有的话)，也添加了状态栏的高度
+            v.setPadding(
+                    originalPaddingLeft,
+                    originalPaddingTop + systemBars.top, // 关键在这里
+                    originalPaddingRight,
+                    originalPaddingBottom
+            );
+
+            // 返回原始的 insets，让子视图（如果有的话）继续处理
+            return windowInsets;
+        });
+
+
         // Observe Profile Data (Goals)
         profileViewModel.getProfileData().observe(getViewLifecycleOwner(), profileData -> {
             if (profileData != null) {
@@ -82,7 +111,6 @@ public class HomeFragment extends Fragment {
     }
 
     private void updateStatsUI() {
-        // Wait until both data sources are loaded
         if (mProfileData == null || mDailyStats == null || getContext() == null) {
             return;
         }
