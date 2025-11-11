@@ -11,8 +11,8 @@
 
     <edu.tamu.csce634.smartshop.ui.home.CircularProgressView
         android:id="@+id/progress_view"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         app:progress="0"
         app:progressText="0"
         app:progressColor="@color/green_500"

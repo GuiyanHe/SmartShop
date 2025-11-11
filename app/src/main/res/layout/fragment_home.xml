@@ -16,16 +16,15 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/text_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="September 25, 2025"
-                android:textColor="@android:color/darker_gray"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+            android:padding="16dp"
+            android:clipToPadding="false"> <TextView
+            android:id="@+id/text_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="September 25, 2025"
+            android:textColor="@android:color/darker_gray"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/text_greeting"
@@ -66,16 +65,28 @@
 
                 <include
                     android:id="@+id/stat_protein"
-                    layout="@layout/item_stat_circle" />
+                    layout="@layout/item_stat_circle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
                 <include
                     android:id="@+id/stat_fat"
-                    layout="@layout/item_stat_circle" />
+                    layout="@layout/item_stat_circle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
                 <include
                     android:id="@+id/stat_calories"
-                    layout="@layout/item_stat_circle" />
+                    layout="@layout/item_stat_circle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
                 <include
                     android:id="@+id/stat_water"
-                    layout="@layout/item_stat_circle" />
+                    layout="@layout/item_stat_circle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
             </LinearLayout>
 
             <GridLayout
