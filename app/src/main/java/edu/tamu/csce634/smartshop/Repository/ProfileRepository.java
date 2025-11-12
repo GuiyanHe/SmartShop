@@ -66,6 +66,9 @@ public class ProfileRepository {
         String allergies = sharedPrefs.getString(KEY_ALLERGIES, defaults.getAllergies());
         String favoriteBrands = sharedPrefs.getString(KEY_FAVORITE_BRANDS, defaults.getFavoriteBrands());
         float maxItemPrice = sharedPrefs.getFloat(KEY_MAX_ITEM_PRICE, defaults.getMaxItemPrice());
+        if (maxItemPrice < 5.0f || maxItemPrice > 50.0f) {
+            maxItemPrice = 20.0f; // safe default value
+        }
         boolean preferDeals = sharedPrefs.getBoolean(KEY_PREFER_DEALS, defaults.isPreferDeals());
         String packageSizePref = sharedPrefs.getString(KEY_PACKAGE_SIZE_PREF, defaults.getPackageSizePref());
 

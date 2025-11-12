@@ -150,7 +150,7 @@ public class ProfileData {
                 false,        // glutenFree
                 "[]",         // allergies
                 "[]",         // favoriteBrands
-                999.99f,      // maxItemPrice
+                20.0f,      // maxItemPrice
                 false,        // preferDeals
                 "regular"     // packageSizePref
         );
