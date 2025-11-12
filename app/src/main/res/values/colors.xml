@@ -1,20 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Home Screen Stats -->
     <color name="stat_protein_green">#4CAF50</color>
     <color name="stat_fat_orange">#FF9800</color>
     <color name="stat_calories_red">#F44336</color>
     <color name="stat_water_blue">#2196F3</color>
     <color name="stat_background_gray">#E0E0E0</color>
+
+    <!-- Material Design Base Colors -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
-    <color name="green_500">#4CAF50</color>
-    <color name="green_700">#388E3C</color>
-    <color name="green_100">#C8E6C9</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Green Palette -->
+    <color name="green_50">#E8F5E9</color>
+    <color name="green_100">#C8E6C9</color>
+    <color name="green_500">#4CAF50</color>
+    <color name="green_600">#43A047</color>
+    <color name="green_700">#388E3C</color>
     <color name="green_fab">#4CAF50</color>
+
+    <!-- Orange Palette (Warnings) -->
+    <color name="orange_50">#FFF3E0</color>
+    <color name="orange_500">#FF9800</color>
+    <color name="orange_600">#FB8C00</color>
+    <color name="orange_700">#F57C00</color>
+    <color name="orange_900">#E65100</color>
+
+    <!-- Red Palette (Errors/Allergies) -->
     <color name="red">#F44336</color>
+    <color name="red_300">#E57373</color>
+    <color name="red_500">#F44336</color>
+    <color name="red_600">#E53935</color>
+
+    <!-- Gray Palette -->
+    <color name="gray_200">#EEEEEE</color>
+    <color name="gray_600">#757575</color>
 </resources>
