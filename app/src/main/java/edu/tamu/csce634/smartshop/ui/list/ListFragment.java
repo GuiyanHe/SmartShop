@@ -87,18 +87,20 @@ public class ListFragment extends Fragment {
         adapter = new ShoppingItemAdapter(new ArrayList<>(), listViewModel);
         recyclerView.setAdapter(adapter);
 
-        // 4) 绑定总价显示
-        TextView totalText = binding.totalText;
+        // 4) 绑定总价显示（分为三个TextView）
         listViewModel.getTotal().observe(getViewLifecycleOwner(), total -> {
             // 获取当前购物车商品数量
             int itemCount = listViewModel.getItemList().getValue() != null ?
                     listViewModel.getItemList().getValue().size() : 0;
 
+            // 更新价格（大字，绿色）
+            binding.totalPrice.setText(String.format(java.util.Locale.US, "$%.2f", total));
+
+            // 更新商品数量（小字，灰色）
             if (itemCount > 0) {
-                String priceText = String.format("Estimated Total: $%.2f (%d items)", total, itemCount);
-                totalText.setText(priceText);
+                binding.itemCount.setText(String.format("(%d items)", itemCount));
             } else {
-                totalText.setText("Estimated Total: $0.00");
+                binding.itemCount.setText("(0 items)");
             }
         });
         // 5) 观察列表变化
@@ -142,11 +144,13 @@ public class ListFragment extends Fragment {
 //        binding.btnRecipeDinner.setOnClickListener(v -> loadRecipe(RECIPE_FAMILY_DINNER));
 //        binding.btnRecipeVegan.setOnClickListener(v -> loadRecipe(RECIPE_VEGAN));
 
-        // 8) 底部“Proceed to Map”
-        binding.btnProceed.setOnClickListener(v ->
-                totalText.setText("Navigating to Store Map… (demo)")
-        );
-
+        // 9) Continue按钮点击事件
+        binding.btnProceed.setOnClickListener(v -> {
+            // 临时演示：显示Toast提示
+            android.widget.Toast.makeText(requireContext(),
+                    "Navigating to Store Map… (demo)",
+                    android.widget.Toast.LENGTH_SHORT).show();
+        });
 
     }
 

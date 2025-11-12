@@ -38,6 +38,7 @@
     <color name="red_600">#E53935</color>
 
     <!-- Gray Palette -->
+    <color name="gray_100">#F5F5F5</color>
     <color name="gray_200">#EEEEEE</color>
     <color name="gray_600">#757575</color>
 </resources>
