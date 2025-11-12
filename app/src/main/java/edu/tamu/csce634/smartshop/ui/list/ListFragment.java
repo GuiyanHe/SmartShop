@@ -25,6 +25,7 @@ import edu.tamu.csce634.smartshop.data.DataSeeder;
 import edu.tamu.csce634.smartshop.data.PresetRepository;
 import edu.tamu.csce634.smartshop.models.ShoppingItem;
 import edu.tamu.csce634.smartshop.ui.recipe.RecipeViewModel;
+import edu.tamu.csce634.smartshop.utils.ConflictDetector;
 import edu.tamu.csce634.smartshop.utils.QuantityParser;
 
 /**
@@ -326,15 +327,99 @@ public class ListFragment extends Fragment {
     private void togglePreferenceMode() {
         if (!preferenceMode) {
             // 尝试启用偏好模式
-            android.util.Log.d("ListFragment", "Attempting to enable preference mode");
-            // TODO: 下一步实现冲突检测
-            android.widget.Toast.makeText(requireContext(),
-                    "Preference mode (coming soon)",
-                    android.widget.Toast.LENGTH_SHORT).show();
+            enablePreferenceMode();
         } else {
             // 禁用偏好模式
             disablePreferenceMode();
         }
+    }
+
+    /**
+     * 启用偏好模式
+     */
+    private void enablePreferenceMode() {
+        android.util.Log.d("ListFragment", "=== enablePreferenceMode called ===");
+
+        // 1. 获取用户Profile（使用observe确保数据已加载）
+        edu.tamu.csce634.smartshop.Repository.ProfileRepository profileRepo =
+                new edu.tamu.csce634.smartshop.Repository.ProfileRepository(
+                        requireActivity().getApplication());
+
+        profileRepo.getProfileData().observe(getViewLifecycleOwner(), profile -> {
+            if (profile == null) {
+                android.util.Log.d("ListFragment", "Profile is null");
+                android.widget.Toast.makeText(requireContext(),
+                        "Please set up your profile first",
+                        android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            android.util.Log.d("ListFragment", "Profile loaded: " + profile.getName());
+            android.util.Log.d("ListFragment", "  isVegan: " + profile.isVegan());
+            android.util.Log.d("ListFragment", "  isVegetarian: " + profile.isVegetarian());
+            android.util.Log.d("ListFragment", "  Allergies: " + profile.getAllergies());
+
+            // 2. 获取当前购物清单
+            List<edu.tamu.csce634.smartshop.models.ShoppingItem> currentItems =
+                    listViewModel.getItemList().getValue();
+
+            if (currentItems == null || currentItems.isEmpty()) {
+                android.util.Log.d("ListFragment", "Shopping list is empty");
+                android.widget.Toast.makeText(requireContext(),
+                        "Shopping list is empty",
+                        android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            android.util.Log.d("ListFragment", "Shopping list has " + currentItems.size() + " items");
+            for (edu.tamu.csce634.smartshop.models.ShoppingItem item : currentItems) {
+                android.util.Log.d("ListFragment", "  - " + item.name);
+            }
+
+            // 3. 检测冲突
+            List<ConflictDetector.Conflict> conflicts =
+                    ConflictDetector.detectConflicts(currentItems, profile);
+
+            android.util.Log.d("ListFragment", "Detected " + conflicts.size() + " conflicts");
+
+            if (!conflicts.isEmpty()) {
+                // 有冲突 - 显示冲突信息
+                StringBuilder sb = new StringBuilder("Found conflicts:\n");
+                for (ConflictDetector.Conflict c : conflicts) {
+                    sb.append("- ").append(c.item.name).append(": ").append(c.reason).append("\n");
+                    android.util.Log.d("ListFragment", "  Conflict: " + c.item.name + " - " + c.reason);
+                }
+
+                android.widget.Toast.makeText(requireContext(),
+                        conflicts.size() + " conflicts detected. Check Logcat for details.",
+                        android.widget.Toast.LENGTH_LONG).show();
+
+                // TODO: 下一步跳转到ConflictResolutionActivity
+            } else {
+                // 无冲突 - 直接启用偏好模式
+                android.util.Log.d("ListFragment", "No conflicts, activating preference mode");
+                activatePreferenceMode(profile);
+            }
+
+            // ⚠️ 重要：observe只触发一次，需要手动移除观察
+            profileRepo.getProfileData().removeObservers(getViewLifecycleOwner());
+        });
+    }
+    /**
+     * 激活偏好模式（无冲突时）
+     */
+    private void activatePreferenceMode(edu.tamu.csce634.smartshop.models.ProfileData profile) {
+        preferenceMode = true;
+        updateModeUI();
+        savePreferenceMode();
+
+        android.widget.Toast.makeText(requireContext(),
+                "Preference mode activated",
+                android.widget.Toast.LENGTH_SHORT).show();
+
+        android.util.Log.d("ListFragment", "Preference mode activated (no conflicts)");
+
+        // TODO: 下一步应用偏好过滤和排序
     }
 
     /**
