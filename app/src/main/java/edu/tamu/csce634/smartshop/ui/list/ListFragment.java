@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.adapters.ShoppingItemAdapter;
 import edu.tamu.csce634.smartshop.databinding.FragmentListBinding;
 import edu.tamu.csce634.smartshop.data.DataSeeder;
@@ -45,16 +46,9 @@ public class ListFragment extends Fragment {
     private ShoppingItemAdapter adapter;
     private PresetRepository repo;
 
-//    // 三套示例配方（ingredientId 与 preset_items.json 对应）
-//    private static final List<String> RECIPE_BREAKFAST = Arrays.asList(
-//            "ing_milk","ing_eggs","ing_bread","ing_butter","ing_coffee","ing_banana"
-//    );
-//    private static final List<String> RECIPE_FAMILY_DINNER = Arrays.asList(
-//            "ing_chicken","ing_rice","ing_tomato","ing_onion","ing_garlic","ing_lettuce","ing_olive_oil"
-//    );
-//    private static final List<String> RECIPE_VEGAN = Arrays.asList(
-//            "ing_spinach","ing_potato","ing_carrot","ing_cucumber","ing_rice","ing_oatmeal","ing_apple"
-//    );
+    // 新增：偏好模式状态
+    private boolean preferenceMode = false;
+    private static final String PREF_MODE_KEY = "shopping_list_preference_mode";
 
     @Nullable
     @Override
@@ -78,100 +72,69 @@ public class ListFragment extends Fragment {
         // 2) 获取 ViewModel（使用 Activity 作用域便于 BottomSheet 共享）
         listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
         recipeViewModel = new ViewModelProvider(requireActivity()).get(RecipeViewModel.class);
-
         recipeViewModel.init(requireContext());
+
         // 3) RecyclerView 基本配置
         RecyclerView recyclerView = binding.recycler;
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        // 先给空数据，后续通过 LiveData 驱动
         adapter = new ShoppingItemAdapter(new ArrayList<>(), listViewModel);
         recyclerView.setAdapter(adapter);
 
         // 4) 绑定总价显示（分为三个TextView）
         listViewModel.getTotal().observe(getViewLifecycleOwner(), total -> {
-            // 获取当前购物车商品数量
             int itemCount = listViewModel.getItemList().getValue() != null ?
                     listViewModel.getItemList().getValue().size() : 0;
 
-            // 更新价格（大字，绿色）
             binding.totalPrice.setText(String.format(java.util.Locale.US, "$%.2f", total));
 
-            // 更新商品数量（小字，灰色）
             if (itemCount > 0) {
                 binding.itemCount.setText(String.format("(%d items)", itemCount));
             } else {
                 binding.itemCount.setText("(0 items)");
             }
         });
+
         // 5) 观察列表变化
         listViewModel.getItemList().observe(getViewLifecycleOwner(), list -> {
             if (adapter == null) {
-                // ✅ 首次创建adapter
                 adapter = new ShoppingItemAdapter(list, listViewModel);
                 recyclerView.setAdapter(adapter);
             } else {
-                // ✅ 后续只更新数据，不重建adapter
                 adapter.updateData(list);
             }
         });
 
-        // 6) 观察购物车聚合食材数据
+        // 6) 加载并恢复模式状态
+        android.content.SharedPreferences modePref = requireContext()
+                .getSharedPreferences("SmartShopListPrefs", android.content.Context.MODE_PRIVATE);
+        preferenceMode = modePref.getBoolean(PREF_MODE_KEY, false);
+        updateModeUI();
+
+        // 7) 模式切换点击事件
+        binding.chipModeToggle.setOnClickListener(v -> {
+            togglePreferenceMode();
+        });
+
+        // 8) 观察购物车聚合食材数据
         recipeViewModel.getRequiredIngredients().observe(getViewLifecycleOwner(), merged -> {
             if (merged != null && !merged.isEmpty()) {
-                // 有数据：隐藏空状态，显示列表
                 binding.emptyStateLayout.setVisibility(View.GONE);
                 binding.recycler.setVisibility(View.VISIBLE);
-
-                // 转换聚合食材为购物清单
                 convertCartToShoppingList(merged);
-//                android.util.Log.d("ListFragment", "Loaded " + merged.size() + " ingredients from cart");
             } else {
-                // 购物车为空：显示空状态，隐藏列表
                 binding.emptyStateLayout.setVisibility(View.VISIBLE);
                 binding.recycler.setVisibility(View.GONE);
-
                 listViewModel.updateItemList(new ArrayList<>());
-//                android.util.Log.d("ListFragment", "Cart is empty, showing empty state");
             }
         });
 
-        // 7) 默认加载：Breakfast 配方
-//        loadRecipe(RECIPE_BREAKFAST);
-        listViewModel.updateItemList(new ArrayList<>());
-
-        // 7) 配方切换按钮
-//        binding.btnRecipeBreakfast.setOnClickListener(v -> loadRecipe(RECIPE_BREAKFAST));
-//        binding.btnRecipeDinner.setOnClickListener(v -> loadRecipe(RECIPE_FAMILY_DINNER));
-//        binding.btnRecipeVegan.setOnClickListener(v -> loadRecipe(RECIPE_VEGAN));
-
         // 9) Continue按钮点击事件
         binding.btnProceed.setOnClickListener(v -> {
-            // 临时演示：显示Toast提示
             android.widget.Toast.makeText(requireContext(),
                     "Navigating to Store Map… (demo)",
                     android.widget.Toast.LENGTH_SHORT).show();
         });
-
     }
-
-//    /** 按配方筛选 items 并交给 ViewModel（会自动重算总价并刷新 UI） */
-//    private void loadRecipe(List<String> ingredientIds) {
-//        try {
-//            List<ShoppingItem> all = repo.loadInitialItems();  // 带默认 option
-//            List<ShoppingItem> filtered = new ArrayList<>();
-//            for (ShoppingItem it : all) {
-//                if (ingredientIds.contains(it.ingredientId)) {
-//                    filtered.add(it);
-//                }
-//            }
-//            listViewModel.updateItemList(filtered);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
     /**
      * 将购物车聚合食材转换为ShoppingItem列表
      * 使用Recipe模块中定义的食材图片
@@ -357,6 +320,66 @@ public class ListFragment extends Fragment {
         }
     }
 
+    /**
+     * 切换偏好模式
+     */
+    private void togglePreferenceMode() {
+        if (!preferenceMode) {
+            // 尝试启用偏好模式
+            android.util.Log.d("ListFragment", "Attempting to enable preference mode");
+            // TODO: 下一步实现冲突检测
+            android.widget.Toast.makeText(requireContext(),
+                    "Preference mode (coming soon)",
+                    android.widget.Toast.LENGTH_SHORT).show();
+        } else {
+            // 禁用偏好模式
+            disablePreferenceMode();
+        }
+    }
+
+    /**
+     * 禁用偏好模式
+     */
+    private void disablePreferenceMode() {
+        preferenceMode = false;
+        updateModeUI();
+        savePreferenceMode();
+
+        android.widget.Toast.makeText(requireContext(),
+                "Switched to default mode",
+                android.widget.Toast.LENGTH_SHORT).show();
+
+        android.util.Log.d("ListFragment", "Preference mode disabled");
+    }
+
+    /**
+     * 更新模式UI显示
+     */
+    private void updateModeUI() {
+        if (preferenceMode) {
+            // 偏好模式：绿色背景，白色文字，显示勾选
+            binding.chipModeToggle.setChecked(true);
+            binding.chipModeToggle.setText("Preference");
+            binding.chipModeToggle.setTextColor(0xFFFFFFFF); // 白色
+            binding.chipModeToggle.setChipBackgroundColorResource(R.color.green_700);
+        } else {
+            // 默认模式：白色背景，绿色文字
+            binding.chipModeToggle.setChecked(false);
+            binding.chipModeToggle.setText("Default");
+            binding.chipModeToggle.setTextColor(0xFF388E3C); // 深绿色
+            binding.chipModeToggle.setChipBackgroundColorResource(android.R.color.white);
+        }
+    }
+
+    /**
+     * 保存模式状态到SharedPreferences
+     */
+    private void savePreferenceMode() {
+        requireContext().getSharedPreferences("SmartShopListPrefs", android.content.Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean(PREF_MODE_KEY, preferenceMode)
+                .apply();
+    }
     @Override
     public void onDestroyView() {
         super.onDestroyView();
