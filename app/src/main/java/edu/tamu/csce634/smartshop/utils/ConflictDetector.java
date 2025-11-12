@@ -32,6 +32,7 @@ public class ConflictDetector {
         public ConflictType type;           // 冲突类型
         public String reason;               // 冲突原因（显示给用户）
         public List<String> conflictDetails; // 具体冲突细节（如过敏源列表）
+        public List<IngredientSubstitutes.Substitute> substitutes; // 替代品列表
         public boolean resolved = false;    // 是否已解决
 
         public Conflict(ShoppingItem item, ConflictType type, String reason) {
@@ -39,6 +40,7 @@ public class ConflictDetector {
             this.type = type;
             this.reason = reason;
             this.conflictDetails = new ArrayList<>();
+            this.substitutes = new ArrayList<>();
         }
     }
 
@@ -73,6 +75,11 @@ public class ConflictDetector {
                 Conflict c = new Conflict(item, ConflictType.ALLERGEN,
                         buildAllergenReason(foundAllergens));
                 c.conflictDetails = foundAllergens;
+
+                // 查找替代品（使用第一个过敏源）
+                c.substitutes = IngredientSubstitutes.getAllergenFreeSubstitutes(
+                        item.name, foundAllergens.get(0));
+
                 conflicts.add(c);
                 continue; // 过敏源冲突最严重，不再检查其他冲突
             }
@@ -81,6 +88,7 @@ public class ConflictDetector {
             if (profile.isVegan() && !isVeganFriendly(item)) {
                 Conflict c = new Conflict(item, ConflictType.VEGAN,
                         "Not suitable for vegan diet");
+                c.substitutes = IngredientSubstitutes.getVeganSubstitutes(item.name);
                 conflicts.add(c);
                 continue;
             }
@@ -89,6 +97,7 @@ public class ConflictDetector {
             if (profile.isVegetarian() && !isVegetarian(item)) {
                 Conflict c = new Conflict(item, ConflictType.VEGETARIAN,
                         "Not suitable for vegetarian diet");
+                c.substitutes = IngredientSubstitutes.getVegetarianSubstitutes(item.name);
                 conflicts.add(c);
                 continue;
             }
@@ -97,6 +106,7 @@ public class ConflictDetector {
             if (profile.isGlutenFree() && containsGluten(item)) {
                 Conflict c = new Conflict(item, ConflictType.GLUTEN,
                         "Contains gluten");
+                c.substitutes = IngredientSubstitutes.getGlutenFreeSubstitutes(item.name);
                 conflicts.add(c);
             }
         }
