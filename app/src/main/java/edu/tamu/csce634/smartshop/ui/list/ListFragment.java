@@ -75,7 +75,8 @@ public class ListFragment extends Fragment {
         listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
         recipeViewModel = new ViewModelProvider(requireActivity()).get(RecipeViewModel.class);
         recipeViewModel.init(requireContext());
-        // ✅ 添加验证调用（仅调试时使用）
+
+        // ✅ Phase 1: 验证替代品数据
         IngredientSubstitutes.validateSubstitutes(requireContext());
 
         // 3) RecyclerView 基本配置
@@ -88,9 +89,7 @@ public class ListFragment extends Fragment {
         listViewModel.getTotal().observe(getViewLifecycleOwner(), total -> {
             int itemCount = listViewModel.getItemList().getValue() != null ?
                     listViewModel.getItemList().getValue().size() : 0;
-
             binding.totalPrice.setText(String.format(java.util.Locale.US, "$%.2f", total));
-
             if (itemCount > 0) {
                 binding.itemCount.setText(String.format("(%d items)", itemCount));
             } else {
@@ -139,6 +138,7 @@ public class ListFragment extends Fragment {
                     android.widget.Toast.LENGTH_SHORT).show();
         });
     }
+
     /**
      * 将购物车聚合食材转换为ShoppingItem列表
      * 使用Recipe模块中定义的食材图片
@@ -148,7 +148,6 @@ public class ListFragment extends Fragment {
             // 获取所有Recipe对象
             List<edu.tamu.csce634.smartshop.models.Recipe> recipes =
                     recipeViewModel.getRecipes().getValue();
-
             if (recipes == null) {
                 recipes = new ArrayList<>();
             }
@@ -162,26 +161,17 @@ public class ListFragment extends Fragment {
                 }
             }
 
-// 获取预置数据作为价格等信息的参考
+            // 获取预置数据作为价格等信息的参考
             List<ShoppingItem> presetItems = repo.loadInitialItems();
-//            for (ShoppingItem p : presetItems) {
-//                android.util.Log.d("ListFragment", "Preset loaded: " + p.name +
-//                        " | SKU: " + p.selectedSkuName +
-//                        " | Spec: " + p.skuSpec +
-//                        " | Price: " + p.unitPrice);
-//            }
-            Map<String, ShoppingItem> presetMap = new HashMap<>();
 
-// 建立多种映射方式
+            Map<String, ShoppingItem> presetMap = new HashMap<>();
+            // 建立多种映射方式
             for (ShoppingItem preset : presetItems) {
                 String normalizedName = preset.name.toLowerCase().trim();
-
                 // 方式1：直接名称匹配
                 presetMap.put(normalizedName, preset);
-
                 // 方式2：移除空格后匹配（如 "Brown Rice" -> "brownrice"）
                 presetMap.put(normalizedName.replaceAll("\\s+", ""), preset);
-
                 // 方式3：使用 selectedSkuName
                 if (preset.selectedSkuName != null) {
                     String normalizedSku = preset.selectedSkuName.toLowerCase().trim();
@@ -189,8 +179,6 @@ public class ListFragment extends Fragment {
                     presetMap.put(normalizedSku.replaceAll("\\s+", ""), preset);
                 }
             }
-
-//            android.util.Log.d("ListFragment", "Built preset map with " + presetMap.size() + " entries");
 
             List<ShoppingItem> cartItems = new ArrayList<>();
             for (Map.Entry<String, String> entry : mergedIngredients.entrySet()) {
@@ -215,36 +203,25 @@ public class ListFragment extends Fragment {
                     item.recipeNeededUnit = "";
                 }
 
-
                 // 从预置数据获取价格等信息（尝试多种匹配方式）
                 String normalizedName = ingredientName.toLowerCase().trim();
                 ShoppingItem preset = presetMap.get(normalizedName);
 
-// 如果直接匹配失败，尝试移除空格
+                // 如果直接匹配失败，尝试移除空格
                 if (preset == null) {
                     preset = presetMap.get(normalizedName.replaceAll("\\s+", ""));
                 }
 
-//                android.util.Log.d("ListFragment", "Ingredient: " + ingredientName +
-//                        ", Preset found: " + (preset != null ? preset.name : "NOT FOUND"));
-
-//                android.util.Log.d("ListFragment", "Converting: " + ingredientName +
-//                        " | normalizedName: " + normalizedName +
-//                        " | preset found: " + (preset != null));
                 if (preset != null) {
-                    item.selectedSkuName = preset.selectedSkuName; // 这个字段是repo.loadInitialItems已经填充好的
+                    item.selectedSkuName = preset.selectedSkuName;
                     item.unitPrice = preset.unitPrice;
                     item.unit = preset.unit;
                     item.aisle = preset.aisle;
                     item.ingredientId = preset.ingredientId;
                     item.skuSpec = preset.skuSpec;
 
-//                    android.util.Log.d("ListFragment", "  -> Using SKU: " + item.selectedSkuName +
-//                            ", Spec: " + item.skuSpec + ", Price: " + item.unitPrice);
-
                     // === 智能计算购买件数 ===
                     QuantityParser.ParsedQuantity packageParsed = QuantityParser.parse(preset.skuSpec);
-
                     if (packageParsed.success && item.recipeNeededValue > 0) {
                         // 检查单位是否匹配
                         boolean unitMatch = item.recipeNeededUnit.isEmpty() ||
@@ -267,7 +244,6 @@ public class ListFragment extends Fragment {
                         // 无法解析包装规格或需求量，默认买1件
                         item.quantity = 1;
                     }
-
                 } else {
                     // 使用默认值
                     item.unitPrice = 2.99;
@@ -275,8 +251,8 @@ public class ListFragment extends Fragment {
                     item.aisle = "General";
                     item.ingredientId = "cart_" + ingredientName.toLowerCase().replaceAll("[^a-z0-9]", "_");
                     item.quantity = 1;
-                    item.selectedSkuName = ingredientName; // 回退到食材名
-                    item.skuSpec = ""; // 无规格信息
+                    item.selectedSkuName = ingredientName;
+                    item.skuSpec = "";
                 }
 
                 // 优先使用Recipe模块的图片资源ID
@@ -303,24 +279,6 @@ public class ListFragment extends Fragment {
             android.util.Log.e("ListFragment", "Error converting cart data: " + e.getMessage());
             e.printStackTrace();
             listViewModel.updateItemList(new ArrayList<>());
-        }
-    }
-
-    /**
-     * 从数量字符串解析数字 (例如: "6 Oz" -> 6.0)
-     */
-    private double parseQuantityFromString(String quantityStr) {
-        try {
-            String[] parts = quantityStr.trim().split("\\s+");
-            if (parts.length > 0) {
-                String numPart = parts[0].replaceAll("[^\\d.]", "");
-                if (!numPart.isEmpty()) {
-                    return Double.parseDouble(numPart);
-                }
-            }
-            return 1.0; // 默认数量
-        } catch (Exception e) {
-            return 1.0; // 解析失败时默认为1
         }
     }
 
@@ -386,18 +344,42 @@ public class ListFragment extends Fragment {
             android.util.Log.d("ListFragment", "Detected " + conflicts.size() + " conflicts");
 
             if (!conflicts.isEmpty()) {
-                // 有冲突 - 显示冲突信息
+                // ✅ Phase 2: 传递冲突数据到Adapter
+                adapter.setConflicts(conflicts);
+
+                // ✅ 设置替代品选择监听器
+                adapter.setOnSubstituteRequestListener((item, conflict) -> {
+                    // TODO: Phase 3 实现替代品选择BottomSheet
+                    android.widget.Toast.makeText(requireContext(),
+                            "Substitute selection will be implemented in Phase 3",
+                            android.widget.Toast.LENGTH_SHORT).show();
+                    android.util.Log.d("ListFragment", "User requested substitute for: " + item.name);
+                });
+
+                // 显示冲突信息
                 StringBuilder sb = new StringBuilder("Found conflicts:\n");
                 for (ConflictDetector.Conflict c : conflicts) {
                     sb.append("- ").append(c.item.name).append(": ").append(c.reason).append("\n");
                     android.util.Log.d("ListFragment", "  Conflict: " + c.item.name + " - " + c.reason);
+
+                    // 调试：输出替代品信息
+                    if (c.substitutes != null && !c.substitutes.isEmpty()) {
+                        android.util.Log.d("ListFragment", "    Available substitutes: " + c.substitutes.size());
+                        for (IngredientSubstitutes.Substitute sub : c.substitutes) {
+                            android.util.Log.d("ListFragment", "      - " + sub.name + " (" + sub.ingredientId + ")");
+                        }
+                    } else {
+                        android.util.Log.w("ListFragment", "    No substitutes available!");
+                    }
                 }
 
                 android.widget.Toast.makeText(requireContext(),
-                        conflicts.size() + " conflicts detected. Check Logcat for details.",
+                        conflicts.size() + " conflicts detected. Tap items to resolve.",
                         android.widget.Toast.LENGTH_LONG).show();
 
-                // TODO: 下一步跳转到ConflictResolutionActivity
+                // 激活偏好模式
+                activatePreferenceMode(profile);
+
             } else {
                 // 无冲突 - 直接启用偏好模式
                 android.util.Log.d("ListFragment", "No conflicts, activating preference mode");
@@ -408,6 +390,7 @@ public class ListFragment extends Fragment {
             profileRepo.getProfileData().removeObservers(getViewLifecycleOwner());
         });
     }
+
     /**
      * 激活偏好模式（无冲突时）
      */
@@ -419,10 +402,9 @@ public class ListFragment extends Fragment {
         android.widget.Toast.makeText(requireContext(),
                 "Preference mode activated",
                 android.widget.Toast.LENGTH_SHORT).show();
+        android.util.Log.d("ListFragment", "Preference mode activated");
 
-        android.util.Log.d("ListFragment", "Preference mode activated (no conflicts)");
-
-        // TODO: 下一步应用偏好过滤和排序
+        // TODO: Phase 5 - 下一步应用偏好过滤和排序
     }
 
     /**
@@ -433,10 +415,14 @@ public class ListFragment extends Fragment {
         updateModeUI();
         savePreferenceMode();
 
+        // ✅ Phase 2: 清除冲突显示
+        if (adapter != null) {
+            adapter.setConflicts(new ArrayList<>());
+        }
+
         android.widget.Toast.makeText(requireContext(),
                 "Switched to default mode",
                 android.widget.Toast.LENGTH_SHORT).show();
-
         android.util.Log.d("ListFragment", "Preference mode disabled");
     }
 
@@ -468,6 +454,7 @@ public class ListFragment extends Fragment {
                 .putBoolean(PREF_MODE_KEY, preferenceMode)
                 .apply();
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
