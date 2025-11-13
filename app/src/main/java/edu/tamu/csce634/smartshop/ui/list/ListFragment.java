@@ -26,6 +26,7 @@ import edu.tamu.csce634.smartshop.data.PresetRepository;
 import edu.tamu.csce634.smartshop.models.ShoppingItem;
 import edu.tamu.csce634.smartshop.ui.recipe.RecipeViewModel;
 import edu.tamu.csce634.smartshop.utils.ConflictDetector;
+import edu.tamu.csce634.smartshop.utils.IngredientSubstitutes;
 import edu.tamu.csce634.smartshop.utils.QuantityParser;
 
 /**
@@ -74,6 +75,8 @@ public class ListFragment extends Fragment {
         listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
         recipeViewModel = new ViewModelProvider(requireActivity()).get(RecipeViewModel.class);
         recipeViewModel.init(requireContext());
+        // ✅ 添加验证调用（仅调试时使用）
+        IngredientSubstitutes.validateSubstitutes(requireContext());
 
         // 3) RecyclerView 基本配置
         RecyclerView recyclerView = binding.recycler;
