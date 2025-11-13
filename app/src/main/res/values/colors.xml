@@ -33,6 +33,7 @@
 
     <!-- Red Palette (Errors/Allergies) -->
     <color name="red">#F44336</color>
+    <color name="red_50">#FFEBEE</color>
     <color name="red_300">#E57373</color>
     <color name="red_500">#F44336</color>
     <color name="red_600">#E53935</color>
