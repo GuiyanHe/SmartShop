@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.tamu.csce634.smartshop.R;
+import edu.tamu.csce634.smartshop.Repository.ProfileRepository;
 import edu.tamu.csce634.smartshop.adapters.ShoppingItemAdapter;
 import edu.tamu.csce634.smartshop.databinding.FragmentListBinding;
 import edu.tamu.csce634.smartshop.data.DataSeeder;
@@ -28,65 +28,52 @@ import edu.tamu.csce634.smartshop.models.ShoppingItem;
 import edu.tamu.csce634.smartshop.ui.recipe.RecipeViewModel;
 import edu.tamu.csce634.smartshop.utils.ConflictDetector;
 import edu.tamu.csce634.smartshop.utils.IngredientSubstitutes;
+import edu.tamu.csce634.smartshop.utils.PreferenceStateManager;
 import edu.tamu.csce634.smartshop.utils.QuantityParser;
 
-/**
- * 购物清单页面：
- * - 首次启动把 res/raw 的预置 JSON 灌入 SharedPreferences
- * - 从预置数据生成初始列表（默认 Breakfast 配方）
- * - 底部提供 3 个 recipe 切换按钮（Quick Breakfast / Family Dinner / Vegan Bowl）
- * - 顶部右侧显示实时总价与 Map 按钮（Map 按钮仅打印日志）
- * - 与 ListViewModel/ShoppingItemAdapter 协作，支持 replaceSkuFull、数量 ± 等
- */
 public class ListFragment extends Fragment {
 
-    // ViewBinding：对应 fragment_list.xml
     private FragmentListBinding binding;
-
-    // VM / 适配器 / 数据仓库
     private ListViewModel listViewModel;
     private RecipeViewModel recipeViewModel;
     private ShoppingItemAdapter adapter;
     private PresetRepository repo;
+    private PreferenceStateManager stateManager;
 
-    // 新增：偏好模式状态
     private boolean preferenceMode = false;
     private static final String PREF_MODE_KEY = "shopping_list_preference_mode";
+
+    // ✅ 新增：标记是否需要恢复状态
+    private boolean needsStateRestore = false;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        // 使用 ViewBinding 加载布局
         binding = FragmentListBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
     @Override
-    public void onViewCreated(@NonNull View view,
-                              @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // 1) 首次把 res/raw 的预置 JSON 灌入 SharedPreferences（只做一次）
         DataSeeder.seedIfNeeded(requireContext());
         repo = new PresetRepository(requireContext());
+        stateManager = new PreferenceStateManager(requireContext());
 
-        // 2) 获取 ViewModel（使用 Activity 作用域便于 BottomSheet 共享）
         listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
         recipeViewModel = new ViewModelProvider(requireActivity()).get(RecipeViewModel.class);
         recipeViewModel.init(requireContext());
 
-        // ✅ Phase 1: 验证替代品数据
         IngredientSubstitutes.validateSubstitutes(requireContext());
 
-        // 3) RecyclerView 基本配置
         RecyclerView recyclerView = binding.recycler;
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new ShoppingItemAdapter(new ArrayList<>(), listViewModel);
         recyclerView.setAdapter(adapter);
 
-        // 4) 绑定总价显示（分为三个TextView）
         listViewModel.getTotal().observe(getViewLifecycleOwner(), total -> {
             int itemCount = listViewModel.getItemList().getValue() != null ?
                     listViewModel.getItemList().getValue().size() : 0;
@@ -98,7 +85,7 @@ public class ListFragment extends Fragment {
             }
         });
 
-        // 5) 观察列表变化
+        // ✅ 关键修改：在列表更新后立即恢复状态
         listViewModel.getItemList().observe(getViewLifecycleOwner(), list -> {
             if (adapter == null) {
                 adapter = new ShoppingItemAdapter(list, listViewModel);
@@ -106,20 +93,26 @@ public class ListFragment extends Fragment {
             } else {
                 adapter.updateData(list);
             }
+
+            // ✅ 如果需要恢复状态且列表已准备好
+            if (needsStateRestore && list != null && !list.isEmpty()) {
+                needsStateRestore = false;
+                binding.getRoot().post(() -> restorePreferenceModeState());
+            }
         });
 
-        // 6) 加载并恢复模式状态
         android.content.SharedPreferences modePref = requireContext()
                 .getSharedPreferences("SmartShopListPrefs", android.content.Context.MODE_PRIVATE);
         preferenceMode = modePref.getBoolean(PREF_MODE_KEY, false);
         updateModeUI();
 
-        // 7) 模式切换点击事件
-        binding.chipModeToggle.setOnClickListener(v -> {
-            togglePreferenceMode();
-        });
+        // ✅ 如果是偏好模式，标记需要恢复状态
+        if (preferenceMode) {
+            needsStateRestore = true;
+        }
 
-        // 8) 观察购物车聚合食材数据
+        binding.chipModeToggle.setOnClickListener(v -> togglePreferenceMode());
+
         recipeViewModel.getRequiredIngredients().observe(getViewLifecycleOwner(), merged -> {
             if (merged != null && !merged.isEmpty()) {
                 binding.emptyStateLayout.setVisibility(View.GONE);
@@ -132,48 +125,28 @@ public class ListFragment extends Fragment {
             }
         });
 
-        // 9) Continue按钮点击事件
-        binding.btnProceed.setOnClickListener(v -> {
-            android.widget.Toast.makeText(requireContext(),
-                    "Navigating to Store Map… (demo)",
-                    android.widget.Toast.LENGTH_SHORT).show();
-        });
+        binding.btnProceed.setOnClickListener(v ->
+                Toast.makeText(requireContext(), "Navigating to Store Map… (demo)", Toast.LENGTH_SHORT).show());
     }
 
-    /**
-     * 将购物车聚合食材转换为ShoppingItem列表
-     * 使用Recipe模块中定义的食材图片
-     */
     private void convertCartToShoppingList(Map<String, String> mergedIngredients) {
         try {
-            // 获取所有Recipe对象
-            List<edu.tamu.csce634.smartshop.models.Recipe> recipes =
-                    recipeViewModel.getRecipes().getValue();
-            if (recipes == null) {
-                recipes = new ArrayList<>();
-            }
+            List<edu.tamu.csce634.smartshop.models.Recipe> recipes = recipeViewModel.getRecipes().getValue();
+            if (recipes == null) recipes = new ArrayList<>();
 
-            // 构建食材名称到图片资源的映射
             Map<String, Integer> ingredientImageMap = new HashMap<>();
             for (edu.tamu.csce634.smartshop.models.Recipe recipe : recipes) {
                 for (edu.tamu.csce634.smartshop.models.Ingredient ingredient : recipe.getIngredients()) {
-                    String name = ingredient.getName().toLowerCase().trim();
-                    ingredientImageMap.put(name, ingredient.getImageResId());
+                    ingredientImageMap.put(ingredient.getName().toLowerCase().trim(), ingredient.getImageResId());
                 }
             }
 
-            // 获取预置数据作为价格等信息的参考
             List<ShoppingItem> presetItems = repo.loadInitialItems();
-
             Map<String, ShoppingItem> presetMap = new HashMap<>();
-            // 建立多种映射方式
             for (ShoppingItem preset : presetItems) {
                 String normalizedName = preset.name.toLowerCase().trim();
-                // 方式1：直接名称匹配
                 presetMap.put(normalizedName, preset);
-                // 方式2：移除空格后匹配（如 "Brown Rice" -> "brownrice"）
                 presetMap.put(normalizedName.replaceAll("\\s+", ""), preset);
-                // 方式3：使用 selectedSkuName
                 if (preset.selectedSkuName != null) {
                     String normalizedSku = preset.selectedSkuName.toLowerCase().trim();
                     presetMap.put(normalizedSku, preset);
@@ -186,15 +159,11 @@ public class ListFragment extends Fragment {
                 String ingredientName = entry.getKey();
                 String quantityStr = entry.getValue();
 
-                // 创建新的购物项
                 ShoppingItem item = new ShoppingItem();
                 item.name = ingredientName;
                 item.selectedSkuName = ingredientName;
+                item.recipeNeededStr = quantityStr;
 
-                // === 新增：保存Recipe需求量 ===
-                item.recipeNeededStr = quantityStr; // 保存原始字符串用于显示
-
-                // 解析需求量
                 QuantityParser.ParsedQuantity parsed = QuantityParser.parse(quantityStr);
                 if (parsed.success) {
                     item.recipeNeededValue = parsed.value;
@@ -204,14 +173,9 @@ public class ListFragment extends Fragment {
                     item.recipeNeededUnit = "";
                 }
 
-                // 从预置数据获取价格等信息（尝试多种匹配方式）
                 String normalizedName = ingredientName.toLowerCase().trim();
                 ShoppingItem preset = presetMap.get(normalizedName);
-
-                // 如果直接匹配失败，尝试移除空格
-                if (preset == null) {
-                    preset = presetMap.get(normalizedName.replaceAll("\\s+", ""));
-                }
+                if (preset == null) preset = presetMap.get(normalizedName.replaceAll("\\s+", ""));
 
                 if (preset != null) {
                     item.selectedSkuName = preset.selectedSkuName;
@@ -221,32 +185,19 @@ public class ListFragment extends Fragment {
                     item.ingredientId = preset.ingredientId;
                     item.skuSpec = preset.skuSpec;
 
-                    // === 智能计算购买件数 ===
                     QuantityParser.ParsedQuantity packageParsed = QuantityParser.parse(preset.skuSpec);
                     if (packageParsed.success && item.recipeNeededValue > 0) {
-                        // 检查单位是否匹配
-                        boolean unitMatch = item.recipeNeededUnit.isEmpty() ||
-                                packageParsed.unit.isEmpty() ||
+                        boolean unitMatch = item.recipeNeededUnit.isEmpty() || packageParsed.unit.isEmpty() ||
                                 item.recipeNeededUnit.equalsIgnoreCase(packageParsed.unit);
-
                         if (unitMatch) {
-                            // 单位匹配，计算需要买几件
-                            item.quantity = QuantityParser.calculatePackageCount(
-                                    item.recipeNeededValue,
-                                    packageParsed.value
-                            );
+                            item.quantity = QuantityParser.calculatePackageCount(item.recipeNeededValue, packageParsed.value);
                         } else {
-                            // 单位不匹配，默认买1件
                             item.quantity = 1;
-                            android.util.Log.w("ListFragment", "Unit mismatch: need " +
-                                    item.recipeNeededUnit + " but package is " + packageParsed.unit);
                         }
                     } else {
-                        // 无法解析包装规格或需求量，默认买1件
                         item.quantity = 1;
                     }
                 } else {
-                    // 使用默认值
                     item.unitPrice = 2.99;
                     item.unit = "Oz";
                     item.aisle = "General";
@@ -256,228 +207,389 @@ public class ListFragment extends Fragment {
                     item.skuSpec = "";
                 }
 
-                // 优先使用Recipe模块的图片资源ID
                 Integer imageResId = ingredientImageMap.get(ingredientName.toLowerCase().trim());
                 if (imageResId != null && imageResId != 0) {
-                    // 将资源ID转换为URL格式供Glide使用
                     item.imageUrl = "res:" + imageResId;
                 } else if (preset != null && preset.imageUrl != null) {
-                    // 回退到预置数据的图片
                     item.imageUrl = preset.imageUrl;
                 } else {
-                    // 无图片
                     item.imageUrl = "";
                 }
 
                 cartItems.add(item);
             }
 
-            // 更新列表
             listViewModel.updateItemList(cartItems);
-            android.util.Log.d("ListFragment", "Converted " + cartItems.size() + " items from cart");
+            // ✅ 关键修复：如果是偏好模式，立即应用历史替换
+            if (preferenceMode) {
+                binding.getRoot().post(() -> {
+                    applyHistoricalSubstitutions(cartItems);
+                    listViewModel.updateItemList(cartItems);
+                });
+            }
 
         } catch (Exception e) {
-            android.util.Log.e("ListFragment", "Error converting cart data: " + e.getMessage());
             e.printStackTrace();
             listViewModel.updateItemList(new ArrayList<>());
         }
     }
 
-    /**
-     * 切换偏好模式
-     */
     private void togglePreferenceMode() {
         if (!preferenceMode) {
-            // 尝试启用偏好模式
+            saveCurrentQuantities(false);
             enablePreferenceMode();
         } else {
-            // 禁用偏好模式
+            saveCurrentQuantities(true);
             disablePreferenceMode();
         }
     }
 
-    /**
-     * 启用偏好模式
-     */
+    private void saveCurrentQuantities(boolean isPreferenceMode) {
+        List<ShoppingItem> currentItems = listViewModel.getItemList().getValue();
+        if (currentItems == null) return;
+
+        Map<String, Integer> quantities = new HashMap<>();
+        for (ShoppingItem item : currentItems) {
+            String key = item.originalIngredientId != null ? item.originalIngredientId : item.ingredientId;
+            quantities.put(key, (int) Math.round(item.quantity));
+        }
+
+        if (isPreferenceMode) {
+            stateManager.savePreferenceQuantities(quantities);
+        } else {
+            stateManager.saveDefaultQuantities(quantities);
+        }
+    }
+
     private void enablePreferenceMode() {
-        android.util.Log.d("ListFragment", "=== enablePreferenceMode called ===");
-
-        // 1. 获取用户Profile（使用observe确保数据已加载）
-        edu.tamu.csce634.smartshop.Repository.ProfileRepository profileRepo =
-                new edu.tamu.csce634.smartshop.Repository.ProfileRepository(
-                        requireActivity().getApplication());
-
+        ProfileRepository profileRepo = new ProfileRepository(requireActivity().getApplication());
         profileRepo.getProfileData().observe(getViewLifecycleOwner(), profile -> {
             if (profile == null) {
-                android.util.Log.d("ListFragment", "Profile is null");
-                android.widget.Toast.makeText(requireContext(),
-                        "Please set up your profile first",
-                        android.widget.Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Please set up your profile first", Toast.LENGTH_SHORT).show();
+                profileRepo.getProfileData().removeObservers(getViewLifecycleOwner());
                 return;
             }
 
-            android.util.Log.d("ListFragment", "Profile loaded: " + profile.getName());
-            android.util.Log.d("ListFragment", "  isVegan: " + profile.isVegan());
-            android.util.Log.d("ListFragment", "  isVegetarian: " + profile.isVegetarian());
-            android.util.Log.d("ListFragment", "  Allergies: " + profile.getAllergies());
-
-            // 2. 获取当前购物清单
-            List<edu.tamu.csce634.smartshop.models.ShoppingItem> currentItems =
-                    listViewModel.getItemList().getValue();
-
+            List<ShoppingItem> currentItems = listViewModel.getItemList().getValue();
             if (currentItems == null || currentItems.isEmpty()) {
-                android.util.Log.d("ListFragment", "Shopping list is empty");
-                android.widget.Toast.makeText(requireContext(),
-                        "Shopping list is empty",
-                        android.widget.Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Shopping list is empty", Toast.LENGTH_SHORT).show();
+                profileRepo.getProfileData().removeObservers(getViewLifecycleOwner());
                 return;
             }
 
-            android.util.Log.d("ListFragment", "Shopping list has " + currentItems.size() + " items");
-            for (edu.tamu.csce634.smartshop.models.ShoppingItem item : currentItems) {
-                android.util.Log.d("ListFragment", "  - " + item.name);
-            }
+            // ✅ 读取历史替换记录
+            Map<String, PreferenceStateManager.ResolutionRecord> savedResolutions = stateManager.loadResolutions();
 
-            // 3. 检测冲突
-            List<ConflictDetector.Conflict> conflicts =
-                    ConflictDetector.detectConflicts(currentItems, profile);
+            if (!savedResolutions.isEmpty()) {
+                Toast.makeText(requireContext(),
+                        "Restoring " + savedResolutions.size() + " previous changes...",
+                        Toast.LENGTH_SHORT).show();
 
-            android.util.Log.d("ListFragment", "Detected " + conflicts.size() + " conflicts");
+                List<ShoppingItem> restoredItems = new ArrayList<>();
+                int appliedCount = 0;
 
-            if (!conflicts.isEmpty()) {
-                // ✅ Phase 2: 传递冲突数据到Adapter
-                adapter.setConflicts(conflicts);
+                for (ShoppingItem item : currentItems) {
+                    ShoppingItem newItem = new ShoppingItem();
+                    copyItemFields(item, newItem);
 
-                // ✅ 设置替代品选择监听器
-                adapter.setOnSubstituteRequestListener((item, conflict) -> {
-                    showSubstituteBottomSheet(item, conflict);
-                });
+                    // ✅ 关键修复：尝试多种key匹配
+                    PreferenceStateManager.ResolutionRecord resolution = null;
 
-                // 显示冲突信息
-                StringBuilder sb = new StringBuilder("Found conflicts:\n");
-                for (ConflictDetector.Conflict c : conflicts) {
-                    sb.append("- ").append(c.item.name).append(": ").append(c.reason).append("\n");
-                    android.util.Log.d("ListFragment", "  Conflict: " + c.item.name + " - " + c.reason);
+                    // 方式1：直接匹配ingredientId
+                    resolution = savedResolutions.get(item.ingredientId);
 
-                    // 调试：输出替代品信息
-                    if (c.substitutes != null && !c.substitutes.isEmpty()) {
-                        android.util.Log.d("ListFragment", "    Available substitutes: " + c.substitutes.size());
-                        for (IngredientSubstitutes.Substitute sub : c.substitutes) {
-                            android.util.Log.d("ListFragment", "      - " + sub.name + " (" + sub.ingredientId + ")");
+                    // 方式2：如果有originalIngredientId，用它匹配
+                    if (resolution == null && item.originalIngredientId != null) {
+                        resolution = savedResolutions.get(item.originalIngredientId);
+                    }
+
+                    // 方式3：按名称模糊匹配（最后手段）
+                    if (resolution == null) {
+                        for (Map.Entry<String, PreferenceStateManager.ResolutionRecord> entry : savedResolutions.entrySet()) {
+                            if (item.name.equalsIgnoreCase(entry.getValue().substituteName)) {
+                                resolution = entry.getValue();
+                                Toast.makeText(requireContext(),
+                                        "DEBUG: Matched by name: " + item.name,
+                                        Toast.LENGTH_SHORT).show();
+                                break;
+                            }
+                        }
+                    }
+
+                    if (resolution != null) {
+                        Toast.makeText(requireContext(),
+                                "DEBUG: Found resolution for " + item.name,
+                                Toast.LENGTH_SHORT).show();
+
+                        if (resolution.type == PreferenceStateManager.ResolutionType.REPLACED) {
+                            applySubstitutionToItem(newItem, resolution);
+                        } else if (resolution.type == PreferenceStateManager.ResolutionType.SET_TO_ZERO) {
+                            newItem.quantity = 0;
                         }
                     } else {
-                        android.util.Log.w("ListFragment", "    No substitutes available!");
+                        Toast.makeText(requireContext(),
+                                "DEBUG: No resolution found for " + item.ingredientId + "/" + item.name,
+                                Toast.LENGTH_SHORT).show();
                     }
+
+                    restoredItems.add(newItem);
+                }
+                // ✅ 强制更新列表
+                listViewModel.updateItemList(restoredItems);
+                currentItems = restoredItems;
+
+                Toast.makeText(requireContext(),
+                        "✓ Applied " + appliedCount + " substitutions",
+                        Toast.LENGTH_LONG).show();
+                // ✅ 调试：打印保存的记录
+                for (Map.Entry<String, PreferenceStateManager.ResolutionRecord> entry : savedResolutions.entrySet()) {
+                    Toast.makeText(requireContext(),
+                            "Saved: [" + entry.getKey() + "] → " + entry.getValue().substituteName,
+                            Toast.LENGTH_LONG).show();
                 }
 
-                android.widget.Toast.makeText(requireContext(),
-                        conflicts.size() + " conflicts detected. Tap items to resolve.",
-                        android.widget.Toast.LENGTH_LONG).show();
-
-                // 激活偏好模式
-                activatePreferenceMode(profile);
-
-            } else {
-                // 无冲突 - 直接启用偏好模式
-                android.util.Log.d("ListFragment", "No conflicts, activating preference mode");
-                activatePreferenceMode(profile);
+// ✅ 调试：打印当前列表
+                for (ShoppingItem item : currentItems) {
+                    Toast.makeText(requireContext(),
+                            "Current: [" + item.ingredientId + "] " + item.name,
+                            Toast.LENGTH_LONG).show();
+                }
             }
 
-            // ⚠️ 重要：observe只触发一次，需要手动移除观察
+            // 检测冲突
+            List<ConflictDetector.Conflict> conflicts = ConflictDetector.detectConflicts(currentItems, profile);
+
+            // 标记已解决的冲突
+            for (ConflictDetector.Conflict conflict : conflicts) {
+                String key = conflict.item.originalIngredientId != null ?
+                        conflict.item.originalIngredientId : conflict.item.ingredientId;
+                if (savedResolutions.containsKey(key)) {
+                    conflict.resolved = true;
+                }
+            }
+
+            if (!conflicts.isEmpty()) {
+                adapter.setConflicts(conflicts);
+                adapter.setOnSubstituteRequestListener(this::showSubstituteBottomSheet);
+
+                int unresolvedCount = 0;
+                for (ConflictDetector.Conflict c : conflicts) {
+                    if (!c.resolved) unresolvedCount++;
+                }
+
+                if (unresolvedCount > 0) {
+                    Toast.makeText(requireContext(),
+                            unresolvedCount + " conflicts detected. Tap items to resolve.",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+
+            activatePreferenceMode(profile);
+            restorePreferenceQuantities();
             profileRepo.getProfileData().removeObservers(getViewLifecycleOwner());
         });
     }
-
-    /**
-     * 激活偏好模式（无冲突时）
-     */
     private void activatePreferenceMode(edu.tamu.csce634.smartshop.models.ProfileData profile) {
         preferenceMode = true;
         updateModeUI();
         savePreferenceMode();
-
-        android.widget.Toast.makeText(requireContext(),
-                "Preference mode activated",
-                android.widget.Toast.LENGTH_SHORT).show();
-        android.util.Log.d("ListFragment", "Preference mode activated");
-
-        // TODO: Phase 5 - 下一步应用偏好过滤和排序
+        Toast.makeText(requireContext(), "Preference mode activated", Toast.LENGTH_SHORT).show();
     }
 
-    /**
-     * 禁用偏好模式
-     */
     private void disablePreferenceMode() {
         preferenceMode = false;
         updateModeUI();
         savePreferenceMode();
+        restoreDefaultMode();
+        if (adapter != null) adapter.setConflicts(new ArrayList<>());
+        Toast.makeText(requireContext(), "✓ Switched to default mode", Toast.LENGTH_SHORT).show();
+    }
 
-        // ✅ Phase 2: 清除冲突显示
-        if (adapter != null) {
-            adapter.setConflicts(new ArrayList<>());
+    private void restoreDefaultMode() {
+        List<ShoppingItem> currentItems = listViewModel.getItemList().getValue();
+        if (currentItems == null) return;
+
+        Map<String, Integer> savedQuantities = stateManager.loadDefaultQuantities();
+        List<ShoppingItem> restoredItems = new ArrayList<>();
+
+        for (ShoppingItem item : currentItems) {
+            ShoppingItem newItem = new ShoppingItem();
+            copyItemFields(item, newItem);
+
+            if (item.isSubstituted && item.originalIngredientId != null) {
+                try {
+                    ShoppingItem originalPreset = loadPresetDataForSubstitute(item.originalIngredientId);
+                    if (originalPreset != null) {
+                        newItem.ingredientId = item.originalIngredientId;
+                        newItem.name = originalPreset.name;
+                        newItem.selectedSkuName = originalPreset.selectedSkuName;
+                        newItem.unitPrice = originalPreset.unitPrice;
+                        newItem.skuSpec = originalPreset.skuSpec;
+                        newItem.unit = originalPreset.unit;
+                        newItem.aisle = originalPreset.aisle;
+                        newItem.imageUrl = getImageUrlForIngredient(originalPreset.name);
+                        newItem.isSubstituted = false;
+                        newItem.substitutionRatio = 1.0;
+                        newItem.originalIngredientId = null;
+
+                        // ✅ 恢复原始Recipe需求量
+                        newItem.recipeNeededValue = item.recipeNeededValue / item.substitutionRatio;
+                        newItem.recipeNeededStr = formatQuantity(newItem.recipeNeededValue) +
+                                (newItem.recipeNeededUnit.isEmpty() ? "" : " " + newItem.recipeNeededUnit);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            String key = item.originalIngredientId != null ? item.originalIngredientId : item.ingredientId;
+            Integer savedQty = savedQuantities.get(key);
+            if (savedQty != null) {
+                newItem.quantity = savedQty;
+            }
+
+            restoredItems.add(newItem);
         }
 
-        android.widget.Toast.makeText(requireContext(),
-                "Switched to default mode",
-                android.widget.Toast.LENGTH_SHORT).show();
-        android.util.Log.d("ListFragment", "Preference mode disabled");
+        listViewModel.updateItemList(restoredItems);
     }
 
-    /**
-     * 更新模式UI显示
-     */
-    private void updateModeUI() {
-        if (preferenceMode) {
-            // 偏好模式：绿色背景，白色文字，显示勾选
-            binding.chipModeToggle.setChecked(true);
-            binding.chipModeToggle.setText("Preference");
-            binding.chipModeToggle.setTextColor(0xFFFFFFFF); // 白色
-            binding.chipModeToggle.setChipBackgroundColorResource(R.color.green_700);
-        } else {
-            // 默认模式：白色背景，绿色文字
-            binding.chipModeToggle.setChecked(false);
-            binding.chipModeToggle.setText("Default");
-            binding.chipModeToggle.setTextColor(0xFF388E3C); // 深绿色
-            binding.chipModeToggle.setChipBackgroundColorResource(android.R.color.white);
+    private void restorePreferenceQuantities() {
+        Map<String, Integer> savedQuantities = stateManager.loadPreferenceQuantities();
+        if (savedQuantities.isEmpty()) return;
+
+        List<ShoppingItem> currentItems = listViewModel.getItemList().getValue();
+        if (currentItems == null) return;
+
+        for (ShoppingItem item : currentItems) {
+            String key = item.originalIngredientId != null ? item.originalIngredientId : item.ingredientId;
+            Integer savedQty = savedQuantities.get(key);
+            if (savedQty != null) {
+                item.quantity = savedQty;
+            }
+        }
+
+        listViewModel.updateItemList(currentItems);
+    }
+
+    private void restorePreferenceModeState() {
+        List<ShoppingItem> currentItems = listViewModel.getItemList().getValue();
+        if (currentItems == null || currentItems.isEmpty()) return;
+
+        ProfileRepository profileRepo = new ProfileRepository(requireActivity().getApplication());
+        profileRepo.getProfileData().observe(getViewLifecycleOwner(), profile -> {
+            if (profile == null) {
+                profileRepo.getProfileData().removeObservers(getViewLifecycleOwner());
+                return;
+            }
+
+            applyHistoricalSubstitutions(currentItems);
+            listViewModel.updateItemList(currentItems);
+
+            List<ConflictDetector.Conflict> conflicts = ConflictDetector.detectConflicts(currentItems, profile);
+            Map<String, PreferenceStateManager.ResolutionRecord> savedResolutions = stateManager.loadResolutions();
+
+            for (ConflictDetector.Conflict conflict : conflicts) {
+                String key = conflict.item.originalIngredientId != null ?
+                        conflict.item.originalIngredientId : conflict.item.ingredientId;
+                if (savedResolutions.containsKey(key)) {
+                    conflict.resolved = true;
+                }
+            }
+
+            if (!conflicts.isEmpty() || !savedResolutions.isEmpty()) {
+                adapter.setConflicts(conflicts);
+                adapter.setOnSubstituteRequestListener(this::showSubstituteBottomSheet);
+            }
+
+            profileRepo.getProfileData().removeObservers(getViewLifecycleOwner());
+        });
+    }
+
+    // ✅ 关键方法：应用历史替换
+    private void applyHistoricalSubstitutions(List<ShoppingItem> items) {
+        Map<String, PreferenceStateManager.ResolutionRecord> savedResolutions = stateManager.loadResolutions();
+
+        for (ShoppingItem item : items) {
+            PreferenceStateManager.ResolutionRecord resolution = savedResolutions.get(item.ingredientId);
+
+            if (resolution != null && resolution.type == PreferenceStateManager.ResolutionType.REPLACED) {
+                applySubstitutionToItem(item, resolution);
+            }
         }
     }
 
-    /**
-     * 保存模式状态到SharedPreferences
-     */
-    private void savePreferenceMode() {
-        requireContext().getSharedPreferences("SmartShopListPrefs", android.content.Context.MODE_PRIVATE)
-                .edit()
-                .putBoolean(PREF_MODE_KEY, preferenceMode)
-                .apply();
-    }
+    private void applySubstitutionToItem(ShoppingItem item, PreferenceStateManager.ResolutionRecord resolution) {
+        try {
+            ShoppingItem presetData = loadPresetDataForSubstitute(resolution.substituteId);
+            if (presetData == null) {
+                Toast.makeText(requireContext(),
+                        "⚠ Cannot load preset for " + resolution.substituteName,
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null; // 防止内存泄漏
-    }
+            int substituteImageResId = getImageResIdForIngredient(resolution.substituteName);
+            presetData.imageUrl = "res:" + substituteImageResId;
 
-    /**
-     * 显示替代品选择BottomSheet
-     */
+            // ✅ 保存原始ID
+            if (item.originalIngredientId == null) {
+                item.originalIngredientId = item.ingredientId;
+            }
+
+            double originalNeededValue = item.recipeNeededValue;
+
+            // ✅ 更新所有字段
+            item.ingredientId = resolution.substituteId;
+            item.name = resolution.substituteName;
+            item.selectedSkuName = presetData.selectedSkuName;
+            item.unitPrice = presetData.unitPrice;
+            item.skuSpec = presetData.skuSpec;
+            item.unit = presetData.unit;
+            item.aisle = presetData.aisle;
+            item.imageUrl = presetData.imageUrl;
+            item.isSubstituted = true;
+            item.substitutionRatio = resolution.substitutionRatio;
+            item.substituteDisplayName = "Replaced with " + resolution.substituteName;
+
+            item.recipeNeededValue = originalNeededValue * resolution.substitutionRatio;
+            item.recipeNeededStr = formatQuantity(item.recipeNeededValue) +
+                    (item.recipeNeededUnit.isEmpty() ? "" : " " + item.recipeNeededUnit);
+
+            QuantityParser.ParsedQuantity packageParsed = QuantityParser.parse(item.skuSpec);
+            if (packageParsed.success && item.recipeNeededValue > 0) {
+                boolean unitMatch = item.recipeNeededUnit.isEmpty() || packageParsed.unit.isEmpty() ||
+                        item.recipeNeededUnit.equalsIgnoreCase(packageParsed.unit);
+                if (unitMatch) {
+                    item.quantity = QuantityParser.calculatePackageCount(item.recipeNeededValue, packageParsed.value);
+                } else {
+                    item.quantity = 1;
+                }
+            }
+
+            // ✅ 添加成功提示
+            Toast.makeText(requireContext(),
+                    "✓ Applied: " + item.name + " (ID: " + item.ingredientId + ")",
+                    Toast.LENGTH_SHORT).show();
+
+        } catch (Exception e) {
+            Toast.makeText(requireContext(),
+                    "⚠ Error applying substitution: " + e.getMessage(),
+                    Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
     private void showSubstituteBottomSheet(ShoppingItem item, ConflictDetector.Conflict conflict) {
-        SubstituteSelectionBottomSheet sheet =
-                SubstituteSelectionBottomSheet.newInstance(item, conflict);
-
+        SubstituteSelectionBottomSheet sheet = SubstituteSelectionBottomSheet.newInstance(item, conflict);
         sheet.setOnSubstituteConfirmedListener((originalItem, selectedSubstitute) -> {
             try {
                 ShoppingItem presetData = loadPresetDataForSubstitute(selectedSubstitute.ingredientId);
-
                 if (presetData == null) {
-                    Toast.makeText(requireContext(),
-                            "⚠ Failed to load substitute data",
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "⚠ Failed to load substitute data", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 presetData.imageUrl = "res:" + selectedSubstitute.imageResId;
-
                 double ratio = parseQuantityRatio(selectedSubstitute.quantityAdjustment);
 
                 boolean success = listViewModel.replaceIngredient(
@@ -490,116 +602,80 @@ public class ListFragment extends Fragment {
 
                 if (success) {
                     conflict.resolved = true;
+                    // ✅ 关键修复：使用originalIngredientId（如果有的话）
+                    String keyToSave = originalItem.originalIngredientId != null ?
+                            originalItem.originalIngredientId : originalItem.ingredientId;
 
-                    List<ConflictDetector.Conflict> currentConflicts = adapter.getConflicts();
-                    adapter.setConflicts(currentConflicts);
-
-                    int newQty = getCurrentQuantityForItem(selectedSubstitute.ingredientId);
-
-                    String message = String.format(
-                            "✓ Replaced %s with %s\nNew quantity: %d",
-                            originalItem.name,
+                    stateManager.recordResolution(
+                            keyToSave,  // ✅ 使用正确的key
+                            PreferenceStateManager.ResolutionType.REPLACED,
+                            selectedSubstitute.ingredientId,
                             selectedSubstitute.name,
-                            newQty
+                            (int) Math.round(originalItem.quantity),
+                            ratio
                     );
-
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
-                } else {
                     Toast.makeText(requireContext(),
-                            "⚠ Replacement failed",
+                            "DEBUG: Saved resolution for key=" + keyToSave,
                             Toast.LENGTH_SHORT).show();
-                }
 
+                    adapter.setConflicts(adapter.getConflicts());
+                    int newQty = getCurrentQuantityForItem(selectedSubstitute.ingredientId);
+                    Toast.makeText(requireContext(),
+                            String.format("✓ Replaced %s with %s\nNew quantity: %d",
+                                    originalItem.name, selectedSubstitute.name, newQty),
+                            Toast.LENGTH_LONG).show();
+                }
             } catch (Exception e) {
-                Toast.makeText(requireContext(),
-                        "⚠ Error: " + e.getMessage(),
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "⚠ Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
         sheet.show(getParentFragmentManager(), "SubstituteSelectionBottomSheet");
     }
 
-    /**
-     * 从PresetRepository加载替代品的完整数据
-     */
     private ShoppingItem loadPresetDataForSubstitute(String substituteIngredientId) {
         try {
-            List<ShoppingItem> allPresets = repo.loadInitialItems();
-            for (ShoppingItem preset : allPresets) {
+            for (ShoppingItem preset : repo.loadInitialItems()) {
                 if (substituteIngredientId.equals(preset.ingredientId)) {
                     return preset;
                 }
             }
         } catch (Exception e) {
-            android.util.Log.e("ListFragment", "Error loading preset data: " + e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }
 
-    /**
-     * 解析用量比例（从 quantityAdjustment 字符串）
-     * 例如：
-     * - "1 egg → 3 Oz tofu" → 返回 3.0
-     * - "4 Oz steak → 5 Oz tofu" → 返回 1.25 (5/4)
-     * - "1:1 replacement" → 返回 1.0
-     */
     private double parseQuantityRatio(String quantityAdjustment) {
-        if (quantityAdjustment == null || quantityAdjustment.isEmpty()) {
-            return 1.0;
-        }
-
+        if (quantityAdjustment == null || quantityAdjustment.isEmpty()) return 1.0;
         try {
-            // 处理 "1:1 replacement" 格式
-            if (quantityAdjustment.toLowerCase().contains("1:1")) {
-                return 1.0;
-            }
-
-            // 处理 "X → Y" 格式（例如 "4 Oz → 5 Oz"）
+            if (quantityAdjustment.toLowerCase().contains("1:1")) return 1.0;
             if (quantityAdjustment.contains("→")) {
                 String[] parts = quantityAdjustment.split("→");
                 if (parts.length == 2) {
                     double original = extractNumber(parts[0].trim());
                     double substitute = extractNumber(parts[1].trim());
-
-                    if (original > 0) {
-                        return substitute / original;
-                    }
-                }
-            }
-
-            // 默认返回1:1
-            return 1.0;
-
-        } catch (Exception e) {
-            android.util.Log.w("ListFragment", "Failed to parse ratio: " + quantityAdjustment);
-            return 1.0;
-        }
-    }
-
-    /**
-     * 从字符串中提取第一个数字
-     * 例如："4 Oz steak" → 4.0
-     */
-    private double extractNumber(String text) {
-        try {
-            String[] tokens = text.split("\\s+");
-            for (String token : tokens) {
-                // 移除非数字字符（保留小数点）
-                String cleaned = token.replaceAll("[^0-9.]", "");
-                if (!cleaned.isEmpty()) {
-                    return Double.parseDouble(cleaned);
+                    if (original > 0) return substitute / original;
                 }
             }
         } catch (Exception e) {
-            // 忽略解析错误
+            e.printStackTrace();
         }
         return 1.0;
     }
 
-    /**
-     * 获取某个食材当前的购买数量（用于Toast提示）
-     */
+    private double extractNumber(String text) {
+        try {
+            for (String token : text.split("\\s+")) {
+                String cleaned = token.replaceAll("[^0-9.]", "");
+                if (!cleaned.isEmpty()) return Double.parseDouble(cleaned);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 1.0;
+    }
+
     private int getCurrentQuantityForItem(String ingredientId) {
         List<ShoppingItem> currentList = listViewModel.getItemList().getValue();
         if (currentList != null) {
@@ -610,5 +686,94 @@ public class ListFragment extends Fragment {
             }
         }
         return 0;
+    }
+
+    private int getImageResIdForIngredient(String ingredientName) {
+        for (IngredientSubstitutes.Substitute sub : getAllPossibleSubstitutes()) {
+            if (sub.name.equalsIgnoreCase(ingredientName)) {
+                return sub.imageResId;
+            }
+        }
+        return R.drawable.tofu;
+    }
+
+    private List<IngredientSubstitutes.Substitute> getAllPossibleSubstitutes() {
+        List<IngredientSubstitutes.Substitute> allSubs = new ArrayList<>();
+        String[] testIngredients = {"Egg", "Steak", "Salmon", "Queso Fresco", "Flour Tortilla"};
+        for (String ing : testIngredients) {
+            allSubs.addAll(IngredientSubstitutes.getVeganSubstitutes(ing));
+            allSubs.addAll(IngredientSubstitutes.getVegetarianSubstitutes(ing));
+            allSubs.addAll(IngredientSubstitutes.getGlutenFreeSubstitutes(ing));
+        }
+        return allSubs;
+    }
+
+    private String getImageUrlForIngredient(String ingredientName) {
+        try {
+            List<edu.tamu.csce634.smartshop.models.Recipe> recipes = recipeViewModel.getRecipes().getValue();
+            if (recipes != null) {
+                for (edu.tamu.csce634.smartshop.models.Recipe recipe : recipes) {
+                    for (edu.tamu.csce634.smartshop.models.Ingredient ingredient : recipe.getIngredients()) {
+                        if (ingredient.getName().equalsIgnoreCase(ingredientName)) {
+                            return "res:" + ingredient.getImageResId();
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "res:" + R.drawable.tofu;
+    }
+
+    private void copyItemFields(ShoppingItem from, ShoppingItem to) {
+        to.ingredientId = from.ingredientId;
+        to.name = from.name;
+        to.unit = from.unit;
+        to.quantity = from.quantity;
+        to.aisle = from.aisle;
+        to.unitPrice = from.unitPrice;
+        to.selectedSkuName = from.selectedSkuName;
+        to.skuSpec = from.skuSpec;
+        to.imageUrl = from.imageUrl;
+        to.recipeNeededStr = from.recipeNeededStr;
+        to.recipeNeededValue = from.recipeNeededValue;
+        to.recipeNeededUnit = from.recipeNeededUnit;
+        to.originalIngredientId = from.originalIngredientId;
+        to.substitutionRatio = from.substitutionRatio;
+        to.isSubstituted = from.isSubstituted;
+        to.substituteDisplayName = from.substituteDisplayName;
+    }
+
+    private String formatQuantity(double value) {
+        if (Math.abs(value - Math.round(value)) < 1e-9) {
+            return String.valueOf((int) Math.round(value));
+        }
+        return String.format(java.util.Locale.US, "%.2f", value);
+    }
+
+    private void updateModeUI() {
+        if (preferenceMode) {
+            binding.chipModeToggle.setChecked(true);
+            binding.chipModeToggle.setText("Preference");
+            binding.chipModeToggle.setTextColor(0xFFFFFFFF);
+            binding.chipModeToggle.setChipBackgroundColorResource(R.color.green_700);
+        } else {
+            binding.chipModeToggle.setChecked(false);
+            binding.chipModeToggle.setText("Default");
+            binding.chipModeToggle.setTextColor(0xFF388E3C);
+            binding.chipModeToggle.setChipBackgroundColorResource(android.R.color.white);
+        }
+    }
+
+    private void savePreferenceMode() {
+        requireContext().getSharedPreferences("SmartShopListPrefs", android.content.Context.MODE_PRIVATE)
+                .edit().putBoolean(PREF_MODE_KEY, preferenceMode).apply();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }
