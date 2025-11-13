@@ -465,22 +465,150 @@ public class ListFragment extends Fragment {
         SubstituteSelectionBottomSheet sheet =
                 SubstituteSelectionBottomSheet.newInstance(item, conflict);
 
-        // ✅ 设置确认回调
         sheet.setOnSubstituteConfirmedListener((originalItem, selectedSubstitute) -> {
-            // TODO: Phase 4 实现实际替换逻辑
+            try {
+                ShoppingItem presetData = loadPresetDataForSubstitute(selectedSubstitute.ingredientId);
 
-            // ✅ 标记冲突为已解决
-            conflict.resolved = true;
+                if (presetData == null) {
+                    Toast.makeText(requireContext(),
+                            "⚠ Failed to load substitute data",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-            // ✅ 刷新 Adapter 显示（徽章会变灰）
-            adapter.notifyDataSetChanged();
+                presetData.imageUrl = "res:" + selectedSubstitute.imageResId;
 
-            android.widget.Toast.makeText(requireContext(),
-                    "✓ Replaced " + originalItem.name + " with " + selectedSubstitute.name +
-                            "\n(Full replacement logic in Phase 4)",
-                    android.widget.Toast.LENGTH_LONG).show();
+                double ratio = parseQuantityRatio(selectedSubstitute.quantityAdjustment);
+
+                boolean success = listViewModel.replaceIngredient(
+                        originalItem.ingredientId,
+                        selectedSubstitute.ingredientId,
+                        selectedSubstitute.name,
+                        ratio,
+                        presetData
+                );
+
+                if (success) {
+                    conflict.resolved = true;
+
+                    List<ConflictDetector.Conflict> currentConflicts = adapter.getConflicts();
+                    adapter.setConflicts(currentConflicts);
+
+                    int newQty = getCurrentQuantityForItem(selectedSubstitute.ingredientId);
+
+                    String message = String.format(
+                            "✓ Replaced %s with %s\nNew quantity: %d",
+                            originalItem.name,
+                            selectedSubstitute.name,
+                            newQty
+                    );
+
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(requireContext(),
+                            "⚠ Replacement failed",
+                            Toast.LENGTH_SHORT).show();
+                }
+
+            } catch (Exception e) {
+                Toast.makeText(requireContext(),
+                        "⚠ Error: " + e.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
         });
 
         sheet.show(getParentFragmentManager(), "SubstituteSelectionBottomSheet");
+    }
+
+    /**
+     * 从PresetRepository加载替代品的完整数据
+     */
+    private ShoppingItem loadPresetDataForSubstitute(String substituteIngredientId) {
+        try {
+            List<ShoppingItem> allPresets = repo.loadInitialItems();
+            for (ShoppingItem preset : allPresets) {
+                if (substituteIngredientId.equals(preset.ingredientId)) {
+                    return preset;
+                }
+            }
+        } catch (Exception e) {
+            android.util.Log.e("ListFragment", "Error loading preset data: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * 解析用量比例（从 quantityAdjustment 字符串）
+     * 例如：
+     * - "1 egg → 3 Oz tofu" → 返回 3.0
+     * - "4 Oz steak → 5 Oz tofu" → 返回 1.25 (5/4)
+     * - "1:1 replacement" → 返回 1.0
+     */
+    private double parseQuantityRatio(String quantityAdjustment) {
+        if (quantityAdjustment == null || quantityAdjustment.isEmpty()) {
+            return 1.0;
+        }
+
+        try {
+            // 处理 "1:1 replacement" 格式
+            if (quantityAdjustment.toLowerCase().contains("1:1")) {
+                return 1.0;
+            }
+
+            // 处理 "X → Y" 格式（例如 "4 Oz → 5 Oz"）
+            if (quantityAdjustment.contains("→")) {
+                String[] parts = quantityAdjustment.split("→");
+                if (parts.length == 2) {
+                    double original = extractNumber(parts[0].trim());
+                    double substitute = extractNumber(parts[1].trim());
+
+                    if (original > 0) {
+                        return substitute / original;
+                    }
+                }
+            }
+
+            // 默认返回1:1
+            return 1.0;
+
+        } catch (Exception e) {
+            android.util.Log.w("ListFragment", "Failed to parse ratio: " + quantityAdjustment);
+            return 1.0;
+        }
+    }
+
+    /**
+     * 从字符串中提取第一个数字
+     * 例如："4 Oz steak" → 4.0
+     */
+    private double extractNumber(String text) {
+        try {
+            String[] tokens = text.split("\\s+");
+            for (String token : tokens) {
+                // 移除非数字字符（保留小数点）
+                String cleaned = token.replaceAll("[^0-9.]", "");
+                if (!cleaned.isEmpty()) {
+                    return Double.parseDouble(cleaned);
+                }
+            }
+        } catch (Exception e) {
+            // 忽略解析错误
+        }
+        return 1.0;
+    }
+
+    /**
+     * 获取某个食材当前的购买数量（用于Toast提示）
+     */
+    private int getCurrentQuantityForItem(String ingredientId) {
+        List<ShoppingItem> currentList = listViewModel.getItemList().getValue();
+        if (currentList != null) {
+            for (ShoppingItem item : currentList) {
+                if (ingredientId.equals(item.ingredientId)) {
+                    return (int) Math.round(item.quantity);
+                }
+            }
+        }
+        return 0;
     }
 }
