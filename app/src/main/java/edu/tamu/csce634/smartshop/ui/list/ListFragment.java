@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -349,11 +350,7 @@ public class ListFragment extends Fragment {
 
                 // ✅ 设置替代品选择监听器
                 adapter.setOnSubstituteRequestListener((item, conflict) -> {
-                    // TODO: Phase 3 实现替代品选择BottomSheet
-                    android.widget.Toast.makeText(requireContext(),
-                            "Substitute selection will be implemented in Phase 3",
-                            android.widget.Toast.LENGTH_SHORT).show();
-                    android.util.Log.d("ListFragment", "User requested substitute for: " + item.name);
+                    showSubstituteBottomSheet(item, conflict);
                 });
 
                 // 显示冲突信息
@@ -459,5 +456,25 @@ public class ListFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null; // 防止内存泄漏
+    }
+
+    /**
+     * 显示替代品选择BottomSheet
+     */
+    private void showSubstituteBottomSheet(ShoppingItem item, ConflictDetector.Conflict conflict) {
+        SubstituteSelectionBottomSheet sheet =
+                SubstituteSelectionBottomSheet.newInstance(item, conflict);
+
+        // 设置确认回调（Phase 4 实现实际替换逻辑）
+        sheet.setOnSubstituteConfirmedListener((originalItem, selectedSubstitute) -> {
+            // TODO: Phase 4 实现实际替换逻辑
+            Toast.makeText(requireContext(),
+                    "Replacement logic will be implemented in Phase 4\n" +
+                            "Original: " + originalItem.name + "\n" +
+                            "Substitute: " + selectedSubstitute.name,
+                    Toast.LENGTH_LONG).show();
+        });
+
+        sheet.show(getParentFragmentManager(), "SubstituteSelectionBottomSheet");
     }
 }

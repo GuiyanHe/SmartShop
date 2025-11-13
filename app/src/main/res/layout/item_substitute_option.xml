@@ -1,65 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 单个替代品选项卡片 -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/card_substitute"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    app:cardCornerRadius="8dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="8dp"
+    app:cardCornerRadius="12dp"
     app:cardElevation="2dp"
-    app:strokeWidth="2dp"
-    app:strokeColor="@android:color/transparent"
-    android:clickable="true"
-    android:focusable="true">
+    app:strokeWidth="0dp"
+    app:strokeColor="@android:color/transparent">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:gravity="center_vertical">
+        android:padding="12dp">
 
+        <!-- 左侧：替代品图片 -->
         <ImageView
             android:id="@+id/img_substitute"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
             android:scaleType="centerCrop"
             android:background="@color/gray_200"
             android:contentDescription="Substitute image"/>
 
+        <!-- 右侧：选中指示器（默认隐藏）-->
+        <ImageView
+            android:id="@+id/img_selected"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@android:drawable/checkbox_on_background"
+            app:tint="@color/green_500"
+            android:visibility="gone"
+            android:contentDescription="Selected indicator"/>
+
+        <!-- 中间：替代品信息 -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_toEndOf="@id/img_substitute"
+            android:layout_toStartOf="@id/img_selected"
+            android:layout_centerVertical="true"
             android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
             android:orientation="vertical">
 
+            <!-- 替代品名称 -->
             <TextView
                 android:id="@+id/text_substitute_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tofu"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/black"/>
 
+            <!-- 说明文字（note + quantity adjustment）-->
             <TextView
                 android:id="@+id/text_substitute_note"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Protein source • 1 → 2 Oz"
-                android:textSize="12sp"
-                android:textColor="@color/gray_600"
-                android:layout_marginTop="2dp"/>
+                android:layout_marginTop="4dp"
+                android:text="Firm texture • 4 Oz steak → 5 Oz tofu"
+                android:textSize="13sp"
+                android:textColor="@color/gray_600"/>
+
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/img_selected"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/checkbox_on_background"            app:tint="@color/green_500"
-            android:visibility="gone"
-            android:contentDescription="Selected indicator"/>
-    </LinearLayout>
+    </RelativeLayout>
+
 </com.google.android.material.card.MaterialCardView>

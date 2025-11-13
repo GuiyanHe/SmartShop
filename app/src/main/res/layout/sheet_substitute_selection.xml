@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 替代品选择 BottomSheet -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <!-- 顶部：拖动指示条 -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="@color/gray_600"
+        android:alpha="0.3"/>
+
+    <!-- 标题：Replace [食材名称] -->
+    <TextView
+        android:id="@+id/text_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Replace: Steak"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:paddingBottom="8dp"/>
+
+    <!-- 冲突原因（红色背景警告）-->
+    <LinearLayout
+        android:id="@+id/layout_conflict_warning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_conflict_details"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:text="⚠"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:layout_marginEnd="8dp"/>
+
+        <TextView
+            android:id="@+id/text_conflict_reason"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Not suitable for vegan diet"
+            android:textSize="14sp"
+            android:textColor="@color/red_600"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+    <!-- 副标题：推荐替代品 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Recommended Substitutes:"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="@color/gray_600"
+        android:paddingBottom="8dp"/>
+
+    <!-- 替代品列表（RecyclerView）-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_substitutes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:nestedScrollingEnabled="false"/>
+
+    <!-- 底部按钮区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <!-- 取消按钮 -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_cancel"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Cancel"
+            android:textColor="@color/gray_600"
+            app:strokeColor="@color/gray_600"/>
+
+        <!-- 确认替换按钮 -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Confirm"
+            android:backgroundTint="@color/green_500"
+            android:textColor="@android:color/white"/>
+
+    </LinearLayout>
+
+    <!-- 无替代品提示（默认隐藏）-->
+    <TextView
+        android:id="@+id/text_no_substitutes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="⚠ No suitable substitutes available.\nConsider setting quantity to 0."
+        android:textSize="14sp"
+        android:textColor="@color/gray_600"
+        android:textAlignment="center"
+        android:padding="24dp"
+        android:visibility="gone"/>
+
+</LinearLayout>
