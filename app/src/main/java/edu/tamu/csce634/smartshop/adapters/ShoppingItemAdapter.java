@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,12 +12,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.models.ShoppingItem;
 import edu.tamu.csce634.smartshop.ui.list.ListViewModel;
 import edu.tamu.csce634.smartshop.ui.list.ProductOptionsBottomSheet;
+import edu.tamu.csce634.smartshop.utils.ConflictDetector;
 
 /**
  * 适配器：将 ShoppingItem 渲染成 “卡片项”（对应 item_shopping.xml）
@@ -28,6 +32,14 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
     private List<ShoppingItem> itemList;   // 数据源
     private final ListViewModel listViewModel;   // 通知 VM 更新总价等
 
+    // 冲突信息映射（ingredientId -> Conflict）
+    private Map<String, ConflictDetector.Conflict> conflictMap = new HashMap<>();
+
+    // 替代品选择监听器
+    public interface OnSubstituteRequestListener {
+        void onSubstituteRequest(ShoppingItem item, ConflictDetector.Conflict conflict);
+    }
+    private OnSubstituteRequestListener substituteListener;
     public ShoppingItemAdapter(List<ShoppingItem> list, ListViewModel vm) {
         this.itemList = list;
         this.listViewModel = vm;
@@ -70,22 +82,6 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
         // Qty 显示
         h.qtyBadge.setText(String.format("Qty: %s", formatQty(it.quantity)));
 
-//        // 加载图片
-//        if (it.imageUrl != null && it.imageUrl.startsWith("asset:")) {
-//            String fileName = it.imageUrl.substring(6); // e.g. "milk.jpeg"
-//            String uri = "file:///android_asset/items/" + fileName;
-//            Glide.with(h.itemView.getContext())
-//                    .load(uri)
-//                    .centerCrop()
-//                    .placeholder(android.R.color.darker_gray)
-//                    .into(h.image);
-//        } else {
-//            Glide.with(h.itemView.getContext())
-//                    .load(it.imageUrl)
-//                    .centerCrop()
-//                    .placeholder(android.R.color.darker_gray)
-//                    .into(h.image);
-//        }
         // 加载图片（支持：drawable资源ID / 网络链接）
         if (it.imageUrl != null && !it.imageUrl.isEmpty()) {
             if (it.imageUrl.startsWith("res:")) {
@@ -135,6 +131,60 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
             h.qtyBadge.setText(String.format("Qty: %s", formatQty(it.quantity)));
             listViewModel.recalculateTotalOnly();
         });
+        // === 新增：冲突处理 ===
+
+        // 检查是否有冲突
+        ConflictDetector.Conflict conflict = conflictMap.get(it.ingredientId);
+
+        if (conflict != null) {
+            // 显示冲突徽章
+            h.conflictBadge.setVisibility(View.VISIBLE);
+
+            // 设置冲突信息
+            h.textConflictMessage.setText(conflict.reason);
+
+            // 点击卡片展开/收起冲突详情
+            h.itemView.setOnClickListener(v -> {
+                if (h.layoutConflictDetails.getVisibility() == View.VISIBLE) {
+                    h.layoutConflictDetails.setVisibility(View.GONE);
+                } else {
+                    h.layoutConflictDetails.setVisibility(View.VISIBLE);
+                }
+            });
+
+            // "Set to 0" 按钮
+            h.btnSetZero.setOnClickListener(v -> {
+                it.quantity = 0;
+                h.qtyBadge.setText("Qty: 0");
+                conflict.resolved = true;
+                h.conflictBadge.setImageResource(android.R.drawable.checkbox_on_background);
+                h.conflictBadge.setColorFilter(v.getContext().getColor(R.color.green_500));
+                h.layoutConflictDetails.setVisibility(View.GONE);
+                listViewModel.recalculateTotalOnly();
+            });
+
+            // "Replace" 按钮
+            h.btnReplaceConflict.setOnClickListener(v -> {
+                if (substituteListener != null) {
+                    substituteListener.onSubstituteRequest(it, conflict);
+                }
+            });
+
+            // 如果没有替代品，禁用Replace按钮
+            if (conflict.substitutes == null || conflict.substitutes.isEmpty()) {
+                h.btnReplaceConflict.setEnabled(false);
+                h.btnReplaceConflict.setText("No substitutes");
+            } else {
+                h.btnReplaceConflict.setEnabled(true);
+                h.btnReplaceConflict.setText("Replace");
+            }
+
+        } else {
+            // 没有冲突，隐藏相关UI
+            h.conflictBadge.setVisibility(View.GONE);
+            h.layoutConflictDetails.setVisibility(View.GONE);
+            h.itemView.setOnClickListener(null);
+        }
     }
 
     @Override
@@ -147,6 +197,27 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
         return String.format("%.1f", q);
     }
 
+    /**
+     * 设置冲突信息
+     */
+    public void setConflicts(List<ConflictDetector.Conflict> conflicts) {
+        conflictMap.clear();
+        if (conflicts != null) {
+            for (ConflictDetector.Conflict c : conflicts) {
+                if (c.item != null && c.item.ingredientId != null) {
+                    conflictMap.put(c.item.ingredientId, c);
+                }
+            }
+        }
+        notifyDataSetChanged();
+    }
+
+    /**
+     * 设置替代品请求监听器
+     */
+    public void setOnSubstituteRequestListener(OnSubstituteRequestListener listener) {
+        this.substituteListener = listener;
+    }
     static class VH extends RecyclerView.ViewHolder {
         ImageView image;      // R.id.itemImage
         TextView title;       // R.id.title
@@ -156,6 +227,12 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
         TextView btnMinus;    // R.id/btnMinus（左侧 -）
         TextView btnPlus;     // R.id/btnPlus（右侧 +）
         TextView neededLabel;
+        // 新增：冲突相关视图
+        ImageView conflictBadge;
+        LinearLayout layoutConflictDetails;
+        TextView textConflictMessage;
+        com.google.android.material.button.MaterialButton btnSetZero;
+        com.google.android.material.button.MaterialButton btnReplaceConflict;
 
         VH(@NonNull View itemView) {
             super(itemView);
@@ -167,6 +244,12 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
             btnMinus = itemView.findViewById(R.id.btnMinus);
             btnPlus = itemView.findViewById(R.id.btnPlus);
             neededLabel = itemView.findViewById(R.id.neededLabel);
+            // 新增视图引用
+            conflictBadge = itemView.findViewById(R.id.img_conflict_badge);
+            layoutConflictDetails = itemView.findViewById(R.id.layout_conflict_details);
+            textConflictMessage = itemView.findViewById(R.id.text_conflict_message);
+            btnSetZero = itemView.findViewById(R.id.btn_set_zero);
+            btnReplaceConflict = itemView.findViewById(R.id.btn_replace_conflict);
         }
     }
 }
