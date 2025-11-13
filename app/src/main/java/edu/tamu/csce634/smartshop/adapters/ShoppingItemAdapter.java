@@ -19,6 +19,7 @@ import java.util.Map;
 
 import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.models.ShoppingItem;
+import edu.tamu.csce634.smartshop.ui.list.ListFragment;
 import edu.tamu.csce634.smartshop.ui.list.ListViewModel;
 import edu.tamu.csce634.smartshop.ui.list.ProductOptionsBottomSheet;
 import edu.tamu.csce634.smartshop.utils.ConflictDetector;
@@ -34,10 +35,14 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
     }
 
     private OnSubstituteRequestListener substituteListener;
+    private androidx.fragment.app.Fragment parentFragment;
 
     public ShoppingItemAdapter(List<ShoppingItem> list, ListViewModel vm) {
         this.itemList = list;
         this.listViewModel = vm;
+    }
+    public void setParentFragment(androidx.fragment.app.Fragment fragment) {
+        this.parentFragment = fragment;
     }
 
     public void updateData(List<ShoppingItem> newList) {
@@ -99,13 +104,68 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
                 it.quantity -= 1;
                 h.qtyBadge.setText(formatQty(it.quantity));
                 listViewModel.recalculateTotalOnly();
+
+                // ✅ 如果减到0且有冲突，自动解决
+                if (it.quantity == 0) {
+                    String conflictKey = it.originalIngredientId != null ?
+                            it.originalIngredientId : it.ingredientId;
+                    ConflictDetector.Conflict conflict = conflictMap.get(conflictKey);
+
+                    if (conflict != null) {
+                        conflict.resolved = true;
+
+                        h.conflictBadge.setImageResource(R.drawable.ic_check_circle_gray);
+                        h.conflictBadge.setBackground(null);
+                        h.conflictBadge.setPadding(0, 0, 0, 0);
+                        h.conflictBadge.setColorFilter(null);
+                        h.conflictBadge.setBackgroundTintList(null);
+                        h.layoutConflictDetails.setVisibility(View.GONE);
+
+                        if (parentFragment instanceof ListFragment) {
+                            ((ListFragment) parentFragment).recordQuantityZeroResolution(conflictKey);
+                        }
+
+                        Toast.makeText(v.getContext(),
+                                "✓ " + it.name + " reduced to 0 - Conflict resolved",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
         });
 
         h.btnPlus.setOnClickListener(v -> {
+            double previousQty = it.quantity;
+
             it.quantity += 1;
             h.qtyBadge.setText(formatQty(it.quantity));
             listViewModel.recalculateTotalOnly();
+
+            // ✅ 如果从0增加到>0且有已解决的冲突，重新激活
+            if (previousQty == 0 && it.quantity > 0) {
+                String conflictKey = it.originalIngredientId != null ?
+                        it.originalIngredientId : it.ingredientId;
+                ConflictDetector.Conflict conflict = conflictMap.get(conflictKey);
+
+                if (conflict != null && conflict.resolved) {
+                    conflict.resolved = false;
+
+                    h.conflictBadge.setImageResource(R.drawable.ic_warning);
+                    h.conflictBadge.setBackgroundTintList(
+                            android.content.res.ColorStateList.valueOf(
+                                    v.getContext().getColor(R.color.red_500)));
+                    h.conflictBadge.setColorFilter(0xFFFFFFFF);
+
+                    if (parentFragment instanceof ListFragment) {
+                        ((ListFragment) parentFragment).clearResolutionForReactivatedConflict(conflictKey);
+                    }
+
+                    Toast.makeText(v.getContext(),
+                            "⚠ " + it.name + " quantity increased - Conflict reactivated",
+                            Toast.LENGTH_SHORT).show();
+
+                    notifyItemChanged(h.getAdapterPosition());
+                }
+            }
         });
 
         if (it.isSubstituted) {

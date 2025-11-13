@@ -72,6 +72,7 @@ public class ListFragment extends Fragment {
         RecyclerView recyclerView = binding.recycler;
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new ShoppingItemAdapter(new ArrayList<>(), listViewModel);
+        adapter.setParentFragment(this);  // ✅ 设置Fragment引用
         recyclerView.setAdapter(adapter);
 
         listViewModel.getTotal().observe(getViewLifecycleOwner(), total -> {
@@ -89,6 +90,7 @@ public class ListFragment extends Fragment {
         listViewModel.getItemList().observe(getViewLifecycleOwner(), list -> {
             if (adapter == null) {
                 adapter = new ShoppingItemAdapter(list, listViewModel);
+                adapter.setParentFragment(this);  // ✅ 设置Fragment引用
                 recyclerView.setAdapter(adapter);
             } else {
                 adapter.updateData(list);
@@ -770,7 +772,34 @@ public class ListFragment extends Fragment {
         requireContext().getSharedPreferences("SmartShopListPrefs", android.content.Context.MODE_PRIVATE)
                 .edit().putBoolean(PREF_MODE_KEY, preferenceMode).apply();
     }
+    /**
+     * 记录通过-按钮解决的冲突
+     */
+    public void recordQuantityZeroResolution(String ingredientId) {
+        stateManager.recordResolution(
+                ingredientId,
+                PreferenceStateManager.ResolutionType.SET_TO_ZERO,
+                null,
+                null,
+                0,
+                1.0
+        );
+    }
 
+    /**
+     * 清除通过+按钮重新激活的冲突记录
+     */
+    public void clearResolutionForReactivatedConflict(String ingredientId) {
+        Map<String, PreferenceStateManager.ResolutionRecord> resolutions = stateManager.loadResolutions();
+        if (resolutions.containsKey(ingredientId)) {
+            resolutions.remove(ingredientId);
+
+            // 重新保存剩余记录
+            android.content.SharedPreferences prefs = requireContext()
+                    .getSharedPreferences("SmartShopPreferenceState", android.content.Context.MODE_PRIVATE);
+            prefs.edit().putString("resolution_actions", new com.google.gson.Gson().toJson(resolutions)).apply();
+        }
+    }
     @Override
     public void onDestroyView() {
         super.onDestroyView();
