@@ -3,6 +3,7 @@ package edu.tamu.csce634.smartshop.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,14 +24,13 @@ import edu.tamu.csce634.smartshop.ui.list.ProductOptionsBottomSheet;
 import edu.tamu.csce634.smartshop.utils.ConflictDetector;
 
 /**
- * 适配器：将 ShoppingItem 渲染成 “卡片项”（对应 item_shopping.xml）
- * 右侧有 - / Qty / + 控件；SKU 行显示 selectedSkuName + skuSpec；
- * 左侧 ImageView 用 Glide 加载图片
+ * 适配器：将 ShoppingItem 渲染成卡片项
+ * 支持冲突检测、替代品选择、数量调整
  */
 public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapter.VH> {
 
-    private List<ShoppingItem> itemList;   // 数据源
-    private final ListViewModel listViewModel;   // 通知 VM 更新总价等
+    private List<ShoppingItem> itemList;
+    private final ListViewModel listViewModel;
 
     // 冲突信息映射（ingredientId -> Conflict）
     private Map<String, ConflictDetector.Conflict> conflictMap = new HashMap<>();
@@ -39,7 +39,9 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
     public interface OnSubstituteRequestListener {
         void onSubstituteRequest(ShoppingItem item, ConflictDetector.Conflict conflict);
     }
+
     private OnSubstituteRequestListener substituteListener;
+
     public ShoppingItemAdapter(List<ShoppingItem> list, ListViewModel vm) {
         this.itemList = list;
         this.listViewModel = vm;
@@ -47,7 +49,7 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
 
     public void updateData(List<ShoppingItem> newList) {
         this.itemList = newList;
-        notifyDataSetChanged(); // 全量刷新（后续可优化为DiffUtil）
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -62,16 +64,18 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
     public void onBindViewHolder(@NonNull VH h, int position) {
         ShoppingItem it = itemList.get(position);
 
-        // 标题：优先显示 selectedSkuName，否则回退到 name
+        // ========== 基础信息显示 ==========
+
+        // 标题：优先显示 selectedSkuName
         String title = it.selectedSkuName != null && !it.selectedSkuName.isEmpty()
                 ? it.selectedSkuName : it.name;
         h.title.setText(title);
 
-        // SKU 行：selectedSkuName + skuSpec（若有）
+        // SKU 行
         String spec = (it.skuSpec != null && !it.skuSpec.isEmpty()) ? " " + it.skuSpec : "";
         h.sub.setText("SKU: " + title + spec);
 
-        // 显示Recipe需求量
+        // 显示 Recipe 需求量
         if (it.recipeNeededStr != null && !it.recipeNeededStr.isEmpty()) {
             h.neededLabel.setVisibility(View.VISIBLE);
             h.neededLabel.setText("Recipe needs: " + it.recipeNeededStr);
@@ -79,13 +83,14 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
             h.neededLabel.setVisibility(View.GONE);
         }
 
-        // Qty 显示
-        h.qtyBadge.setText(String.format("Qty: %s", formatQty(it.quantity)));
+        // Qty 显示（纯数字）
+        h.qtyBadge.setText(formatQty(it.quantity));
 
-        // 加载图片（支持：drawable资源ID / 网络链接）
+        // ========== 图片加载 ==========
+
         if (it.imageUrl != null && !it.imageUrl.isEmpty()) {
             if (it.imageUrl.startsWith("res:")) {
-                // Recipe模块的drawable资源ID
+                // Drawable 资源ID
                 try {
                     int resId = Integer.parseInt(it.imageUrl.substring(4));
                     Glide.with(h.itemView.getContext())
@@ -97,7 +102,7 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
                     h.image.setImageResource(android.R.color.darker_gray);
                 }
             } else {
-                // HTTP/HTTPS网络链接
+                // 网络链接
                 Glide.with(h.itemView.getContext())
                         .load(it.imageUrl)
                         .centerCrop()
@@ -105,61 +110,99 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
                         .into(h.image);
             }
         } else {
-            // 无图片时显示默认占位图
             h.image.setImageResource(android.R.color.darker_gray);
         }
 
-        // Options：弹出 BottomSheet
+        // ========== Options 按钮 ==========
+
         h.btnReplace.setOnClickListener(v -> {
             ProductOptionsBottomSheet sheet = ProductOptionsBottomSheet.newInstance(it.ingredientId);
             sheet.show(((androidx.fragment.app.FragmentActivity) v.getContext())
                     .getSupportFragmentManager(), "ProductOptionsBottomSheet");
         });
 
-        // “-” 数量减一（到 0 为止）
+        // ========== 数量调整按钮 ==========
+
+        // "-" 数量减一
         h.btnMinus.setOnClickListener(v -> {
             if (it.quantity > 0) {
                 it.quantity -= 1;
-                h.qtyBadge.setText(String.format("Qty: %s", formatQty(it.quantity)));
+                h.qtyBadge.setText(formatQty(it.quantity));
                 listViewModel.recalculateTotalOnly();
             }
         });
 
-        // “+” 数量加一
+        // "+" 数量加一
         h.btnPlus.setOnClickListener(v -> {
             it.quantity += 1;
-            h.qtyBadge.setText(String.format("Qty: %s", formatQty(it.quantity)));
+            h.qtyBadge.setText(formatQty(it.quantity));
             listViewModel.recalculateTotalOnly();
         });
-        // === 新增：冲突处理 ===
 
-        // 检查是否有冲突
+// ========== 冲突处理 ==========
+
         ConflictDetector.Conflict conflict = conflictMap.get(it.ingredientId);
 
         if (conflict != null) {
             // 显示冲突徽章
             h.conflictBadge.setVisibility(View.VISIBLE);
 
+            // ✅ 根据解决状态设置徽章样式（完全切换图标和背景）
+            if (conflict.resolved) {
+                // 已解决：灰色圆形打勾（完全替换，无叠加）
+                h.conflictBadge.setImageResource(R.drawable.ic_check_circle_gray);
+                h.conflictBadge.setBackground(null);  // ✅ 移除红色圆形背景
+                h.conflictBadge.setPadding(0, 0, 0, 0);  // ✅ 移除内边距
+                h.conflictBadge.setColorFilter(null);  // ✅ 移除颜色滤镜
+                h.conflictBadge.setBackgroundTintList(null);  // ✅ 移除背景着色
+            } else {
+                // 未解决：红色圆形警告
+                h.conflictBadge.setImageResource(R.drawable.ic_warning);
+//                h.conflictBadge.setBackgroundResource(R.drawable.circle_background);  // ✅ 重新设置圆形背景
+                h.conflictBadge.setBackgroundTintList(
+                        android.content.res.ColorStateList.valueOf(
+                                h.itemView.getContext().getColor(R.color.red_500)));
+//                h.conflictBadge.setPadding(8, 8, 8, 8);  // ✅ 恢复内边距
+                h.conflictBadge.setColorFilter(0xFFFFFFFF);  // 白色图标
+            }
+
             // 设置冲突信息
             h.textConflictMessage.setText(conflict.reason);
 
-            // 点击卡片展开/收起冲突详情
-            h.itemView.setOnClickListener(v -> {
+            // 点击事件（徽章或卡片都可以展开）
+            View.OnClickListener toggleConflictDetails = v -> {
                 if (h.layoutConflictDetails.getVisibility() == View.VISIBLE) {
                     h.layoutConflictDetails.setVisibility(View.GONE);
                 } else {
                     h.layoutConflictDetails.setVisibility(View.VISIBLE);
                 }
-            });
+            };
+
+            h.itemView.setOnClickListener(toggleConflictDetails);
+            h.conflictBadge.setOnClickListener(toggleConflictDetails);
 
             // "Set to 0" 按钮
             h.btnSetZero.setOnClickListener(v -> {
                 it.quantity = 0;
-                h.qtyBadge.setText("Qty: 0");
+                h.qtyBadge.setText(formatQty(it.quantity));
+
+                // 标记为已解决
                 conflict.resolved = true;
-                h.conflictBadge.setImageResource(android.R.drawable.checkbox_on_background);
-                h.conflictBadge.setColorFilter(v.getContext().getColor(R.color.green_500));
+
+                // ✅ 徽章完全切换为灰色圆形打勾
+                h.conflictBadge.setImageResource(R.drawable.ic_check_circle_gray);
+                h.conflictBadge.setBackground(null);  // 移除红色背景
+                h.conflictBadge.setPadding(0, 0, 0, 0);
+                h.conflictBadge.setColorFilter(null);
+                h.conflictBadge.setBackgroundTintList(null);
+
+                // 收起冲突详情
                 h.layoutConflictDetails.setVisibility(View.GONE);
+
+                android.widget.Toast.makeText(v.getContext(),
+                        "✓ " + it.name + " set to 0",
+                        android.widget.Toast.LENGTH_SHORT).show();
+
                 listViewModel.recalculateTotalOnly();
             });
 
@@ -170,13 +213,15 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
                 }
             });
 
-            // 如果没有替代品，禁用Replace按钮
+            // 如果没有替代品，禁用 Replace 按钮
             if (conflict.substitutes == null || conflict.substitutes.isEmpty()) {
                 h.btnReplaceConflict.setEnabled(false);
                 h.btnReplaceConflict.setText("No substitutes");
+                h.btnReplaceConflict.setAlpha(0.5f);
             } else {
                 h.btnReplaceConflict.setEnabled(true);
                 h.btnReplaceConflict.setText("Replace");
+                h.btnReplaceConflict.setAlpha(1.0f);
             }
 
         } else {
@@ -192,9 +237,15 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
         return itemList.size();
     }
 
+    /**
+     * 格式化数量显示
+     */
     private String formatQty(double q) {
-        if (Math.abs(q - Math.round(q)) < 1e-6) return String.valueOf((int) Math.round(q));
-        return String.format("%.1f", q);
+        if (q <= 0) return "0";
+        if (Math.abs(q - Math.round(q)) < 1e-6) {
+            return String.valueOf((int) Math.round(q));
+        }
+        return String.format(java.util.Locale.US, "%.1f", q);
     }
 
     /**
@@ -218,18 +269,30 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
     public void setOnSubstituteRequestListener(OnSubstituteRequestListener listener) {
         this.substituteListener = listener;
     }
+
+    /**
+     * 获取当前所有冲突（用于未解决冲突检测）
+     */
+    public List<ConflictDetector.Conflict> getConflicts() {
+        return new java.util.ArrayList<>(conflictMap.values());
+    }
+
+    /**
+     * ViewHolder
+     */
     static class VH extends RecyclerView.ViewHolder {
-        ImageView image;      // R.id.itemImage
-        TextView title;       // R.id.title
-        TextView sub;         // R.id.sub
-        TextView btnReplace;  // R.id.btnReplace
-        TextView qtyBadge;    // R.id/qtyBadge（中间的 Qty: x）
-        TextView btnMinus;    // R.id/btnMinus（左侧 -）
-        TextView btnPlus;     // R.id/btnPlus（右侧 +）
+        ImageView image;
+        TextView title;
+        TextView sub;
+        TextView btnReplace;
+        TextView qtyBadge;
+        ImageButton btnMinus;
+        ImageButton btnPlus;
         TextView neededLabel;
-        // 新增：冲突相关视图
+
+        // 冲突相关视图
         ImageView conflictBadge;
-        LinearLayout layoutConflictDetails;
+        View layoutConflictDetails;
         TextView textConflictMessage;
         com.google.android.material.button.MaterialButton btnSetZero;
         com.google.android.material.button.MaterialButton btnReplaceConflict;
@@ -244,7 +307,8 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
             btnMinus = itemView.findViewById(R.id.btnMinus);
             btnPlus = itemView.findViewById(R.id.btnPlus);
             neededLabel = itemView.findViewById(R.id.neededLabel);
-            // 新增视图引用
+
+            // 冲突视图
             conflictBadge = itemView.findViewById(R.id.img_conflict_badge);
             layoutConflictDetails = itemView.findViewById(R.id.layout_conflict_details);
             textConflictMessage = itemView.findViewById(R.id.text_conflict_message);

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 替代品选择 BottomSheet -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -17,7 +16,7 @@
         android:background="@color/gray_600"
         android:alpha="0.3"/>
 
-    <!-- 标题：Replace [食材名称] -->
+    <!-- 标题 -->
     <TextView
         android:id="@+id/text_title"
         android:layout_width="match_parent"
@@ -28,7 +27,7 @@
         android:textColor="@android:color/black"
         android:paddingBottom="8dp"/>
 
-    <!-- 冲突原因（红色背景警告）-->
+    <!-- 冲突原因警告 -->
     <LinearLayout
         android:id="@+id/layout_conflict_warning"
         android:layout_width="match_parent"
@@ -36,7 +35,8 @@
         android:orientation="horizontal"
         android:background="@drawable/bg_conflict_details"
         android:padding="12dp"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="16dp"
+        android:gravity="center_vertical">
 
         <TextView
             android:layout_width="24dp"
@@ -58,7 +58,7 @@
 
     </LinearLayout>
 
-    <!-- 副标题：推荐替代品 -->
+    <!-- 副标题 -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
         android:textColor="@color/gray_600"
         android:paddingBottom="8dp"/>
 
-    <!-- 替代品列表（RecyclerView）-->
+    <!-- 替代品列表 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_substitutes"
         android:layout_width="match_parent"
@@ -76,36 +76,42 @@
         android:layout_marginBottom="16dp"
         android:nestedScrollingEnabled="false"/>
 
-    <!-- 底部按钮区域 -->
+    <!-- 底部按钮 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end">
+        android:orientation="horizontal">
 
-        <!-- 取消按钮 -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_cancel"
             style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
             android:layout_marginEnd="8dp"
             android:text="Cancel"
+            android:textSize="15sp"
+            android:textAllCaps="false"
             android:textColor="@color/gray_600"
-            app:strokeColor="@color/gray_600"/>
+            app:strokeColor="@color/gray_600"
+            app:cornerRadius="24dp"/>
 
-        <!-- 确认替换按钮 -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_confirm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
             android:text="Confirm"
-            android:backgroundTint="@color/green_500"
-            android:textColor="@android:color/white"/>
+            android:textSize="15sp"
+            android:textAllCaps="false"
+            android:backgroundTint="@color/green_fab"
+            android:textColor="@android:color/white"
+            app:cornerRadius="24dp"/>
 
     </LinearLayout>
 
-    <!-- 无替代品提示（默认隐藏）-->
+    <!-- 无替代品提示 -->
     <TextView
         android:id="@+id/text_no_substitutes"
         android:layout_width="match_parent"

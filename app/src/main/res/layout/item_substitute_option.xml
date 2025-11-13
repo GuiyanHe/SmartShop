@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 单个替代品选项卡片 -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -16,32 +15,33 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp">
+        android:padding="12dp"
+        android:minHeight="80dp">
 
         <!-- 左侧：替代品图片 -->
         <ImageView
             android:id="@+id/img_substitute"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:scaleType="centerCrop"
             android:background="@color/gray_200"
             android:contentDescription="Substitute image"/>
 
-        <!-- 右侧：选中指示器（默认隐藏）-->
+        <!-- 右侧：选中指示器 -->
         <ImageView
             android:id="@+id/img_selected"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:src="@android:drawable/checkbox_on_background"
-            app:tint="@color/green_500"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/ic_check_circle"
             android:visibility="gone"
             android:contentDescription="Selected indicator"/>
 
-        <!-- 中间：替代品信息 -->
+        <!-- ✅ 修复：中间文字区域（确保有足够空间）-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -50,27 +50,35 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="12dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:minHeight="56dp"
+            android:gravity="center_vertical">
 
             <!-- 替代品名称 -->
             <TextView
                 android:id="@+id/text_substitute_name"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Tofu"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/black"/>
+                android:textColor="#000000"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:visibility="visible"/>
 
-            <!-- 说明文字（note + quantity adjustment）-->
+            <!-- 说明文字 -->
             <TextView
                 android:id="@+id/text_substitute_note"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Firm texture • 4 Oz steak → 5 Oz tofu"
-                android:textSize="13sp"
-                android:textColor="@color/gray_600"/>
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:visibility="visible"/>
 
         </LinearLayout>
 

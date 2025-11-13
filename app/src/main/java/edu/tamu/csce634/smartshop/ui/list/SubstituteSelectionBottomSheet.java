@@ -131,7 +131,6 @@ public class SubstituteSelectionBottomSheet extends BottomSheetDialogFragment {
                 IngredientSubstitutes.Substitute selected = adapter.getSelectedSubstitute();
 
                 if (selected == null) {
-                    // 未选择任何替代品（理论上不会发生，因为默认选中第一个）
                     Toast.makeText(requireContext(),
                             "Please select a substitute",
                             Toast.LENGTH_SHORT).show();
@@ -142,6 +141,9 @@ public class SubstituteSelectionBottomSheet extends BottomSheetDialogFragment {
                 Toast.makeText(requireContext(),
                         "✓ Replaced " + originalItem.name + " with " + selected.name,
                         Toast.LENGTH_SHORT).show();
+
+                // ✅ 标记冲突已解决（只在确认时）
+                conflict.resolved = true;
 
                 // 回调监听器
                 if (listener != null) {

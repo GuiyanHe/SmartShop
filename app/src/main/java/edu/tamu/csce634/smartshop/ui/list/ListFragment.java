@@ -465,14 +465,20 @@ public class ListFragment extends Fragment {
         SubstituteSelectionBottomSheet sheet =
                 SubstituteSelectionBottomSheet.newInstance(item, conflict);
 
-        // 设置确认回调（Phase 4 实现实际替换逻辑）
+        // ✅ 设置确认回调
         sheet.setOnSubstituteConfirmedListener((originalItem, selectedSubstitute) -> {
             // TODO: Phase 4 实现实际替换逻辑
-            Toast.makeText(requireContext(),
-                    "Replacement logic will be implemented in Phase 4\n" +
-                            "Original: " + originalItem.name + "\n" +
-                            "Substitute: " + selectedSubstitute.name,
-                    Toast.LENGTH_LONG).show();
+
+            // ✅ 标记冲突为已解决
+            conflict.resolved = true;
+
+            // ✅ 刷新 Adapter 显示（徽章会变灰）
+            adapter.notifyDataSetChanged();
+
+            android.widget.Toast.makeText(requireContext(),
+                    "✓ Replaced " + originalItem.name + " with " + selectedSubstitute.name +
+                            "\n(Full replacement logic in Phase 4)",
+                    android.widget.Toast.LENGTH_LONG).show();
         });
 
         sheet.show(getParentFragmentManager(), "SubstituteSelectionBottomSheet");

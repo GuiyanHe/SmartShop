@@ -7,7 +7,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -49,15 +48,19 @@ public class SubstituteAdapter extends RecyclerView.Adapter<SubstituteAdapter.Su
     public void onBindViewHolder(@NonNull SubstituteViewHolder holder, int position) {
         IngredientSubstitutes.Substitute substitute = substitutes.get(position);
 
-        // 设置名称
+        // ✅ 设置名称（每次都执行）
         holder.name.setText(substitute.name);
 
-        // 设置说明（note + quantity adjustment）
+        // ✅ 设置说明（每次都执行）
         String noteText = substitute.note;
         if (substitute.quantityAdjustment != null && !substitute.quantityAdjustment.isEmpty()) {
             noteText += " • " + substitute.quantityAdjustment;
         }
         holder.note.setText(noteText);
+
+        // ✅ 确保文字可见
+        holder.name.setVisibility(View.VISIBLE);
+        holder.note.setVisibility(View.VISIBLE);
 
         // 加载图片
         Glide.with(holder.itemView.getContext())
@@ -74,7 +77,7 @@ public class SubstituteAdapter extends RecyclerView.Adapter<SubstituteAdapter.Su
         MaterialCardView card = (MaterialCardView) holder.itemView;
         if (isSelected) {
             card.setStrokeColor(holder.itemView.getContext().getColor(R.color.green_500));
-            card.setStrokeWidth(4);
+            card.setStrokeWidth(6);  // ✅ 加粗边框更明显
         } else {
             card.setStrokeColor(android.graphics.Color.TRANSPARENT);
             card.setStrokeWidth(0);
