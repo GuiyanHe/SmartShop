@@ -3,46 +3,57 @@ package edu.tamu.csce634.smartshop.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.models.ShoppingItem;
+import edu.tamu.csce634.smartshop.ui.list.ListFragment;
 import edu.tamu.csce634.smartshop.ui.list.ListViewModel;
 import edu.tamu.csce634.smartshop.ui.list.ProductOptionsBottomSheet;
+import edu.tamu.csce634.smartshop.utils.ConflictDetector;
 
-/**
- * 适配器：将 ShoppingItem 渲染成 “卡片项”（对应 item_shopping.xml）
- * 右侧有 - / Qty / + 控件；SKU 行显示 selectedSkuName + skuSpec；
- * 左侧 ImageView 用 Glide 加载图片
- */
 public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapter.VH> {
 
-    private List<ShoppingItem> itemList;   // 数据源
-    private final ListViewModel listViewModel;   // 通知 VM 更新总价等
+    private List<ShoppingItem> itemList;
+    private final ListViewModel listViewModel;
+    private Map<String, ConflictDetector.Conflict> conflictMap = new HashMap<>();
+
+    public interface OnSubstituteRequestListener {
+        void onSubstituteRequest(ShoppingItem item, ConflictDetector.Conflict conflict);
+    }
+
+    private OnSubstituteRequestListener substituteListener;
+    private androidx.fragment.app.Fragment parentFragment;
 
     public ShoppingItemAdapter(List<ShoppingItem> list, ListViewModel vm) {
         this.itemList = list;
         this.listViewModel = vm;
     }
+    public void setParentFragment(androidx.fragment.app.Fragment fragment) {
+        this.parentFragment = fragment;
+    }
 
     public void updateData(List<ShoppingItem> newList) {
         this.itemList = newList;
-        notifyDataSetChanged(); // 全量刷新（后续可优化为DiffUtil）
+        notifyDataSetChanged();
     }
 
     @NonNull
     @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_shopping, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_shopping, parent, false);
         return new VH(v);
     }
 
@@ -50,16 +61,12 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
     public void onBindViewHolder(@NonNull VH h, int position) {
         ShoppingItem it = itemList.get(position);
 
-        // 标题：优先显示 selectedSkuName，否则回退到 name
-        String title = it.selectedSkuName != null && !it.selectedSkuName.isEmpty()
-                ? it.selectedSkuName : it.name;
+        String title = it.selectedSkuName != null && !it.selectedSkuName.isEmpty() ? it.selectedSkuName : it.name;
         h.title.setText(title);
 
-        // SKU 行：selectedSkuName + skuSpec（若有）
         String spec = (it.skuSpec != null && !it.skuSpec.isEmpty()) ? " " + it.skuSpec : "";
         h.sub.setText("SKU: " + title + spec);
 
-        // 显示Recipe需求量
         if (it.recipeNeededStr != null && !it.recipeNeededStr.isEmpty()) {
             h.neededLabel.setVisibility(View.VISIBLE);
             h.neededLabel.setText("Recipe needs: " + it.recipeNeededStr);
@@ -67,74 +74,187 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
             h.neededLabel.setVisibility(View.GONE);
         }
 
-        // Qty 显示
-        h.qtyBadge.setText(String.format("Qty: %s", formatQty(it.quantity)));
+        h.qtyBadge.setText(formatQty(it.quantity));
 
-//        // 加载图片
-//        if (it.imageUrl != null && it.imageUrl.startsWith("asset:")) {
-//            String fileName = it.imageUrl.substring(6); // e.g. "milk.jpeg"
-//            String uri = "file:///android_asset/items/" + fileName;
-//            Glide.with(h.itemView.getContext())
-//                    .load(uri)
-//                    .centerCrop()
-//                    .placeholder(android.R.color.darker_gray)
-//                    .into(h.image);
-//        } else {
-//            Glide.with(h.itemView.getContext())
-//                    .load(it.imageUrl)
-//                    .centerCrop()
-//                    .placeholder(android.R.color.darker_gray)
-//                    .into(h.image);
-//        }
-        // 加载图片（支持：drawable资源ID / 网络链接）
         if (it.imageUrl != null && !it.imageUrl.isEmpty()) {
             if (it.imageUrl.startsWith("res:")) {
-                // Recipe模块的drawable资源ID
                 try {
                     int resId = Integer.parseInt(it.imageUrl.substring(4));
-                    Glide.with(h.itemView.getContext())
-                            .load(resId)
-                            .centerCrop()
-                            .placeholder(android.R.color.darker_gray)
-                            .into(h.image);
+                    Glide.with(h.itemView.getContext()).load(resId).centerCrop()
+                            .placeholder(android.R.color.darker_gray).into(h.image);
                 } catch (NumberFormatException e) {
                     h.image.setImageResource(android.R.color.darker_gray);
                 }
             } else {
-                // HTTP/HTTPS网络链接
-                Glide.with(h.itemView.getContext())
-                        .load(it.imageUrl)
-                        .centerCrop()
-                        .placeholder(android.R.color.darker_gray)
-                        .into(h.image);
+                Glide.with(h.itemView.getContext()).load(it.imageUrl).centerCrop()
+                        .placeholder(android.R.color.darker_gray).into(h.image);
             }
         } else {
-            // 无图片时显示默认占位图
             h.image.setImageResource(android.R.color.darker_gray);
         }
 
-        // Options：弹出 BottomSheet
         h.btnReplace.setOnClickListener(v -> {
             ProductOptionsBottomSheet sheet = ProductOptionsBottomSheet.newInstance(it.ingredientId);
             sheet.show(((androidx.fragment.app.FragmentActivity) v.getContext())
                     .getSupportFragmentManager(), "ProductOptionsBottomSheet");
         });
 
-        // “-” 数量减一（到 0 为止）
         h.btnMinus.setOnClickListener(v -> {
             if (it.quantity > 0) {
                 it.quantity -= 1;
-                h.qtyBadge.setText(String.format("Qty: %s", formatQty(it.quantity)));
+                h.qtyBadge.setText(formatQty(it.quantity));
                 listViewModel.recalculateTotalOnly();
+
+                // ✅ 如果减到0且有冲突，自动解决
+                if (it.quantity == 0) {
+                    String conflictKey = it.originalIngredientId != null ?
+                            it.originalIngredientId : it.ingredientId;
+                    ConflictDetector.Conflict conflict = conflictMap.get(conflictKey);
+
+                    if (conflict != null) {
+                        conflict.resolved = true;
+
+                        h.conflictBadge.setImageResource(R.drawable.ic_check_circle_gray);
+                        h.conflictBadge.setBackground(null);
+                        h.conflictBadge.setPadding(0, 0, 0, 0);
+                        h.conflictBadge.setColorFilter(null);
+                        h.conflictBadge.setBackgroundTintList(null);
+                        h.layoutConflictDetails.setVisibility(View.GONE);
+
+                        if (parentFragment instanceof ListFragment) {
+                            ((ListFragment) parentFragment).recordQuantityZeroResolution(conflictKey);
+                        }
+
+                        Toast.makeText(v.getContext(),
+                                "✓ " + it.name + " reduced to 0 - Conflict resolved",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
         });
 
-        // “+” 数量加一
         h.btnPlus.setOnClickListener(v -> {
+            double previousQty = it.quantity;
+
             it.quantity += 1;
-            h.qtyBadge.setText(String.format("Qty: %s", formatQty(it.quantity)));
+            h.qtyBadge.setText(formatQty(it.quantity));
             listViewModel.recalculateTotalOnly();
+
+            // ✅ 如果从0增加到>0且有已解决的冲突，重新激活
+            if (previousQty == 0 && it.quantity > 0) {
+                String conflictKey = it.originalIngredientId != null ?
+                        it.originalIngredientId : it.ingredientId;
+                ConflictDetector.Conflict conflict = conflictMap.get(conflictKey);
+
+                if (conflict != null && conflict.resolved) {
+                    conflict.resolved = false;
+
+                    h.conflictBadge.setImageResource(R.drawable.ic_warning);
+                    h.conflictBadge.setBackgroundTintList(
+                            android.content.res.ColorStateList.valueOf(
+                                    v.getContext().getColor(R.color.red_500)));
+                    h.conflictBadge.setColorFilter(0xFFFFFFFF);
+
+                    if (parentFragment instanceof ListFragment) {
+                        ((ListFragment) parentFragment).clearResolutionForReactivatedConflict(conflictKey);
+                    }
+
+                    Toast.makeText(v.getContext(),
+                            "⚠ " + it.name + " quantity increased - Conflict reactivated",
+                            Toast.LENGTH_SHORT).show();
+
+                    notifyItemChanged(h.getAdapterPosition());
+                }
+            }
         });
+
+        if (it.isSubstituted) {
+            h.conflictBadge.setVisibility(View.VISIBLE);
+            h.conflictBadge.setImageResource(R.drawable.ic_check_circle_gray);
+            h.conflictBadge.setBackground(null);
+            h.conflictBadge.setPadding(0, 0, 0, 0);
+            h.conflictBadge.setColorFilter(null);
+            h.conflictBadge.setBackgroundTintList(null);
+            h.conflictBadge.setOnClickListener(v -> {
+                String message = it.substituteDisplayName != null ? "✓ " + it.substituteDisplayName : "✓ Replaced item";
+                Toast.makeText(v.getContext(), message, Toast.LENGTH_SHORT).show();
+            });
+            h.itemView.setOnClickListener(null);
+            h.layoutConflictDetails.setVisibility(View.GONE);
+            return;
+        }
+
+        String conflictKey = it.originalIngredientId != null ? it.originalIngredientId : it.ingredientId;
+        ConflictDetector.Conflict conflict = conflictMap.get(conflictKey);
+
+        if (conflict != null) {
+            h.conflictBadge.setVisibility(View.VISIBLE);
+
+            if (conflict.resolved) {
+                h.conflictBadge.setImageResource(R.drawable.ic_check_circle_gray);
+                h.conflictBadge.setBackground(null);
+                h.conflictBadge.setPadding(0, 0, 0, 0);
+                h.conflictBadge.setColorFilter(null);
+                h.conflictBadge.setBackgroundTintList(null);
+                h.conflictBadge.setOnClickListener(v ->
+                        Toast.makeText(v.getContext(), "✓ Conflict resolved (Set to 0)", Toast.LENGTH_SHORT).show());
+                h.itemView.setOnClickListener(null);
+                h.layoutConflictDetails.setVisibility(View.GONE);
+            } else {
+                h.conflictBadge.setImageResource(R.drawable.ic_warning);
+                h.conflictBadge.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
+                        h.itemView.getContext().getColor(R.color.red_500)));
+                h.conflictBadge.setColorFilter(0xFFFFFFFF);
+                h.textConflictMessage.setText(conflict.reason);
+
+                View.OnClickListener toggleConflictDetails = v -> {
+                    if (h.layoutConflictDetails.getVisibility() == View.VISIBLE) {
+                        h.layoutConflictDetails.setVisibility(View.GONE);
+                    } else {
+                        h.layoutConflictDetails.setVisibility(View.VISIBLE);
+                    }
+                };
+
+                h.itemView.setOnClickListener(toggleConflictDetails);
+                h.conflictBadge.setOnClickListener(toggleConflictDetails);
+
+                h.btnSetZero.setOnClickListener(v -> {
+                    it.quantity = 0;
+                    h.qtyBadge.setText(formatQty(it.quantity));
+                    conflict.resolved = true;
+
+                    h.conflictBadge.setImageResource(R.drawable.ic_check_circle_gray);
+                    h.conflictBadge.setBackground(null);
+                    h.conflictBadge.setPadding(0, 0, 0, 0);
+                    h.conflictBadge.setColorFilter(null);
+                    h.conflictBadge.setBackgroundTintList(null);
+                    h.layoutConflictDetails.setVisibility(View.GONE);
+
+                    Toast.makeText(v.getContext(), "✓ " + it.name + " set to 0", Toast.LENGTH_SHORT).show();
+                    listViewModel.recalculateTotalOnly();
+                });
+
+                h.btnReplaceConflict.setOnClickListener(v -> {
+                    if (substituteListener != null) {
+                        substituteListener.onSubstituteRequest(it, conflict);
+                    }
+                });
+
+                if (conflict.substitutes == null || conflict.substitutes.isEmpty()) {
+                    h.btnReplaceConflict.setEnabled(false);
+                    h.btnReplaceConflict.setText("No substitutes");
+                    h.btnReplaceConflict.setAlpha(0.5f);
+                } else {
+                    h.btnReplaceConflict.setEnabled(true);
+                    h.btnReplaceConflict.setText("Replace");
+                    h.btnReplaceConflict.setAlpha(1.0f);
+                }
+            }
+        } else {
+            h.conflictBadge.setVisibility(View.GONE);
+            h.layoutConflictDetails.setVisibility(View.GONE);
+            h.itemView.setOnClickListener(null);
+        }
     }
 
     @Override
@@ -143,19 +263,37 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
     }
 
     private String formatQty(double q) {
+        if (q <= 0) return "0";
         if (Math.abs(q - Math.round(q)) < 1e-6) return String.valueOf((int) Math.round(q));
-        return String.format("%.1f", q);
+        return String.format(java.util.Locale.US, "%.1f", q);
+    }
+
+    public void setConflicts(List<ConflictDetector.Conflict> conflicts) {
+        conflictMap.clear();
+        if (conflicts != null) {
+            for (ConflictDetector.Conflict c : conflicts) {
+                if (c.item != null && c.item.ingredientId != null) {
+                    conflictMap.put(c.item.ingredientId, c);
+                }
+            }
+        }
+        notifyDataSetChanged();
+    }
+
+    public void setOnSubstituteRequestListener(OnSubstituteRequestListener listener) {
+        this.substituteListener = listener;
+    }
+
+    public List<ConflictDetector.Conflict> getConflicts() {
+        return new java.util.ArrayList<>(conflictMap.values());
     }
 
     static class VH extends RecyclerView.ViewHolder {
-        ImageView image;      // R.id.itemImage
-        TextView title;       // R.id.title
-        TextView sub;         // R.id.sub
-        TextView btnReplace;  // R.id.btnReplace
-        TextView qtyBadge;    // R.id/qtyBadge（中间的 Qty: x）
-        TextView btnMinus;    // R.id/btnMinus（左侧 -）
-        TextView btnPlus;     // R.id/btnPlus（右侧 +）
-        TextView neededLabel;
+        ImageView image, conflictBadge;
+        TextView title, sub, btnReplace, qtyBadge, neededLabel, textConflictMessage;
+        ImageButton btnMinus, btnPlus;
+        View layoutConflictDetails;
+        com.google.android.material.button.MaterialButton btnSetZero, btnReplaceConflict;
 
         VH(@NonNull View itemView) {
             super(itemView);
@@ -167,6 +305,11 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
             btnMinus = itemView.findViewById(R.id.btnMinus);
             btnPlus = itemView.findViewById(R.id.btnPlus);
             neededLabel = itemView.findViewById(R.id.neededLabel);
+            conflictBadge = itemView.findViewById(R.id.img_conflict_badge);
+            layoutConflictDetails = itemView.findViewById(R.id.layout_conflict_details);
+            textConflictMessage = itemView.findViewById(R.id.text_conflict_message);
+            btnSetZero = itemView.findViewById(R.id.btn_set_zero);
+            btnReplaceConflict = itemView.findViewById(R.id.btn_replace_conflict);
         }
     }
 }

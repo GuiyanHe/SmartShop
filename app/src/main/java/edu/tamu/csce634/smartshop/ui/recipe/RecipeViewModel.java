@@ -84,7 +84,7 @@ public class RecipeViewModel extends ViewModel {
     tofuBowl.addIngredient(new Ingredient("Brown Rice", "1 Oz", R.drawable.brown_rice));
     tofuBowl.addIngredient(new Ingredient("Egg", "1", R.drawable.egg));
     tofuBowl.addIngredient(new Ingredient("Corn", "2 Oz", R.drawable.corn));
-//    tofuBowl.addIngredient(new Ingredient("Purple Cabbage", "1 Oz", R.drawable.purple_cabbage));
+    tofuBowl.addIngredient(new Ingredient("Purple Cabbage", "1 Oz", R.drawable.red_cabbage));
         recipes.add(tofuBowl);
 
         // Quinoa Vegetable Stir-fry
