@@ -19,4 +19,7 @@ public class ShoppingItem {
     public double substitutionRatio = 1.0;
     public boolean isSubstituted = false;
     public String substituteDisplayName;
+
+    public boolean isPicked = false;
+
 }

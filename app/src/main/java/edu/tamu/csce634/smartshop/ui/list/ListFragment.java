@@ -27,6 +27,7 @@ import edu.tamu.csce634.smartshop.data.DataSeeder;
 import edu.tamu.csce634.smartshop.data.PresetRepository;
 import edu.tamu.csce634.smartshop.models.ShoppingItem;
 import edu.tamu.csce634.smartshop.ui.recipe.RecipeViewModel;
+import edu.tamu.csce634.smartshop.utils.CartManager;
 import edu.tamu.csce634.smartshop.utils.ConflictDetector;
 import edu.tamu.csce634.smartshop.utils.IngredientSubstitutes;
 import edu.tamu.csce634.smartshop.utils.PreferenceStateManager;
@@ -238,26 +239,43 @@ public class ListFragment extends Fragment {
     }
 
     /**
-     * 导航到地图页面（占位实现）
+     * 导航到地图页面
+     *
+     * Phase 6: 清空数据并传递控制权给Map模块
      */
     private void navigateToStoreMap() {
-        // 1. 清空Recipe购物车
-        edu.tamu.csce634.smartshop.utils.CartManager.getInstance(requireContext()).clearCart();
+        // 1. 清空Recipe购物车（用户无法返回List重新编辑）
+        CartManager.getInstance(requireContext()).clearCart();
 
-        // 2. 清空偏好状态
-        stateManager.clearAll();
+        // 2. 清空偏好模式状态（解决方案记录、数量快照）
+        if (stateManager != null) {
+            stateManager.clearAll();
+        }
 
-        // 3. 重置模式
+        // 3. 重置偏好模式标记
         preferenceMode = false;
         savePreferenceMode();
 
+        // 4. 更新UI为默认模式
+        updateModeUI();
+
+        // ✅ 显示提示（告知用户数据已转移）
         Toast.makeText(requireContext(),
-                "✓ Data transferred to Map\nList will be cleared after shopping",
+                "✓ Data transferred to Store Map\n" +
+                        "Complete shopping to clear list",
                 Toast.LENGTH_LONG).show();
 
-        // TODO: Map模块添加导航代码
-        // NavController navController = Navigation.findNavController(requireView());
+        // TODO: Map模块在此添加导航代码
+        // 示例（如果使用Navigation Component）：
+        // androidx.navigation.NavController navController =
+        //         androidx.navigation.Navigation.findNavController(requireView());
         // navController.navigate(R.id.action_list_to_map);
+
+        // 示例（如果使用FragmentTransaction）：
+        // requireActivity().getSupportFragmentManager().beginTransaction()
+        //         .replace(R.id.container, new MapFragment())
+        //         .addToBackStack(null)
+        //         .commit();
     }
     private void convertCartToShoppingList(Map<String, String> mergedIngredients) {
         try {
