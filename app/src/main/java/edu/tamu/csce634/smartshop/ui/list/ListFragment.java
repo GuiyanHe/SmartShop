@@ -241,13 +241,23 @@ public class ListFragment extends Fragment {
      * 导航到地图页面（占位实现）
      */
     private void navigateToStoreMap() {
+        // 1. 清空Recipe购物车
+        edu.tamu.csce634.smartshop.utils.CartManager.getInstance(requireContext()).clearCart();
+
+        // 2. 清空偏好状态
+        stateManager.clearAll();
+
+        // 3. 重置模式
+        preferenceMode = false;
+        savePreferenceMode();
+
         Toast.makeText(requireContext(),
-                "✓ Navigating to Store Map…\nTotal: " +
-                        binding.totalPrice.getText().toString(),
+                "✓ Data transferred to Map\nList will be cleared after shopping",
                 Toast.LENGTH_LONG).show();
 
-        // TODO: 实际导航逻辑
-        // NavHostFragment.findNavController(this).navigate(R.id.action_list_to_map);
+        // TODO: Map模块添加导航代码
+        // NavController navController = Navigation.findNavController(requireView());
+        // navController.navigate(R.id.action_list_to_map);
     }
     private void convertCartToShoppingList(Map<String, String> mergedIngredients) {
         try {

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import edu.tamu.csce634.smartshop.models.ShoppingItem;
 import edu.tamu.csce634.smartshop.utils.QuantityParser;
@@ -36,6 +37,7 @@ public class ListViewModel extends ViewModel {
         this.itemList = newItemList;
         itemListLiveData.setValue(newItemList);
         recalculateTotal(newItemList);
+        updateAisleGrouping(newItemList);
     }
 
     public void replaceSku(String ingredientId, String newSkuName, double newPrice) {
@@ -174,5 +176,33 @@ public class ListViewModel extends ViewModel {
             return String.valueOf((int) Math.round(value));
         }
         return String.format(java.util.Locale.US, "%.2f", value);
+    }
+    // ========== Map模块接口 ==========
+
+    // 1. 按通道分组的数据
+    private final MutableLiveData<Map<String, List<ShoppingItem>>> itemsByAisleLiveData =
+            new MutableLiveData<>();
+
+    public LiveData<Map<String, List<ShoppingItem>>> getItemsByAisle() {
+        return itemsByAisleLiveData;
+    }
+
+    // 2. 在 updateItemList() 方法末尾调用此方法
+    private void updateAisleGrouping(List<ShoppingItem> items) {
+        Map<String, List<ShoppingItem>> grouped = new java.util.LinkedHashMap<>();
+        for (ShoppingItem item : items) {
+            if (item.quantity <= 0) continue;
+            String aisle = item.aisle != null ? item.aisle : "General";
+            grouped.computeIfAbsent(aisle, k -> new ArrayList<>()).add(item);
+        }
+        itemsByAisleLiveData.setValue(grouped);
+    }
+
+    // 3. 清空数据方法
+    public void clearAllData() {
+        this.itemList.clear();
+        itemListLiveData.setValue(new ArrayList<>());
+        itemsByAisleLiveData.setValue(new java.util.LinkedHashMap<>());
+        totalLiveData.setValue(0.0);
     }
 }
