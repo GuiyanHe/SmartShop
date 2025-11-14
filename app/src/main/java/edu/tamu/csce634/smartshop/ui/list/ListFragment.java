@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -67,7 +68,7 @@ public class ListFragment extends Fragment {
         recipeViewModel = new ViewModelProvider(requireActivity()).get(RecipeViewModel.class);
         recipeViewModel.init(requireContext());
 
-        IngredientSubstitutes.validateSubstitutes(requireContext());
+//        IngredientSubstitutes.validateSubstitutes(requireContext());
 
         RecyclerView recyclerView = binding.recycler;
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -127,10 +128,127 @@ public class ListFragment extends Fragment {
             }
         });
 
-        binding.btnProceed.setOnClickListener(v ->
-                Toast.makeText(requireContext(), "Navigating to Store Map… (demo)", Toast.LENGTH_SHORT).show());
+        binding.btnProceed.setOnClickListener(v -> {
+            // ✅ Phase 6: 检查未解决冲突
+            if (preferenceMode) {
+                List<ConflictDetector.Conflict> unresolved = getUnresolvedConflicts();
+
+                if (!unresolved.isEmpty()) {
+                    showUnresolvedConflictsDialog(unresolved);
+                    return;  // 阻止导航
+                }
+            }
+
+            // 无冲突或非偏好模式，直接导航
+            navigateToStoreMap();
+        });
     }
 
+
+    /**
+     * 获取未解决的冲突列表
+     */
+    private List<ConflictDetector.Conflict> getUnresolvedConflicts() {
+        List<ConflictDetector.Conflict> all = adapter.getConflicts();
+        List<ConflictDetector.Conflict> unresolved = new ArrayList<>();
+
+        for (ConflictDetector.Conflict conflict : all) {
+            // 数量>0 且 未解决 → 真正的未解决冲突
+            if (conflict.item.quantity > 0 && !conflict.resolved) {
+                unresolved.add(conflict);
+            }
+        }
+
+        return unresolved;
+    }
+
+    /**
+     * 显示未解决冲突对话框
+     */
+    private void showUnresolvedConflictsDialog(List<ConflictDetector.Conflict> unresolved) {
+        // 构建冲突列表文本
+        StringBuilder conflictList = new StringBuilder();
+        for (int i = 0; i < unresolved.size(); i++) {
+            ConflictDetector.Conflict c = unresolved.get(i);
+
+            // 提取冲突类型简短描述
+            String typeLabel = getConflictTypeLabel(c.type);
+
+            conflictList.append("• ")
+                    .append(c.item.name)
+                    .append(" (")
+                    .append(typeLabel)
+                    .append(")");
+
+            if (i < unresolved.size() - 1) {
+                conflictList.append("\n");
+            }
+        }
+
+        // 创建对话框
+        View dialogView = getLayoutInflater().inflate(
+                R.layout.dialog_unresolved_conflicts, null);
+
+        TextView textConflictCount = dialogView.findViewById(R.id.text_conflict_count);
+        TextView textConflictListView = dialogView.findViewById(R.id.text_conflict_list);
+        com.google.android.material.button.MaterialButton btnReview =
+                dialogView.findViewById(R.id.btn_review);
+        com.google.android.material.button.MaterialButton btnContinue =
+                dialogView.findViewById(R.id.btn_continue_anyway);
+
+        // 设置冲突数量
+        textConflictCount.setText(unresolved.size() +
+                (unresolved.size() == 1 ? " item conflicts" : " items conflict") +
+                " with your preferences:");
+
+        // 设置冲突列表
+        textConflictListView.setText(conflictList.toString());
+
+        // 创建AlertDialog
+        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(true)
+                .create();
+
+        // Review按钮：关闭对话框，让用户查看列表
+        btnReview.setOnClickListener(v -> {
+            dialog.dismiss();
+        });
+
+        // Continue按钮：忽略警告继续
+        btnContinue.setOnClickListener(v -> {
+            dialog.dismiss();
+            navigateToStoreMap();
+        });
+
+        dialog.show();
+    }
+
+    /**
+     * 获取冲突类型的简短标签
+     */
+    private String getConflictTypeLabel(ConflictDetector.ConflictType type) {
+        switch (type) {
+            case ALLERGEN: return "Allergen";
+            case VEGAN: return "Vegan";
+            case VEGETARIAN: return "Vegetarian";
+            case GLUTEN: return "Gluten";
+            default: return "Conflict";
+        }
+    }
+
+    /**
+     * 导航到地图页面（占位实现）
+     */
+    private void navigateToStoreMap() {
+        Toast.makeText(requireContext(),
+                "✓ Navigating to Store Map…\nTotal: " +
+                        binding.totalPrice.getText().toString(),
+                Toast.LENGTH_LONG).show();
+
+        // TODO: 实际导航逻辑
+        // NavHostFragment.findNavController(this).navigate(R.id.action_list_to_map);
+    }
     private void convertCartToShoppingList(Map<String, String> mergedIngredients) {
         try {
             List<edu.tamu.csce634.smartshop.models.Recipe> recipes = recipeViewModel.getRecipes().getValue();
@@ -267,14 +385,12 @@ public class ListFragment extends Fragment {
         ProfileRepository profileRepo = new ProfileRepository(requireActivity().getApplication());
         profileRepo.getProfileData().observe(getViewLifecycleOwner(), profile -> {
             if (profile == null) {
-                Toast.makeText(requireContext(), "Please set up your profile first", Toast.LENGTH_SHORT).show();
                 profileRepo.getProfileData().removeObservers(getViewLifecycleOwner());
                 return;
             }
 
             List<ShoppingItem> currentItems = listViewModel.getItemList().getValue();
             if (currentItems == null || currentItems.isEmpty()) {
-                Toast.makeText(requireContext(), "Shopping list is empty", Toast.LENGTH_SHORT).show();
                 profileRepo.getProfileData().removeObservers(getViewLifecycleOwner());
                 return;
             }
@@ -283,9 +399,6 @@ public class ListFragment extends Fragment {
             Map<String, PreferenceStateManager.ResolutionRecord> savedResolutions = stateManager.loadResolutions();
 
             if (!savedResolutions.isEmpty()) {
-                Toast.makeText(requireContext(),
-                        "Restoring " + savedResolutions.size() + " previous changes...",
-                        Toast.LENGTH_SHORT).show();
 
                 List<ShoppingItem> restoredItems = new ArrayList<>();
                 int appliedCount = 0;
@@ -294,7 +407,7 @@ public class ListFragment extends Fragment {
                     ShoppingItem newItem = new ShoppingItem();
                     copyItemFields(item, newItem);
 
-                    // ✅ 关键修复：尝试多种key匹配
+                    // 尝试多种key匹配
                     PreferenceStateManager.ResolutionRecord resolution = null;
 
                     // 方式1：直接匹配ingredientId
@@ -310,28 +423,17 @@ public class ListFragment extends Fragment {
                         for (Map.Entry<String, PreferenceStateManager.ResolutionRecord> entry : savedResolutions.entrySet()) {
                             if (item.name.equalsIgnoreCase(entry.getValue().substituteName)) {
                                 resolution = entry.getValue();
-                                Toast.makeText(requireContext(),
-                                        "DEBUG: Matched by name: " + item.name,
-                                        Toast.LENGTH_SHORT).show();
                                 break;
                             }
                         }
                     }
 
                     if (resolution != null) {
-                        Toast.makeText(requireContext(),
-                                "DEBUG: Found resolution for " + item.name,
-                                Toast.LENGTH_SHORT).show();
-
                         if (resolution.type == PreferenceStateManager.ResolutionType.REPLACED) {
                             applySubstitutionToItem(newItem, resolution);
                         } else if (resolution.type == PreferenceStateManager.ResolutionType.SET_TO_ZERO) {
                             newItem.quantity = 0;
                         }
-                    } else {
-                        Toast.makeText(requireContext(),
-                                "DEBUG: No resolution found for " + item.ingredientId + "/" + item.name,
-                                Toast.LENGTH_SHORT).show();
                     }
 
                     restoredItems.add(newItem);
@@ -343,19 +445,7 @@ public class ListFragment extends Fragment {
                 Toast.makeText(requireContext(),
                         "✓ Applied " + appliedCount + " substitutions",
                         Toast.LENGTH_LONG).show();
-                // ✅ 调试：打印保存的记录
-                for (Map.Entry<String, PreferenceStateManager.ResolutionRecord> entry : savedResolutions.entrySet()) {
-                    Toast.makeText(requireContext(),
-                            "Saved: [" + entry.getKey() + "] → " + entry.getValue().substituteName,
-                            Toast.LENGTH_LONG).show();
-                }
 
-// ✅ 调试：打印当前列表
-                for (ShoppingItem item : currentItems) {
-                    Toast.makeText(requireContext(),
-                            "Current: [" + item.ingredientId + "] " + item.name,
-                            Toast.LENGTH_LONG).show();
-                }
             }
 
             // 检测冲突
@@ -404,7 +494,7 @@ public class ListFragment extends Fragment {
         savePreferenceMode();
         restoreDefaultMode();
         if (adapter != null) adapter.setConflicts(new ArrayList<>());
-        Toast.makeText(requireContext(), "✓ Switched to default mode", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(requireContext(), "✓ Switched to default mode", Toast.LENGTH_SHORT).show();
     }
 
     private void restoreDefaultMode() {
@@ -525,9 +615,6 @@ public class ListFragment extends Fragment {
         try {
             ShoppingItem presetData = loadPresetDataForSubstitute(resolution.substituteId);
             if (presetData == null) {
-                Toast.makeText(requireContext(),
-                        "⚠ Cannot load preset for " + resolution.substituteName,
-                        Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -568,12 +655,6 @@ public class ListFragment extends Fragment {
                     item.quantity = 1;
                 }
             }
-
-            // ✅ 添加成功提示
-            Toast.makeText(requireContext(),
-                    "✓ Applied: " + item.name + " (ID: " + item.ingredientId + ")",
-                    Toast.LENGTH_SHORT).show();
-
         } catch (Exception e) {
             Toast.makeText(requireContext(),
                     "⚠ Error applying substitution: " + e.getMessage(),
@@ -616,15 +697,12 @@ public class ListFragment extends Fragment {
                             (int) Math.round(originalItem.quantity),
                             ratio
                     );
-                    Toast.makeText(requireContext(),
-                            "DEBUG: Saved resolution for key=" + keyToSave,
-                            Toast.LENGTH_SHORT).show();
 
                     adapter.setConflicts(adapter.getConflicts());
                     int newQty = getCurrentQuantityForItem(selectedSubstitute.ingredientId);
                     Toast.makeText(requireContext(),
-                            String.format("✓ Replaced %s with %s\nNew quantity: %d",
-                                    originalItem.name, selectedSubstitute.name, newQty),
+                            String.format("✓ Replaced %s with %s",
+                                    originalItem.name, selectedSubstitute.name),
                             Toast.LENGTH_LONG).show();
                 }
             } catch (Exception e) {
