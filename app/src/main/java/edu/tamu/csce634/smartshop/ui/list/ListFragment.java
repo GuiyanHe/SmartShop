@@ -33,8 +33,17 @@ import edu.tamu.csce634.smartshop.utils.IngredientSubstitutes;
 import edu.tamu.csce634.smartshop.utils.PreferenceStateManager;
 import edu.tamu.csce634.smartshop.utils.QuantityParser;
 
+/**
+ * 购物清单页面：
+ * - 首次启动把 res/raw 的预置 JSON 灌入 SharedPreferences
+ * - 从预置数据生成初始列表（默认 Breakfast 配方）
+ * - 底部提供 3 个 recipe 切换按钮（Quick Breakfast / Family Dinner / Vegan Bowl）
+ * - 顶部右侧显示实时总价与 Map 按钮（Map 按钮仅打印日志）
+ * - 与 ListViewModel/ShoppingItemAdapter 协作，支持 replaceSkuFull、数量 ± 等
+ */
 public class ListFragment extends Fragment {
 
+    // ViewBinding：对应 fragment_list.xml
     private FragmentListBinding binding;
     private ListViewModel listViewModel;
     private RecipeViewModel recipeViewModel;
@@ -909,6 +918,6 @@ public class ListFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
+        binding = null; // 防止内存泄漏
     }
 }
