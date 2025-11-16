@@ -152,7 +152,7 @@ public class MapFragment extends Fragment {
         @Override
         public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_shopping, parent, false);
+                    .inflate(R.layout.item_shopping_map, parent, false);
             return new VH(v);
         }
 
