@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,6 +19,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import edu.tamu.csce634.smartshop.R;
 
 import edu.tamu.csce634.smartshop.adapters.ShoppingItemAdapter;
 import edu.tamu.csce634.smartshop.databinding.FragmentListBinding;
@@ -143,9 +147,13 @@ public class ListFragment extends Fragment {
 //        binding.btnRecipeVegan.setOnClickListener(v -> loadRecipe(RECIPE_VEGAN));
 
         // 8) 底部“Proceed to Map”
-        binding.btnProceed.setOnClickListener(v ->
-                totalText.setText("Navigating to Store Map… (demo)")
-        );
+        binding.btnProceed.setOnClickListener(v -> {
+            // 使用 Navigation Component 执行页面跳转
+            // 这行代码会触发您在导航图中定义的 action，从而切换到 MapFragment
+            NavHostFragment.findNavController(ListFragment.this)
+                    .navigate(R.id.action_list_to_map);
+        });
+
 
 
     }
