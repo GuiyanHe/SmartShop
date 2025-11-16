@@ -1,5 +1,5 @@
-@Deprecated
-package edu.tamu.csce634.smartshop.manager;
+
+package edu.tamu.csce634.smartshop.managers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,7 +15,7 @@ import java.util.Map;
 
 import edu.tamu.csce634.smartshop.models.Ingredient;
 import edu.tamu.csce634.smartshop.models.Recipe;
-
+@Deprecated
 public class CartManager {
     private static CartManager instance;
     private Map<String, Integer> recipeQuantities;

@@ -27,7 +27,7 @@ import java.util.List;
 
 import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.models.Recipe;
-import edu.tamu.csce634.smartshop.manager.RecipeManager;
+import edu.tamu.csce634.smartshop.managers.RecipeManager;
 import edu.tamu.csce634.smartshop.utils.HapticFeedback;
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {

@@ -12,7 +12,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import edu.tamu.csce634.smartshop.databinding.ActivityMainBinding;
-import edu.tamu.csce634.smartshop.manager.RecipeManager;
+import edu.tamu.csce634.smartshop.managers.RecipeManager;
 
 public class MainActivity extends AppCompatActivity {
 
