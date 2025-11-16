@@ -14,13 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.adapters.RecipeAdapter;
-import edu.tamu.csce634.smartshop.models.Ingredient;
 import edu.tamu.csce634.smartshop.models.Recipe;
-import edu.tamu.csce634.smartshop.utils.CartManager;
+import edu.tamu.csce634.smartshop.manager.CartManager;
 import edu.tamu.csce634.smartshop.utils.HapticFeedback;
 import edu.tamu.csce634.smartshop.utils.SwipeHelper;
 

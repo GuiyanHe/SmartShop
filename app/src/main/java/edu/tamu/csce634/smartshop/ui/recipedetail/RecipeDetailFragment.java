@@ -27,7 +27,7 @@ import com.google.android.material.button.MaterialButton;
 import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.adapters.IngredientAdapter;
 import edu.tamu.csce634.smartshop.models.Recipe;
-import edu.tamu.csce634.smartshop.utils.CartManager;
+import edu.tamu.csce634.smartshop.manager.CartManager;
 import edu.tamu.csce634.smartshop.utils.HapticFeedback;
 
 import android.app.AlertDialog;
