@@ -1,3 +1,4 @@
+@Deprecated
 package edu.tamu.csce634.smartshop.manager;
 
 import android.content.Context;

@@ -27,7 +27,7 @@ import java.util.List;
 
 import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.models.Recipe;
-import edu.tamu.csce634.smartshop.manager.CartManager;
+import edu.tamu.csce634.smartshop.manager.RecipeManager;
 import edu.tamu.csce634.smartshop.utils.HapticFeedback;
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
@@ -78,7 +78,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         // Add button - add to cart
         holder.addButton.setOnClickListener(v -> {
             HapticFeedback.mediumClick(v);
-            CartManager.getInstance(v.getContext()).addRecipe(recipe.getTitle());
+            RecipeManager.getInstance(v.getContext()).addRecipe(recipe.getTitle());
             updateButtonState(holder, recipe);
             notifyCartChanged();
         });
@@ -103,7 +103,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         
         final EditText input = new EditText(view.getContext());
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        input.setText(String.valueOf(CartManager.getInstance(view.getContext()).getQuantity(recipe.getTitle())));
+        input.setText(String.valueOf(RecipeManager.getInstance(view.getContext()).getQuantity(recipe.getTitle())));
         input.setSelection(input.getText().length());
         builder.setView(input);
         
@@ -114,13 +114,13 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                     int newQuantity = Integer.parseInt(text);
                     if (newQuantity >= 0 && newQuantity <= 99) {
                         // Clear current quantity
-                        int currentQuantity = CartManager.getInstance(view.getContext()).getQuantity(recipe.getTitle());
+                        int currentQuantity = RecipeManager.getInstance(view.getContext()).getQuantity(recipe.getTitle());
                         for (int i = 0; i < currentQuantity; i++) {
-                            CartManager.getInstance(view.getContext()).removeRecipe(recipe.getTitle());
+                            RecipeManager.getInstance(view.getContext()).removeRecipe(recipe.getTitle());
                         }
                         // Set new quantity
                         for (int i = 0; i < newQuantity; i++) {
-                            CartManager.getInstance(view.getContext()).addRecipe(recipe.getTitle());
+                            RecipeManager.getInstance(view.getContext()).addRecipe(recipe.getTitle());
                         }
                         HapticFeedback.mediumClick(view);
                         updateButtonState(holder, recipe);
@@ -149,7 +149,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                 case MotionEvent.ACTION_DOWN:
                     // Single click
                     HapticFeedback.lightClick(v);
-                    CartManager.getInstance(v.getContext()).addRecipe(recipe.getTitle());
+                    RecipeManager.getInstance(v.getContext()).addRecipe(recipe.getTitle());
                     updateButtonState(holder, recipe);
                     notifyCartChanged();
                     
@@ -158,7 +158,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                         @Override
                         public void run() {
                             HapticFeedback.lightClick(v);
-                            CartManager.getInstance(v.getContext()).addRecipe(recipe.getTitle());
+                            RecipeManager.getInstance(v.getContext()).addRecipe(recipe.getTitle());
                             updateButtonState(holder, recipe);
                             notifyCartChanged();
                             handler.postDelayed(this, 150);
@@ -188,7 +188,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                 case MotionEvent.ACTION_DOWN:
                     // Single click
                     HapticFeedback.lightClick(v);
-                    CartManager.getInstance(v.getContext()).removeRecipe(recipe.getTitle());
+                    RecipeManager.getInstance(v.getContext()).removeRecipe(recipe.getTitle());
                     updateButtonState(holder, recipe);
                     notifyCartChanged();
                     
@@ -196,9 +196,9 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                     runnable[0] = new Runnable() {
                         @Override
                         public void run() {
-                            if (CartManager.getInstance(v.getContext()).getQuantity(recipe.getTitle()) > 0) {
+                            if (RecipeManager.getInstance(v.getContext()).getQuantity(recipe.getTitle()) > 0) {
                                 HapticFeedback.lightClick(v);
-                                CartManager.getInstance(v.getContext()).removeRecipe(recipe.getTitle());
+                                RecipeManager.getInstance(v.getContext()).removeRecipe(recipe.getTitle());
                                 updateButtonState(holder, recipe);
                                 notifyCartChanged();
                                 handler.postDelayed(this, 150);
@@ -223,7 +223,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     }
 
     private void updateButtonState(RecipeViewHolder holder, Recipe recipe) {
-        int quantity = CartManager.getInstance(holder.itemView.getContext()).getQuantity(recipe.getTitle());
+        int quantity = RecipeManager.getInstance(holder.itemView.getContext()).getQuantity(recipe.getTitle());
         
         if (quantity > 0) {
             holder.addButton.setVisibility(View.GONE);

@@ -12,7 +12,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import edu.tamu.csce634.smartshop.databinding.ActivityMainBinding;
-import edu.tamu.csce634.smartshop.manager.CartManager;
+import edu.tamu.csce634.smartshop.manager.RecipeManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,8 +22,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Initialize CartManager with context
-        CartManager.getInstance(this);
+        // Initialize RecipeManager with context
+        RecipeManager.getInstance(this);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

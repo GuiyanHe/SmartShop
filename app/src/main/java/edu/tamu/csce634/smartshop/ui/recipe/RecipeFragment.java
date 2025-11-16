@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.adapters.RecipeAdapter;
 import edu.tamu.csce634.smartshop.models.Recipe;
-import edu.tamu.csce634.smartshop.manager.CartManager;
+import edu.tamu.csce634.smartshop.manager.RecipeManager;
 import edu.tamu.csce634.smartshop.utils.HapticFeedback;
 import edu.tamu.csce634.smartshop.utils.SwipeHelper;
 
@@ -95,7 +95,7 @@ public class RecipeFragment extends Fragment {
             @Override
             public boolean canSwipe(int position) {
                 Recipe recipe = adapter.getRecipeAt(position);
-                return CartManager.getInstance(requireContext()).getQuantity(recipe.getTitle()) > 0;
+                return RecipeManager.getInstance(requireContext()).getQuantity(recipe.getTitle()) > 0;
             }
 
             @Override
@@ -110,7 +110,7 @@ public class RecipeFragment extends Fragment {
     }
 
     private void showDeleteConfirmation(Recipe recipe, int position) {
-    int quantity = CartManager.getInstance(requireContext()).getQuantity(recipe.getTitle());
+    int quantity = RecipeManager.getInstance(requireContext()).getQuantity(recipe.getTitle());
         
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Remove from Cart");
@@ -122,7 +122,7 @@ public class RecipeFragment extends Fragment {
             
             // Remove all quantities
             for (int i = 0; i < quantity; i++) {
-                CartManager.getInstance(requireContext()).removeRecipe(recipe.getTitle());
+                RecipeManager.getInstance(requireContext()).removeRecipe(recipe.getTitle());
             }
             // Refresh required ingredients in ViewModel after batch mutation
             viewModel.refreshRequiredIngredients(requireContext());
