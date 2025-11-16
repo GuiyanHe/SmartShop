@@ -8,24 +8,25 @@
     tools:context=".ui.home.HomeFragment">
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/home_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="true"
+        android:clipToPadding="false"
         android:paddingBottom="80dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:clipToPadding="false"> <TextView
-            android:id="@+id/text_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="September 25, 2025"
-            android:textColor="@android:color/darker_gray"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:padding="16dp">
+
+            <!-- Top Header: Date, Hello User, Profile Icon -->
+            <TextView
+                android:id="@+id/text_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="September 25, 2025"
+                android:textColor="@android:color/darker_gray"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/text_greeting"
@@ -50,88 +51,28 @@
                 android:src="@drawable/ic_person"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/text_date"
-                app:tint="@color/green_500" />
+                app:tint="@color/purple_500" />
 
 
+            <!-- Stats Section (Using LinearLayout for simplicity) -->
             <LinearLayout
                 android:id="@+id/stats_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:baselineAligned="false"
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/text_greeting">
 
-                <include
-                    android:id="@+id/stat_protein"
-                    layout="@layout/item_stat_circle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-                <include
-                    android:id="@+id/stat_fat"
-                    layout="@layout/item_stat_circle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-                <include
-                    android:id="@+id/stat_calories"
-                    layout="@layout/item_stat_circle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-                <include
-                    android:id="@+id/stat_water"
-                    layout="@layout/item_stat_circle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                <!-- You would replace these with custom progress bar views for the exact look -->
+                <include layout="@layout/item_stat_circle" />
+                <include layout="@layout/item_stat_circle" />
+                <include layout="@layout/item_stat_circle" />
+                <include layout="@layout/item_stat_circle" />
             </LinearLayout>
 
-            <GridLayout
-                android:id="@+id/test_buttons"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:columnCount="2"
-                android:rowCount="2"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/stats_layout">
-
-                <Button
-                    android:id="@+id/button_add_protein"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_marginEnd="8dp"
-                    android:text="Add 10g Pro" />
-                <Button
-                    android:id="@+id/button_add_fat"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="8dp"
-                    android:text="Add 5g Fat" />
-                <Button
-                    android:id="@+id/button_add_calories"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_marginEnd="8dp"
-                    android:text="Add 100 Cal" />
-                <Button
-                    android:id="@+id/button_add_water"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="8dp"
-                    android:text="Add 1 Cup" />
-            </GridLayout>
-
-
+            <!-- Height and Weight Cards -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_height"
                 android:layout_width="0dp"
@@ -143,22 +84,16 @@
                 app:cardElevation="2dp"
                 app:layout_constraintEnd_toStartOf="@id/card_weight"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/test_buttons"> <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="16dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Height"/>
-                <TextView
-                    android:id="@+id/text_height_value"
-                    android:layout_width="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/stats_layout">
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    tools:text="175 cm"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/black"/>
-            </LinearLayout>
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Height"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="175 cm" android:textSize="18sp" android:textStyle="bold" android:textColor="@android:color/black"/>
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
@@ -179,17 +114,11 @@
                     android:orientation="vertical"
                     android:padding="16dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Weight"/>
-                    <TextView
-                        android:id="@+id/text_weight_value"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        tools:text="95 kg"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@android:color/black"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="95 kg" android:textSize="18sp" android:textStyle="bold" android:textColor="@android:color/black"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Today's Recommendations -->
             <TextView
                 android:id="@+id/title_recommendations"
                 android:layout_width="wrap_content"
@@ -217,6 +146,7 @@
                     android:contentDescription="Avocado Chicken Salad"
                     android:scaleType="centerCrop"
                     android:src="@drawable/avocado_salad" />
+                <!-- Gradient overlay -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

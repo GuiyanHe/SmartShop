@@ -2,9 +2,9 @@
 <!--
 SmartShop - Shopping List 页面
 样式：
-- 顶部绿色标题栏（带模式切换Chip）
-- 标题下方：白色卡片（总价分两行 + Continue按钮）
-- 下面是购物列表
+- 顶部绿色标题栏
+- 标题下方：白色卡片（Estimated Total + 按钮）
+- 下面是购物列表与Recipe按钮
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -20,8 +20,6 @@ SmartShop - Shopping List 页面
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:background="#4CAF50"
-        android:paddingStart="30dp"
-        android:paddingEnd="20dp"
         android:gravity="center_vertical">
 
         <TextView
@@ -32,28 +30,10 @@ SmartShop - Shopping List 页面
             android:textSize="22sp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"/>
-
-        <!-- 模式切换Chip -->
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_mode_toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Default"
-            android:textColor="#388E3C"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            android:checkable="true"
-            app:chipBackgroundColor="@android:color/white"
-            app:chipStrokeWidth="0dp"
-            app:chipIconVisible="false"
-            app:chipMinHeight="32dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"/>
+            android:layout_marginStart="20dp" />
     </RelativeLayout>
 
-    <!-- 白色卡片：总价（两行）+ Continue按钮 -->
+    <!-- 白色卡片：Estimated Total + 按钮 -->
     <LinearLayout
         android:id="@+id/topPanel"
         android:layout_width="match_parent"
@@ -68,51 +48,28 @@ SmartShop - Shopping List 页面
         android:clipToPadding="false"
         android:background="@drawable/bg_white_card">
 
-        <!-- 左侧：总价信息（垂直布局，两行） -->
-        <LinearLayout
+        <!-- 总价文本 -->
+        <TextView
+            android:id="@+id/totalText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/labelEstimatedTotal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Estimated Total:"
-                android:textColor="#666666"
-                android:textSize="13sp"/>
-
-            <TextView
-                android:id="@+id/totalPrice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="$19.43"
-                android:textColor="#4CAF50"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:layout_marginTop="2dp"/>
-
-            <TextView
-                android:id="@+id/itemCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="(5 items)"
-                android:textColor="#999999"
-                android:textSize="12sp"/>
-        </LinearLayout>
+            android:text="Estimated Total: ¥0.00"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <!-- 继续按钮 -->
         <Button
             android:id="@+id/btnProceed"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="Continue"
+            android:layout_height="40dp"
+            android:text="Continue to Store Map"
             android:textAllCaps="false"
             android:backgroundTint="#4CAF50"
             android:textColor="#FFFFFF"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
             android:layout_marginStart="12dp"/>
     </LinearLayout>
 
@@ -125,6 +82,51 @@ SmartShop - Shopping List 页面
         android:padding="8dp"
         android:clipToPadding="false"
         android:scrollbars="vertical" />
+
+<!--    &lt;!&ndash; Recipe 切换按钮行 &ndash;&gt;-->
+<!--    <LinearLayout-->
+<!--        android:id="@+id/recipeButtons"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:paddingStart="12dp"-->
+<!--        android:paddingEnd="12dp"-->
+<!--        android:paddingTop="8dp"-->
+<!--        android:paddingBottom="12dp"-->
+<!--        android:gravity="center">-->
+
+<!--        <Button-->
+<!--            android:id="@+id/btnRecipeBreakfast"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:text="Quick Breakfast"-->
+<!--            android:textAllCaps="false"-->
+<!--            android:backgroundTint="#4CAF50"-->
+<!--            android:textColor="#FFFFFF"-->
+<!--            android:layout_marginEnd="6dp" />-->
+
+<!--        <Button-->
+<!--            android:id="@+id/btnRecipeDinner"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:text="Family Dinner"-->
+<!--            android:textAllCaps="false"-->
+<!--            android:backgroundTint="#4CAF50"-->
+<!--            android:textColor="#FFFFFF"-->
+<!--            android:layout_marginEnd="6dp" />-->
+
+<!--        <Button-->
+<!--            android:id="@+id/btnRecipeVegan"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:text="Vegan Bowl"-->
+<!--            android:textAllCaps="false"-->
+<!--            android:backgroundTint="#4CAF50"-->
+<!--            android:textColor="#FFFFFF" />-->
+<!--    </LinearLayout>-->
 
     <!-- 空状态提示 -->
     <LinearLayout
@@ -161,5 +163,4 @@ SmartShop - Shopping List 页面
             android:textColor="#666666"
             android:gravity="center" />
     </LinearLayout>
-
 </LinearLayout>
