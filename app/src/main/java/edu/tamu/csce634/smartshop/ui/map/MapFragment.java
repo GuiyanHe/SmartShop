@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,7 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.tamu.csce634.smartshop.R;
-
+import edu.tamu.csce634.smartshop.models.ShoppingItem;
+import edu.tamu.csce634.smartshop.ui.list.ListViewModel;
 public class MapFragment extends Fragment {
 
     private ImageView imgMap;
@@ -31,7 +33,7 @@ public class MapFragment extends Fragment {
     // 新加的两个按钮
     private Button btnCurrentItem;
     private Button btnNext;
-
+    private ListViewModel listViewModel;
     private final List<ShoppingItem> shoppingList = new ArrayList<>();
     private int currentIndex = 0;
 
@@ -48,48 +50,69 @@ public class MapFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view,
-                              @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // --- 1. 视图绑定 (这部分保持不变) ---
         imgMap = view.findViewById(R.id.img_map);
         tvItemName = view.findViewById(R.id.tv_item_name);
         tvInstruction = view.findViewById(R.id.tv_instruction);
         tvProgress = view.findViewById(R.id.tv_progress);
-
-        // 这两个是你刚才要加回来的按钮
         btnCurrentItem = view.findViewById(R.id.btn_current_item);
         btnNext = view.findViewById(R.id.btn_next);
 
-        // 1. 假数据
-        initFakeShoppingList();
+        // --- 2. ViewModel 初始化和数据观察 (核心修改) ---
+        // 获取与Activity绑定的共享ViewModel实例
+        listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
 
-        // 2. 显示第一个
-        showCurrentItem();
+        // 观察ViewModel中的购物列表数据
+        listViewModel.getItemList().observe(getViewLifecycleOwner(), items -> {
+            // 当ViewModel中的数据更新时，这个代码块会自动执行
+            shoppingList.clear(); // 清空旧数据
+            if (items != null) {
+                shoppingList.addAll(items); // 添加新数据
+            }
 
-        // 3. 底部列表
+            // 刷新UI
+            if (!shoppingList.isEmpty()) {
+                // 如果有数据，重置索引并显示第一项
+                currentIndex = 0;
+                showCurrentItem();
+            } else {
+                // 如果列表为空，显示提示信息
+                tvItemName.setText("Shopping list is empty");
+                tvInstruction.setText("Add items from the list page to get started.");
+                tvProgress.setText("Item 0 / 0");
+            }
+
+            // 在 observe 代码块内部
+            RecyclerView rv = view.findViewById(R.id.rv_shopping_list); // 先找到RecyclerView
+            if (rv.getAdapter() != null) {
+                rv.getAdapter().notifyDataSetChanged();
+            }
+        });
+
+        // --- 3. 底部列表和 Bottom Sheet (这部分保持不变) ---
         RecyclerView rv = view.findViewById(R.id.rv_shopping_list);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
-        rv.setAdapter(new ShoppingAdapter(shoppingList));
+        rv.setAdapter(new ShoppingAdapter(shoppingList)); // Adapter现在使用会被ViewModel填充的shoppingList
 
-        // 4. bottom sheet 行为
         View bottomSheet = view.findViewById(R.id.bottom_sheet);
-        BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(bottomSheet);
-        // behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        BottomSheetBehavior.from(bottomSheet);
 
-        // 5. 按钮逻辑
-        // 左边按钮：先当成“标记完成/取消完成”
+        // --- 4. 按钮逻辑 (这部分保持不变) ---
         if (btnCurrentItem != null) {
             btnCurrentItem.setOnClickListener(v -> {
+                if (shoppingList.isEmpty()) return; // 防止空列表崩溃
                 ShoppingItem cur = shoppingList.get(currentIndex);
-                cur.done = !cur.done;
+                cur.setDone(!cur.isDone()); // 使用 getter/setter
                 showCurrentItem();
             });
         }
 
-        // 右边按钮：Next Item
         if (btnNext != null) {
             btnNext.setOnClickListener(v -> {
+                if (shoppingList.isEmpty()) return; // 防止空列表崩溃
                 currentIndex++;
                 if (currentIndex >= shoppingList.size()) {
                     currentIndex = 0;
@@ -99,45 +122,29 @@ public class MapFragment extends Fragment {
         }
     }
 
-    private void initFakeShoppingList() {
-        shoppingList.clear();
-        shoppingList.add(new ShoppingItem("Chicken", "Go to Meat section, back right", false));
-        shoppingList.add(new ShoppingItem("Brown Rice", "Aisle 5 → grains", false));
-        shoppingList.add(new ShoppingItem("Egg", "Dairy corner, top left", false));
-        shoppingList.add(new ShoppingItem("Corn", "Produce → middle racks", false));
-        shoppingList.add(new ShoppingItem("Broccoli Crown", "Aisle 9 → Produce", false));
-    }
-
     private void showCurrentItem() {
+        if (shoppingList.isEmpty() || currentIndex >= shoppingList.size()) {
+            return; // 增加安全检查，防止列表为空或索引越界
+        }
+
         ShoppingItem item = shoppingList.get(currentIndex);
-        tvItemName.setText(item.name);
-        tvInstruction.setText(item.instruction);
+        tvItemName.setText(item.getName()); // 使用 getName()
+        tvInstruction.setText(item.getAisle()); // 使用 getAisle()
 
         String progress = "Item " + (currentIndex + 1) + " / " + shoppingList.size();
-        if (item.done) {
+        if (item.isDone()) { // 使用 isDone()
             progress += " (done)";
         }
         tvProgress.setText(progress);
 
-        // 同步到左边的按钮上：Broccoli Crown (2/5)
         if (btnCurrentItem != null) {
-            String btnText = item.name + " (" + (currentIndex + 1) + "/" + shoppingList.size() + ")";
+            String btnText = item.getName() + " (" + (currentIndex + 1) + "/" + shoppingList.size() + ")";
             btnCurrentItem.setText(btnText);
         }
     }
 
-    // -------- 数据结构 --------
-    private static class ShoppingItem {
-        String name;
-        String instruction;
-        boolean done;
 
-        ShoppingItem(String name, String instruction, boolean done) {
-            this.name = name;
-            this.instruction = instruction;
-            this.done = done;
-        }
-    }
+    // -------- 数据结构 --------
 
     // -------- RecyclerView 适配器 --------
     private class ShoppingAdapter extends RecyclerView.Adapter<ShoppingAdapter.VH> {
@@ -159,7 +166,7 @@ public class MapFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull VH holder, int position) {
             ShoppingItem item = items.get(position);
-            holder.name.setText(item.name);
+            holder.name.setText(item.getName());
 
             holder.btnUse.setOnClickListener(v -> {
                 int pos = holder.getAdapterPosition();

@@ -18,4 +18,21 @@ public class ShoppingItem {
     public double recipeNeededValue;
     // Recipe需求单位（如 "Oz"）
     public String recipeNeededUnit;
+
+    private boolean done = false;
+
+    public String getName() {
+        return name;
+    }
+
+    public String getAisle() {
+        return aisle;
+    }
+    public boolean isDone() {
+        return this.done;
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
+    }
 }
