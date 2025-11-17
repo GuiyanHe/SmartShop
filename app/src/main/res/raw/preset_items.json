@@ -179,6 +179,78 @@
       "defaultQuantity": 1,
       "defaultOptionId": "opt_avocado_greenvalley_5oz",
       "imageUrl": "asset:avocado.webp"
+    },
+    {
+      "ingredientId": "ing_soy_milk",
+      "name": "Soy Milk",
+      "unit": "Oz",
+      "aisle": "Dairy Alternatives Aisle 6",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_soy_milk_greenvalley_32oz",
+      "imageUrl": "asset:soy_milk.webp"
+    },
+    {
+      "ingredientId": "ing_almond_milk",
+      "name": "Almond Milk",
+      "unit": "Oz",
+      "aisle": "Dairy Alternatives Aisle 6",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_almond_milk_naturebest_32oz",
+      "imageUrl": "asset:almond_milk.webp"
+    },
+    {
+      "ingredientId": "ing_oat_milk",
+      "name": "Oat Milk",
+      "unit": "Oz",
+      "aisle": "Dairy Alternatives Aisle 6",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_oat_milk_greenvalley_32oz",
+      "imageUrl": "asset:oat_milk.webp"
+    },
+    {
+      "ingredientId": "ing_tempeh",
+      "name": "Tempeh",
+      "unit": "Oz",
+      "aisle": "Produce Aisle 4",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_tempeh_greenvalley_8oz",
+      "imageUrl": "asset:tempeh.webp"
+    },
+    {
+      "ingredientId": "ing_seitan",
+      "name": "Seitan",
+      "unit": "Oz",
+      "aisle": "Produce Aisle 4",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_seitan_naturebest_8oz",
+      "imageUrl": "asset:seitan.webp"
+    },
+    {
+      "ingredientId": "ing_flax_seed",
+      "name": "Flax Seed Meal",
+      "unit": "Oz",
+      "aisle": "Grains & Seeds Aisle",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_flax_seed_greenvalley_16oz",
+      "imageUrl": "asset:flax_seed.webp"
+    },
+    {
+      "ingredientId": "ing_nutritional_yeast",
+      "name": "Nutritional Yeast",
+      "unit": "Oz",
+      "aisle": "Grains & Seeds Aisle",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_nutritional_yeast_naturebest_4oz",
+      "imageUrl": "asset:nutritional_yeast.webp"
+    },
+    {
+      "ingredientId": "ing_corn_tortilla",
+      "name": "Corn Tortilla",
+      "unit": "count",
+      "aisle": "Bakery Aisle 2",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_corn_tortilla_greenvalley_10ct",
+      "imageUrl": "asset:corn_tortilla.webp"
     }
   ]
 }

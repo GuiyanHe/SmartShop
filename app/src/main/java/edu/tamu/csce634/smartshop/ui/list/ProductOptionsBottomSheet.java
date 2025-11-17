@@ -58,7 +58,7 @@ public class ProductOptionsBottomSheet extends BottomSheetDialogFragment {
                 double price   = o.optDouble("unitPrice", 0.0);
                 String img     = o.optString("imageUrl", "");
 
-                String label = display + " • " + size + (org ? " • Organic" : "") + " • ¥" + String.format("%.2f", price);
+                String label = display + " • " + size + (org ? " • Organic" : "") + " • $" + String.format("%.2f", price);
 
                 android.widget.Button btn = new android.widget.Button(requireContext());
                 btn.setAllCaps(false);
