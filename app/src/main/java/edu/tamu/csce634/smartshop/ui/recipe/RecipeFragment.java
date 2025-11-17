@@ -126,6 +126,7 @@ public class RecipeFragment extends Fragment {
             }
             // Refresh required ingredients in ViewModel after batch mutation
             viewModel.refreshRequiredIngredients(requireContext());
+            viewModel.refreshNutritionTotals(requireContext());
             
             // Refresh the item
             adapter.notifyItemChanged(position);
