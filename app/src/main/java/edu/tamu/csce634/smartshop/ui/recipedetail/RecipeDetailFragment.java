@@ -27,7 +27,7 @@ import com.google.android.material.button.MaterialButton;
 import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.adapters.IngredientAdapter;
 import edu.tamu.csce634.smartshop.models.Recipe;
-import edu.tamu.csce634.smartshop.utils.CartManager;
+import edu.tamu.csce634.smartshop.managers.RecipeManager;
 import edu.tamu.csce634.smartshop.utils.HapticFeedback;
 
 import android.app.AlertDialog;
@@ -103,7 +103,7 @@ public class RecipeDetailFragment extends Fragment {
                 
                 // Add the recipe multiple times based on portion count
                 for (int i = 0; i < portionCount; i++) {
-                    CartManager.getInstance(requireContext()).addRecipe(recipe.getTitle());
+                    RecipeManager.getInstance(requireContext()).addRecipe(recipe.getTitle());
                 }
                 
                 String message = portionCount == 1 
