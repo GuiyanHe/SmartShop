@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.bumptech.glide.Glide;
@@ -53,7 +55,11 @@ public class MapFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        ImageButton btnBack = view.findViewById(R.id.btn_back);
+        btnBack.setOnClickListener(v -> {
+            // 调用 NavController 的 popBackStack() 方法返回上一页
+            NavHostFragment.findNavController(this).popBackStack();
+        });
         // --- 1. 视图绑定 (这部分保持不变) ---
         imgMap = view.findViewById(R.id.img_map);
         tvItemName = view.findViewById(R.id.tv_item_name);

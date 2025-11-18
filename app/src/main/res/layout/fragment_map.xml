@@ -12,27 +12,46 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_title"
+        <!-- vvvvvvvvvv 1. 修改这个标题栏区域 vvvvvvvvvv -->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:text="Map Page"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:background="#19A95F"
-            android:textColor="#FFFFFF" />
+            android:background="#19A95F">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="Map Page"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/btn_back"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="start|center_vertical"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Back to Shopping List"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@android:color/white" />
+
+        </FrameLayout>
+        <!-- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ -->
+
 
         <ImageView
             android:id="@+id/img_map"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:scaleType="centerCrop"
             android:background="#333333"
+            android:scaleType="centerCrop"
             android:src="@drawable/store_map" />
     </LinearLayout>
+
 
     <!-- 底部可拖动的面板（BottomSheet） -->
     <LinearLayout
