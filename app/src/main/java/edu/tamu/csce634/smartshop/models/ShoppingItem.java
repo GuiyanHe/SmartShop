@@ -20,7 +20,9 @@ public class ShoppingItem {
     public String recipeNeededUnit;
 
     private boolean done = false;
-
+    public String getImageUrl() {
+        return imageUrl;
+    }
     public String getName() {
         return name;
     }

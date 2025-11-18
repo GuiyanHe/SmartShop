@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -168,6 +169,31 @@ public class MapFragment extends Fragment {
             ShoppingItem item = items.get(position);
             holder.name.setText(item.getName());
 
+            String imageUrl = item.getImageUrl();
+            if (imageUrl != null && imageUrl.startsWith("res:")) {
+                // 如果是 "res:" 格式，说明它是一个资源ID
+                try {
+                    // 从字符串中提取出数字ID
+                    int resId = Integer.parseInt(imageUrl.substring(4));
+                    Glide.with(holder.itemView.getContext())
+                            .load(resId) // 直接加载资源ID
+                            .placeholder(android.R.drawable.ic_menu_gallery)
+                            .error(android.R.drawable.ic_dialog_alert)
+                            .into(holder.image);
+                } catch (NumberFormatException e) {
+                    // 如果 "res:" 后面的不是数字，显示错误图标
+                    holder.image.setImageResource(android.R.drawable.ic_dialog_alert);
+                }
+            } else {
+                // 如果是普通的 URL (http, https, etc.)，或者为空，正常处理
+                Glide.with(holder.itemView.getContext())
+                        .load(imageUrl) // 正常加载URL
+                        .placeholder(android.R.drawable.ic_menu_gallery)
+                        .error(android.R.drawable.ic_dialog_alert)
+                        .into(holder.image);
+            }
+
+
             holder.btnUse.setOnClickListener(v -> {
                 int pos = holder.getAdapterPosition();
                 if (pos != RecyclerView.NO_POSITION) {
@@ -185,10 +211,12 @@ public class MapFragment extends Fragment {
         class VH extends RecyclerView.ViewHolder {
             TextView name;
             Button btnUse;
+            ImageView image;
             VH(@NonNull View itemView) {
                 super(itemView);
                 name = itemView.findViewById(R.id.tv_name);
                 btnUse = itemView.findViewById(R.id.btn_use);
+                image = itemView.findViewById(R.id.iv_item_image);
             }
         }
     }
