@@ -162,7 +162,7 @@
             android:layout_marginTop="8dp"
             android:background="#EEEEEE" />
 
-        <!-- 整个 list：只有往上拖的时候才会完全露出来 -->
+        <!-- The entire list: only fully visible when dragged up -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_shopping_list"
             android:layout_width="match_parent"
