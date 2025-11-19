@@ -12,6 +12,8 @@ public class ShoppingItem {
     public String skuSpec; // 规格/包装信息（如 "500g"、"1L x 2"）
     public String imageUrl;
 
+    public double coordinateX = -1.0; // 默认值为-1，表示尚未定位
+    public double coordinateY = -1.0;
     public String recipeNeededStr;
     public double recipeNeededValue;
     public String recipeNeededUnit;
