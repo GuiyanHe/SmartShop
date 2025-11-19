@@ -23,7 +23,6 @@ import java.util.Map;
 
 import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.Repository.ProfileRepository;
-import edu.tamu.csce634.smartshop.R;
 
 import edu.tamu.csce634.smartshop.adapters.ShoppingItemAdapter;
 import edu.tamu.csce634.smartshop.databinding.FragmentListBinding;
