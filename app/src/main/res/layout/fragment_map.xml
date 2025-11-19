@@ -2,17 +2,19 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".ui.map.MapFragment">
 
     <!-- 上面的地图区域 -->
-    <LinearLayout
+    <!-- 核心修改: 将 LinearLayout 改为 FrameLayout 以便叠加View，其他一切不变 -->
+    <FrameLayout
         android:id="@+id/map_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <!-- vvvvvvvvvv 1. 修改这个标题栏区域 vvvvvvvvvv -->
+        <!-- 1. 标题栏部分 (完全没有改动) -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
@@ -37,42 +39,46 @@
                 android:contentDescription="Back to Shopping List"
                 android:src="@drawable/ic_arrow_back"
                 app:tint="@android:color/white" />
-
         </FrameLayout>
-        <!-- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ -->
 
-
+        <!-- 2. 地图图片 (我们把它变成一个空白背景，因为我们将用代码画地图) -->
         <ImageView
             android:id="@+id/img_map"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="#333333"
-            android:scaleType="centerCrop"
-            android:src="@drawable/store_map" />
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:layout_marginTop="48dp"
+            android:background="@android:color/white" />
+
+        <!-- 3. 新增的“画板”层 (它会覆盖在上面) -->
+        <edu.tamu.csce634.smartshop.ui.map.PathNavigationView
+            android:id="@+id/path_navigation_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="48dp" />
+
+    </FrameLayout>
 
 
     <!-- 底部可拖动的面板（BottomSheet） -->
+    <!-- 这个部分的代码，包括其所有子控件，都与您之前的版本完全相同，此处省略以保持简洁 -->
     <LinearLayout
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="800dp"
         android:layout_gravity="bottom"
-        android:orientation="vertical"
         android:background="@android:color/white"
+        android:orientation="vertical"
         app:behavior_hideable="false"
         app:behavior_peekHeight="160dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-        <!-- 顶部那条：收起时就看到它 -->
+        <!-- Top handle bar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="16dp"
-            android:gravity="center_vertical">
-
+            android:padding="16dp">
             <TextView
                 android:id="@+id/tv_sheet_title"
                 android:layout_width="0dp"
@@ -80,72 +86,63 @@
                 android:layout_weight="1"
                 android:text="Shopping List"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
-
-            <!-- 你右边图里的那个小编辑icon就先用文字代替 -->
+                android:textStyle="bold" />
             <TextView
                 android:id="@+id/tv_edit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="✏️" />
         </LinearLayout>
-
-        <!-- 当前 item 简单信息，收起时也能看到 -->
+        <!-- Current item preview -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp">
-
             <TextView
                 android:id="@+id/tv_item_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Broccoli Crown"
-                android:textStyle="bold"
-                android:textSize="16sp" />
-
+                android:textSize="16sp"
+                android:textStyle="bold" />
             <TextView
                 android:id="@+id/tv_instruction"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:text="Aisle 9 → Produce"
-                android:textSize="13sp"
                 android:textColor="#666666"
-                android:layout_marginTop="4dp"/>
-
+                android:textSize="13sp" />
             <TextView
                 android:id="@+id/tv_progress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="Item 2 / 6"
-                android:textSize="12sp"
                 android:textColor="#999999"
-                android:layout_marginTop="2dp"/>
+                android:textSize="12sp" />
         </LinearLayout>
-        <!-- 底部两个按钮：左边当前item(2/6)，右边Next -->
+        <!-- Action buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:orientation="horizontal"
             android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:layout_marginTop="12dp">
-
+            android:paddingEnd="16dp">
             <Button
                 android:id="@+id/btn_current_item"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:text="Broccoli Crown (1/5)"
                 android:backgroundTint="#B5F5C9"
+                android:text="Broccoli Crown (1/5)"
                 android:textAllCaps="false" />
-
             <Space
                 android:layout_width="12dp"
                 android:layout_height="wrap_content" />
-
             <Button
                 android:id="@+id/btn_next"
                 android:layout_width="0dp"
@@ -154,22 +151,19 @@
                 android:text="Next Item"
                 android:textAllCaps="false" />
         </LinearLayout>
-
-        <!-- 分割线 -->
+        <!-- Divider -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="8dp"
             android:background="#EEEEEE" />
-
-        <!-- The entire list: only fully visible when dragged up -->
+        <!-- RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_shopping_list"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:padding="16dp" />
-
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

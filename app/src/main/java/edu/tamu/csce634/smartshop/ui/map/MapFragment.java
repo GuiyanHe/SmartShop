@@ -1,5 +1,7 @@
 package edu.tamu.csce634.smartshop.ui.map;
 
+import android.graphics.Color;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,147 +15,200 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.navigation.fragment.NavHostFragment;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.bumptech.glide.Glide;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.gson.Gson;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.models.ShoppingItem;
+import edu.tamu.csce634.smartshop.models.world.SupermarketLayout;
 import edu.tamu.csce634.smartshop.ui.list.ListViewModel;
+
 public class MapFragment extends Fragment {
 
-    private ImageView imgMap;
-    private TextView tvItemName;
-    private TextView tvInstruction;
-    private TextView tvProgress;
-
-    // 新加的两个按钮
-    private Button btnCurrentItem;
-    private Button btnNext;
+    // --- UI 控件和数据变量 ---
+    private ImageView imgMap; // We will keep this to get view dimensions, but make it transparent
+    private TextView tvItemName, tvInstruction, tvProgress;
+    private Button btnCurrentItem, btnNext;
+    private PathNavigationView pathNavigationView; // 我们的“画板”
+    private RecyclerView recyclerView;
     private ListViewModel listViewModel;
     private final List<ShoppingItem> shoppingList = new ArrayList<>();
     private int currentIndex = 0;
+    private PointF lastLocation; // 记录上一个点的位置
 
-    public static MapFragment newInstance() {
-        return new MapFragment();
-    }
+    private SupermarketLayout supermarketLayout; // New: Holds the layout data
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_map, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ImageButton btnBack = view.findViewById(R.id.btn_back);
-        btnBack.setOnClickListener(v -> {
-            // 调用 NavController 的 popBackStack() 方法返回上一页
-            NavHostFragment.findNavController(this).popBackStack();
-        });
-        // --- 1. 视图绑定 (这部分保持不变) ---
+
+        // 1. Load data first
+        loadSupermarketLayout();
+
+        // 2. Setup all views
+        setupViews(view);
+
+        // 3. Setup data observation
+        setupViewModel();
+
+        // 4. Setup interaction
+        setupClickListeners(view);
+        setupBottomSheet(view);
+    }
+
+    private void loadSupermarketLayout() {
+        try (InputStream is = requireContext().getResources().openRawResource(R.raw.supermarket_layout)) {
+            this.supermarketLayout = new Gson().fromJson(new InputStreamReader(is, StandardCharsets.UTF_8), SupermarketLayout.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            this.supermarketLayout = null;
+        }
+    }
+
+    private void setupViews(View view) {
         imgMap = view.findViewById(R.id.img_map);
+        // Make the old background image transparent, we will draw our own
+        imgMap.setImageDrawable(null);
+        imgMap.setBackgroundColor(Color.WHITE); // Set a plain background color
+
+        pathNavigationView = view.findViewById(R.id.path_navigation_view);
+        // Pass the loaded layout data to our "canvas" view
+        pathNavigationView.setSupermarketLayout(this.supermarketLayout);
+
         tvItemName = view.findViewById(R.id.tv_item_name);
         tvInstruction = view.findViewById(R.id.tv_instruction);
         tvProgress = view.findViewById(R.id.tv_progress);
         btnCurrentItem = view.findViewById(R.id.btn_current_item);
         btnNext = view.findViewById(R.id.btn_next);
 
-        // --- 2. ViewModel 初始化和数据观察 (核心修改) ---
-        // 获取与Activity绑定的共享ViewModel实例
-        listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
+        recyclerView = view.findViewById(R.id.rv_shopping_list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(new ShoppingAdapter(shoppingList));
+    }
 
-        // 观察ViewModel中的购物列表数据
+    private void setupViewModel() {
+        listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
         listViewModel.getItemList().observe(getViewLifecycleOwner(), items -> {
-            // 当ViewModel中的数据更新时，这个代码块会自动执行
-            shoppingList.clear(); // 清空旧数据
+            shoppingList.clear();
             if (items != null) {
-                shoppingList.addAll(items); // 添加新数据
+                shoppingList.addAll(items);
             }
 
-            // 刷新UI
             if (!shoppingList.isEmpty()) {
-                // 如果有数据，重置索引并显示第一项
                 currentIndex = 0;
+                // Navigation starts from the entrance
+                lastLocation = new PointF(0.5f, 0.95f);
                 showCurrentItem();
             } else {
-                // 如果列表为空，显示提示信息
-                tvItemName.setText("Shopping list is empty");
-                tvInstruction.setText("Add items from the list page to get started.");
-                tvProgress.setText("Item 0 / 0");
+                handleEmptyList();
             }
 
-            // 在 observe 代码块内部
-            RecyclerView rv = view.findViewById(R.id.rv_shopping_list); // 先找到RecyclerView
-            if (rv.getAdapter() != null) {
-                rv.getAdapter().notifyDataSetChanged();
+            if (recyclerView.getAdapter() != null) {
+                recyclerView.getAdapter().notifyDataSetChanged();
             }
         });
+    }
 
-        // --- 3. 底部列表和 Bottom Sheet (这部分保持不变) ---
-        RecyclerView rv = view.findViewById(R.id.rv_shopping_list);
-        rv.setLayoutManager(new LinearLayoutManager(getContext()));
-        rv.setAdapter(new ShoppingAdapter(shoppingList)); // Adapter现在使用会被ViewModel填充的shoppingList
+    private void setupClickListeners(View view) {
+        ImageButton btnBack = view.findViewById(R.id.btn_back);
+        btnBack.setOnClickListener(v -> NavHostFragment.findNavController(this).popBackStack());
 
-        View bottomSheet = view.findViewById(R.id.bottom_sheet);
-        BottomSheetBehavior.from(bottomSheet);
-
-        // --- 4. 按钮逻辑 (这部分保持不变) ---
         if (btnCurrentItem != null) {
             btnCurrentItem.setOnClickListener(v -> {
-                if (shoppingList.isEmpty()) return; // 防止空列表崩溃
+                if (shoppingList.isEmpty()) return;
                 ShoppingItem cur = shoppingList.get(currentIndex);
-                cur.setDone(!cur.isDone()); // 使用 getter/setter
+                cur.setDone(!cur.isDone());
                 showCurrentItem();
             });
         }
 
         if (btnNext != null) {
             btnNext.setOnClickListener(v -> {
-                if (shoppingList.isEmpty()) return; // 防止空列表崩溃
+                if (shoppingList.isEmpty()) return;
+                ShoppingItem currentItem = shoppingList.get(currentIndex);
+                if (currentItem.coordinateX != -1.0) {
+                    lastLocation = new PointF((float) currentItem.coordinateX, (float) currentItem.coordinateY);
+                }
                 currentIndex++;
                 if (currentIndex >= shoppingList.size()) {
                     currentIndex = 0;
+                    lastLocation = new PointF(0.5f, 0.95f); // Loop back to entrance
                 }
                 showCurrentItem();
             });
         }
     }
 
-    private void showCurrentItem() {
-        if (shoppingList.isEmpty() || currentIndex >= shoppingList.size()) {
-            return; // 增加安全检查，防止列表为空或索引越界
-        }
+    private void setupBottomSheet(View view) {
+        View bottomSheet = view.findViewById(R.id.bottom_sheet);
+        BottomSheetBehavior.from(bottomSheet);
+    }
 
-        ShoppingItem item = shoppingList.get(currentIndex);
-        tvItemName.setText(item.getName()); // 使用 getName()
-        tvInstruction.setText(item.getAisle()); // 使用 getAisle()
-
-        String progress = "Item " + (currentIndex + 1) + " / " + shoppingList.size();
-        if (item.isDone()) { // 使用 isDone()
-            progress += " (done)";
-        }
-        tvProgress.setText(progress);
-
-        if (btnCurrentItem != null) {
-            String btnText = item.getName() + " (" + (currentIndex + 1) + "/" + shoppingList.size() + ")";
-            btnCurrentItem.setText(btnText);
+    private void handleEmptyList() {
+        tvItemName.setText("No items");
+        tvInstruction.setText("Your shopping list is empty.");
+        tvProgress.setText("Item 0 / 0");
+        if (pathNavigationView != null) {
+            pathNavigationView.clearPath();
         }
     }
 
+    private void showCurrentItem() {
+        if (shoppingList.isEmpty() || currentIndex >= shoppingList.size()) {
+            if (pathNavigationView != null) pathNavigationView.clearPath();
+            return;
+        }
 
-    // -------- 数据结构 --------
+        ShoppingItem item = shoppingList.get(currentIndex);
+        tvItemName.setText(item.getName());
+        tvInstruction.setText(item.getAisle());
+        String progress = "Item " + (currentIndex + 1) + " / " + shoppingList.size();
+        if (item.isDone()) {
+            progress += " (done)";
+        }
+        tvProgress.setText(progress);
+        if (btnCurrentItem != null) {
+            btnCurrentItem.setText(item.getName() + " (" + (currentIndex + 1) + "/" + shoppingList.size() + ")");
+        }
 
-    // -------- RecyclerView 适配器 --------
+        if (item.coordinateX == -1.0) {
+            if (pathNavigationView != null) pathNavigationView.clearPath();
+            return;
+        }
+
+        PointF targetCoords = new PointF((float) item.coordinateX, (float) item.coordinateY);
+
+        imgMap.post(() -> {
+            if (lastLocation != null) {
+                int mapWidth = imgMap.getWidth();
+                int mapHeight = imgMap.getHeight();
+                PointF startPixel = new PointF(lastLocation.x * mapWidth, lastLocation.y * mapHeight);
+                PointF endPixel = new PointF(targetCoords.x * mapWidth, targetCoords.y * mapHeight);
+                if (pathNavigationView != null) {
+                    pathNavigationView.drawPath(startPixel, endPixel);
+                }
+            }
+        });
+    }
+
+    // --- RecyclerView适配器部分 ---
     private class ShoppingAdapter extends RecyclerView.Adapter<ShoppingAdapter.VH> {
 
         private final List<ShoppingItem> items;
@@ -175,31 +230,34 @@ public class MapFragment extends Fragment {
             ShoppingItem item = items.get(position);
             holder.name.setText(item.getName());
 
+            // 图片加载逻辑
             String imageUrl = item.getImageUrl();
             if (imageUrl != null && imageUrl.startsWith("res:")) {
-                // 如果是 "res:" 格式，说明它是一个资源ID
                 try {
-                    // 从字符串中提取出数字ID
                     int resId = Integer.parseInt(imageUrl.substring(4));
-                    Glide.with(holder.itemView.getContext())
-                            .load(resId) // 直接加载资源ID
-                            .placeholder(android.R.drawable.ic_menu_gallery)
-                            .error(android.R.drawable.ic_dialog_alert)
-                            .into(holder.image);
+                    Glide.with(holder.itemView.getContext()).load(resId).placeholder(android.R.drawable.ic_menu_gallery).error(android.R.drawable.ic_dialog_alert).into(holder.image);
                 } catch (NumberFormatException e) {
-                    // 如果 "res:" 后面的不是数字，显示错误图标
                     holder.image.setImageResource(android.R.drawable.ic_dialog_alert);
                 }
             } else {
-                // 如果是普通的 URL (http, https, etc.)，或者为空，正常处理
-                Glide.with(holder.itemView.getContext())
-                        .load(imageUrl) // 正常加载URL
-                        .placeholder(android.R.drawable.ic_menu_gallery)
-                        .error(android.R.drawable.ic_dialog_alert)
-                        .into(holder.image);
+                Glide.with(holder.itemView.getContext()).load(imageUrl).placeholder(android.R.drawable.ic_menu_gallery).error(android.R.drawable.ic_dialog_alert).into(holder.image);
             }
 
+            // 点击列表中的一项，直接导航到那里
+            holder.itemView.setOnClickListener(v -> {
+                int currentPosition = holder.getAdapterPosition();
+                if (currentPosition == RecyclerView.NO_POSITION || currentPosition == currentIndex) return;
 
+                ShoppingItem currentItem = shoppingList.get(currentIndex);
+                if (currentItem.coordinateX != -1.0) {
+                    lastLocation = new PointF((float) currentItem.coordinateX, (float) currentItem.coordinateY);
+                }
+
+                currentIndex = currentPosition;
+                showCurrentItem();
+            });
+
+            // 保留您之前的btnUse逻辑
             holder.btnUse.setOnClickListener(v -> {
                 int pos = holder.getAdapterPosition();
                 if (pos != RecyclerView.NO_POSITION) {
@@ -218,6 +276,7 @@ public class MapFragment extends Fragment {
             TextView name;
             Button btnUse;
             ImageView image;
+
             VH(@NonNull View itemView) {
                 super(itemView);
                 name = itemView.findViewById(R.id.tv_name);
