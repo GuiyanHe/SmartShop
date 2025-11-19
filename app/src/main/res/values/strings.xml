@@ -8,4 +8,5 @@
         <item>Fat Loss</item>
         <item>Muscle Gain</item>
     </string-array>
+    <string name="title_map">Store Map</string>
 </resources>

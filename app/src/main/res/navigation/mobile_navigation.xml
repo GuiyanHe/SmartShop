@@ -18,11 +18,26 @@
             app:destination="@id/navigation_feedback" />
     </fragment>
 
+    <!-- 这是 ListFragment -->
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="edu.tamu.csce634.smartshop.ui.list.ListFragment"
         android:label="@string/title_list"
-        tools:layout="@layout/fragment_list" />
+        tools:layout="@layout/fragment_list" >
+
+        <!-- 1. 在这里添加了从 List 到 Map 的 Action -->
+        <action
+            android:id="@+id/action_list_to_map"
+            app:destination="@id/navigation_map" />
+
+    </fragment>
+
+    <!-- 2. 在这里添加了 MapFragment 的完整定义 -->
+    <fragment
+        android:id="@+id/navigation_map"
+        android:name="edu.tamu.csce634.smartshop.ui.map.MapFragment"
+        android:label="@string/title_map"
+        tools:layout="@layout/fragment_map" />
 
     <fragment
         android:id="@+id/navigation_recipe"

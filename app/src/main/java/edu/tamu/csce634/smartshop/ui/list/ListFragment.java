@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,17 +23,20 @@ import java.util.Map;
 
 import edu.tamu.csce634.smartshop.R;
 import edu.tamu.csce634.smartshop.Repository.ProfileRepository;
+
 import edu.tamu.csce634.smartshop.adapters.ShoppingItemAdapter;
 import edu.tamu.csce634.smartshop.databinding.FragmentListBinding;
 import edu.tamu.csce634.smartshop.data.DataSeeder;
 import edu.tamu.csce634.smartshop.data.PresetRepository;
 import edu.tamu.csce634.smartshop.models.ShoppingItem;
 import edu.tamu.csce634.smartshop.ui.recipe.RecipeViewModel;
-import edu.tamu.csce634.smartshop.utils.CartManager;
+//import edu.tamu.csce634.smartshop.utils.CartManager;
 import edu.tamu.csce634.smartshop.utils.ConflictDetector;
 import edu.tamu.csce634.smartshop.utils.IngredientSubstitutes;
 import edu.tamu.csce634.smartshop.utils.PreferenceStateManager;
 import edu.tamu.csce634.smartshop.utils.QuantityParser;
+
+import edu.tamu.csce634.smartshop.utils.LocationEngine;
 
 /**
  * 购物清单页面：
@@ -150,7 +155,10 @@ public class ListFragment extends Fragment {
             }
 
             // 无冲突或非偏好模式，直接导航
-            navigateToStoreMap();
+            //navigateToStoreMap();
+            NavHostFragment.findNavController(ListFragment.this)
+                    .navigate(R.id.action_list_to_map);
+
         });
     }
 
@@ -211,8 +219,8 @@ public class ListFragment extends Fragment {
                 (unresolved.size() == 1 ? " item conflicts" : " items conflict") +
                 " with your preferences:");
 
-        // 设置冲突列表
-        textConflictListView.setText(conflictList.toString());
+        // 8) 底部“Proceed to Map”
+
 
         // 创建AlertDialog
         androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(requireContext())
@@ -228,7 +236,7 @@ public class ListFragment extends Fragment {
         // Continue按钮：忽略警告继续
         btnContinue.setOnClickListener(v -> {
             dialog.dismiss();
-            navigateToStoreMap();
+            //navigateToStoreMap();
         });
 
         dialog.show();
@@ -246,46 +254,46 @@ public class ListFragment extends Fragment {
             default: return "Conflict";
         }
     }
-
-    /**
-     * 导航到地图页面
-     *
-     * Phase 6: 清空数据并传递控制权给Map模块
-     */
-    private void navigateToStoreMap() {
-        // 1. 清空Recipe购物车（用户无法返回List重新编辑）
-        CartManager.getInstance(requireContext()).clearCart();
-
-        // 2. 清空偏好模式状态（解决方案记录、数量快照）
-        if (stateManager != null) {
-            stateManager.clearAll();
-        }
-
-        // 3. 重置偏好模式标记
-        preferenceMode = false;
-        savePreferenceMode();
-
-        // 4. 更新UI为默认模式
-        updateModeUI();
-
-        // ✅ 显示提示（告知用户数据已转移）
-        Toast.makeText(requireContext(),
-                "✓ Data transferred to Store Map\n" +
-                        "Complete shopping to clear list",
-                Toast.LENGTH_LONG).show();
-
-        // TODO: Map模块在此添加导航代码
-        // 示例（如果使用Navigation Component）：
-        // androidx.navigation.NavController navController =
-        //         androidx.navigation.Navigation.findNavController(requireView());
-        // navController.navigate(R.id.action_list_to_map);
-
-        // 示例（如果使用FragmentTransaction）：
-        // requireActivity().getSupportFragmentManager().beginTransaction()
-        //         .replace(R.id.container, new MapFragment())
-        //         .addToBackStack(null)
-        //         .commit();
-    }
+//
+//    /**
+//     * 导航到地图页面
+//     *
+//     * Phase 6: 清空数据并传递控制权给Map模块
+//     */
+//    private void navigateToStoreMap() {
+//        // 1. 清空Recipe购物车（用户无法返回List重新编辑）
+//        CartManager.getInstance(requireContext()).clearCart();
+//
+//        // 2. 清空偏好模式状态（解决方案记录、数量快照）
+//        if (stateManager != null) {
+//            stateManager.clearAll();
+//        }
+//
+//        // 3. 重置偏好模式标记
+//        preferenceMode = false;
+//        savePreferenceMode();
+//
+//        // 4. 更新UI为默认模式
+//        updateModeUI();
+//
+//        // ✅ 显示提示（告知用户数据已转移）
+//        Toast.makeText(requireContext(),
+//                "✓ Data transferred to Store Map\n" +
+//                        "Complete shopping to clear list",
+//                Toast.LENGTH_LONG).show();
+//
+//        // TODO: Map模块在此添加导航代码
+//        // 示例（如果使用Navigation Component）：
+//        // androidx.navigation.NavController navController =
+//        //         androidx.navigation.Navigation.findNavController(requireView());
+//        // navController.navigate(R.id.action_list_to_map);
+//
+//        // 示例（如果使用FragmentTransaction）：
+//        // requireActivity().getSupportFragmentManager().beginTransaction()
+//        //         .replace(R.id.container, new MapFragment())
+//        //         .addToBackStack(null)
+//        //         .commit();
+//    }
     private void convertCartToShoppingList(Map<String, String> mergedIngredients) {
         try {
             List<edu.tamu.csce634.smartshop.models.Recipe> recipes = recipeViewModel.getRecipes().getValue();
@@ -376,6 +384,13 @@ public class ListFragment extends Fragment {
                 cartItems.add(item);
             }
 
+            LocationEngine locationEngine = new LocationEngine(requireContext());
+            locationEngine.calculateCoordinatesForList(cartItems);
+
+            for (ShoppingItem item : cartItems) {
+                android.util.Log.d("LocationTest", "Item: " + item.name +
+                        ", Coords: (" + item.coordinateX + ", " + item.coordinateY + ")");
+            }
             listViewModel.updateItemList(cartItems);
             // ✅ 关键修复：如果是偏好模式，立即应用历史替换
             if (preferenceMode) {

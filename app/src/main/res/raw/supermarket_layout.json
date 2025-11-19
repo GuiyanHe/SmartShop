@@ -1,0 +1,61 @@
+{
+  "supermarket_name": "My Smart Shop Demo",
+  "aisles": [
+    {
+      "id": "Aisle_5",
+      "x": 0.5,
+      "y": 0.15,
+      "width": 0.08,
+      "height": 0.5,
+      "item_zones": [
+        {
+          "category": "grains",
+          "start": 0.0,
+          "end": 1.0
+        }
+      ]
+    },
+    {
+      "id": "Aisle_9_Produce",
+      "x": 0.25,
+      "y": 0.4,
+      "width": 0.15,
+      "height": 0.08,
+      "item_zones": [
+        {
+          "category": "produce",
+          "start": 0.0,
+          "end": 1.0
+        }
+      ]
+    },
+    {
+      "id": "Meat_Section",
+      "x": 0.75,
+      "y": 0.7,
+      "width": 0.1,
+      "height": 0.2,
+      "item_zones": [
+        {
+          "category": "meat",
+          "start": 0.0,
+          "end": 1.0
+        }
+      ]
+    },
+    {
+      "id": "Dairy_Corner",
+      "x": 0.1,
+      "y": 0.1,
+      "width": 0.2,
+      "height": 0.15,
+      "item_zones": [
+        {
+          "category": "dairy",
+          "start": 0.0,
+          "end": 1.0
+        }
+      ]
+    }
+  ]
+}
