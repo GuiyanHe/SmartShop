@@ -12,11 +12,8 @@ public class ShoppingItem {
     public String skuSpec; // 规格/包装信息（如 "500g"、"1L x 2"）
     public String imageUrl;
 
-    // Recipe需求量（原始字符串，如 "0.2 Oz"）
     public String recipeNeededStr;
-    // 解析后的Recipe需求量数值（如 0.2）
     public double recipeNeededValue;
-    // Recipe需求单位（如 "Oz"）
     public String recipeNeededUnit;
 
     private boolean done = false;
@@ -37,4 +34,12 @@ public class ShoppingItem {
     public void setDone(boolean done) {
         this.done = done;
     }
+
+    public String originalIngredientId;
+    public double substitutionRatio = 1.0;
+    public boolean isSubstituted = false;
+    public String substituteDisplayName;
+
+    public boolean isPicked = false;
+
 }
