@@ -25,7 +25,7 @@
         android:textAppearance="?attr/textAppearanceBody1"
         tools:text="Apple" />
 
-    <!-- 3. 原有的 Button -->
+    <!-- 3. Existing Button -->
     <Button
         android:id="@+id/btn_use"
         style="?attr/materialButtonOutlinedStyle"
