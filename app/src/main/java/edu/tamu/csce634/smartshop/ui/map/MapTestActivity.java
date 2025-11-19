@@ -18,7 +18,7 @@ public class MapTestActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_test);
 
-        // 动态加载 MapFragment
+        // Dynamically load MapFragment
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new MapFragment())
