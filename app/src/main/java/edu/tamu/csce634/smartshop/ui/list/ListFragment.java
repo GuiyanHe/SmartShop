@@ -37,6 +37,8 @@ import edu.tamu.csce634.smartshop.utils.IngredientSubstitutes;
 import edu.tamu.csce634.smartshop.utils.PreferenceStateManager;
 import edu.tamu.csce634.smartshop.utils.QuantityParser;
 
+import edu.tamu.csce634.smartshop.utils.LocationEngine;
+
 /**
  * 购物清单页面：
  * - 首次启动把 res/raw 的预置 JSON 灌入 SharedPreferences
@@ -389,6 +391,13 @@ public class ListFragment extends Fragment {
                 cartItems.add(item);
             }
 
+            LocationEngine locationEngine = new LocationEngine(requireContext());
+            locationEngine.calculateCoordinatesForList(cartItems);
+
+            for (ShoppingItem item : cartItems) {
+                android.util.Log.d("LocationTest", "Item: " + item.name +
+                        ", Coords: (" + item.coordinateX + ", " + item.coordinateY + ")");
+            }
             listViewModel.updateItemList(cartItems);
             // ✅ 关键修复：如果是偏好模式，立即应用历史替换
             if (preferenceMode) {

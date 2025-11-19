@@ -5,6 +5,7 @@
       "name": "Tofu",
       "unit": "Oz",
       "aisle": "Produce Aisle 4",
+      "category": "produce",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_tofu_greenvalley_8oz",
       "imageUrl": "asset:tofu.webp"
@@ -14,6 +15,7 @@
       "name": "Brown Rice",
       "unit": "Oz",
       "aisle": "Grains Aisle",
+      "category": "grains",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_brown_rice_greenvalley_16oz",
       "imageUrl": "asset:brown_rice.webp"
@@ -23,6 +25,7 @@
       "name": "Egg",
       "unit": "count",
       "aisle": "Dairy Aisle 2",
+      "category": "dairy",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_egg_greenvalley_6ct",
       "imageUrl": "asset:egg.webp"
@@ -32,6 +35,7 @@
       "name": "Corn",
       "unit": "Oz",
       "aisle": "Produce Aisle 2",
+      "category": "produce",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_corn_greenvalley_8oz",
       "imageUrl": "asset:corn.webp"
@@ -41,6 +45,7 @@
       "name": "Purple Cabbage",
       "unit": "Oz",
       "aisle": "Produce Aisle 1",
+      "category": "produce",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_purple_cabbage_greenvalley_16oz",
       "imageUrl": "asset:purple_cabbage.webp"
@@ -50,6 +55,7 @@
       "name": "Quinoa",
       "unit": "Oz",
       "aisle": "Grains Aisle",
+      "category": "grains",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_quinoa_greenvalley_16oz",
       "imageUrl": "asset:quinoa.webp"
@@ -59,6 +65,7 @@
       "name": "Bell Peppers",
       "unit": "Oz",
       "aisle": "Produce Aisle 2",
+      "category": "produce",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_bell_peppers_greenvalley_8oz",
       "imageUrl": "asset:bell_pepper.webp"
@@ -68,6 +75,7 @@
       "name": "Chickpeas",
       "unit": "Oz",
       "aisle": "Canned Goods Aisle",
+      "category": "canned_goods",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_chickpeas_greenvalley_15oz",
       "imageUrl": "asset:chickpea.webp"
@@ -77,6 +85,7 @@
       "name": "Cherry Tomatoes",
       "unit": "Oz",
       "aisle": "Produce Aisle 2",
+      "category": "produce",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_cherry_tomatoes_greenvalley_10oz",
       "imageUrl": "asset:cherry_tomatos.webp"
@@ -86,6 +95,7 @@
       "name": "Red Cabbage",
       "unit": "Oz",
       "aisle": "Produce Aisle 1",
+      "category": "produce",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_red_cabbage_greenvalley_16oz",
       "imageUrl": "asset:red_cabbage.webp"
@@ -95,6 +105,7 @@
       "name": "Salmon",
       "unit": "Oz",
       "aisle": "Seafood Aisle",
+      "category": "seafood",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_salmon_greenvalley_16oz",
       "imageUrl": "asset:salmon.webp"
@@ -104,6 +115,7 @@
       "name": "Cucumber",
       "unit": "Oz",
       "aisle": "Produce Aisle 2",
+      "category": "produce",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_cucumber_greenvalley_8oz",
       "imageUrl": "asset:cucumber.webp"
@@ -113,6 +125,7 @@
       "name": "Radish",
       "unit": "Oz",
       "aisle": "Produce Aisle 2",
+      "category": "produce",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_radish_greenvalley_6oz",
       "imageUrl": "asset:radish.webp"
@@ -122,6 +135,7 @@
       "name": "Carrots",
       "unit": "Oz",
       "aisle": "Produce Aisle 2",
+      "category": "produce",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_carrots_greenvalley_8oz",
       "imageUrl": "asset:carrot.webp"
@@ -131,6 +145,7 @@
       "name": "Cilantro",
       "unit": "Oz",
       "aisle": "Produce Aisle 1",
+      "category": "produce",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_cilantro_greenvalley_2oz",
       "imageUrl": "asset:cilantro.webp"
@@ -140,6 +155,7 @@
       "name": "Steak",
       "unit": "Oz",
       "aisle": "Meat Aisle 1",
+      "category": "meat",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_steak_greenvalley_16oz",
       "imageUrl": "asset:steak.webp"
@@ -149,6 +165,7 @@
       "name": "Flour Tortilla",
       "unit": "count",
       "aisle": "Bakery Aisle 2",
+      "category": "bakery",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_flour_tortilla_greenvalley_8ct",
       "imageUrl": "asset:flour_tortilla.webp"
@@ -158,6 +175,7 @@
       "name": "Tomatoes",
       "unit": "Oz",
       "aisle": "Produce Aisle 2",
+      "category": "produce",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_tomatoes_greenvalley_8oz",
       "imageUrl": "asset:cherry_tomatos.webp"
@@ -167,6 +185,7 @@
       "name": "Queso Fresco",
       "unit": "Oz",
       "aisle": "Dairy Aisle 5",
+      "category": "dairy",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_queso_fresco_greenvalley_8oz",
       "imageUrl": "asset:queso_fresco.webp"
@@ -176,6 +195,7 @@
       "name": "Avocado",
       "unit": "Oz",
       "aisle": "Produce Aisle 2",
+      "category": "produce",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_avocado_greenvalley_5oz",
       "imageUrl": "asset:avocado.webp"
@@ -185,6 +205,7 @@
       "name": "Soy Milk",
       "unit": "Oz",
       "aisle": "Dairy Alternatives Aisle 6",
+      "category": "dairy_alternatives",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_soy_milk_greenvalley_32oz",
       "imageUrl": "asset:soy_milk.webp"
@@ -194,6 +215,7 @@
       "name": "Almond Milk",
       "unit": "Oz",
       "aisle": "Dairy Alternatives Aisle 6",
+      "category": "dairy_alternatives",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_almond_milk_naturebest_32oz",
       "imageUrl": "asset:almond_milk.webp"
@@ -203,6 +225,7 @@
       "name": "Oat Milk",
       "unit": "Oz",
       "aisle": "Dairy Alternatives Aisle 6",
+      "category": "dairy_alternatives",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_oat_milk_greenvalley_32oz",
       "imageUrl": "asset:oat_milk.webp"
@@ -212,6 +235,7 @@
       "name": "Tempeh",
       "unit": "Oz",
       "aisle": "Produce Aisle 4",
+      "category": "produce",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_tempeh_greenvalley_8oz",
       "imageUrl": "asset:tempeh.webp"
@@ -221,6 +245,7 @@
       "name": "Seitan",
       "unit": "Oz",
       "aisle": "Produce Aisle 4",
+      "category": "produce",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_seitan_naturebest_8oz",
       "imageUrl": "asset:seitan.webp"
@@ -230,6 +255,7 @@
       "name": "Flax Seed Meal",
       "unit": "Oz",
       "aisle": "Grains & Seeds Aisle",
+      "category": "grains",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_flax_seed_greenvalley_16oz",
       "imageUrl": "asset:flax_seed.webp"
@@ -239,6 +265,7 @@
       "name": "Nutritional Yeast",
       "unit": "Oz",
       "aisle": "Grains & Seeds Aisle",
+      "category": "grains",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_nutritional_yeast_naturebest_4oz",
       "imageUrl": "asset:nutritional_yeast.webp"
@@ -248,9 +275,11 @@
       "name": "Corn Tortilla",
       "unit": "count",
       "aisle": "Bakery Aisle 2",
+      "category": "bakery",
       "defaultQuantity": 1,
       "defaultOptionId": "opt_corn_tortilla_greenvalley_10ct",
       "imageUrl": "asset:corn_tortilla.webp"
     }
   ]
 }
+

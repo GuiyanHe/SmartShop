@@ -7,6 +7,8 @@ public class ShoppingItem {
     public String unit;            // 单位，例如 L / kg
     public double quantity;        // 数量
     public String aisle;           // 门店分区（保留字段，看需要使用）
+    public String category;        // 分类（保留字段，看需要使用）
+
     public double unitPrice;       // 单价
     public String selectedSkuName; // 当前选中的商品名（如 Organic Milk）
     public String skuSpec; // 规格/包装信息（如 "500g"、"1L x 2"）
