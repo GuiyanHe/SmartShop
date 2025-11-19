@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,7 +21,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.gson.Gson;
 
 import java.io.InputStream;
@@ -38,7 +36,6 @@ import edu.tamu.csce634.smartshop.ui.list.ListViewModel;
 
 public class MapFragment extends Fragment {
 
-    // --- UI 控件和数据变量 ---
     private ImageView imgMap;
     private TextView tvItemName, tvInstruction, tvProgress;
     private Button btnCurrentItem, btnNext;
@@ -232,3 +229,4 @@ public class MapFragment extends Fragment {
         }
     }
 }
+
