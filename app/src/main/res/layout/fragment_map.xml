@@ -49,8 +49,8 @@
             android:layout_height="match_parent" />
     </FrameLayout>
 
-    <!-- 4. 底部面板 (BottomSheet) -->
-    <!-- 核心: 我们现在用 <include> 来加载我们分离出去的布局 -->
+    <!-- 4. Bottom sheet panel -->
+    <!-- Core: Using <include> to load the separated layout -->
     <include layout="@layout/sheet_map_shopping_list" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
