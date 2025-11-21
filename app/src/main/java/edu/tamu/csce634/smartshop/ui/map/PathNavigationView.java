@@ -136,6 +136,10 @@ public class PathNavigationView extends View {
     }
 
     public void setDestinationImage(Bitmap bitmap) {
+        if (this.destinationBitmap != null) {
+            this.destinationBitmap.recycle();
+            this.destinationBitmap = null;
+        }
         if (bitmap != null) {
             this.destinationBitmap = Bitmap.createScaledBitmap(bitmap, 80, 80, false);
         } else {
