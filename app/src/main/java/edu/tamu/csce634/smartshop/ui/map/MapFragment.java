@@ -66,13 +66,13 @@ public class MapFragment extends Fragment {
     }
 
     private void loadSupermarketLayout() {
-        try (InputStream is = requireContext().getResources().openRawResource(R.raw.supermarket_layout)) {
-            this.supermarketLayout = new Gson().fromJson(new InputStreamReader(is, StandardCharsets.UTF_8), SupermarketLayout.class);
+        try (InputStream is = requireContext().getResources().openRawResource(R.raw.supermarket_layout);
+             InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+            this.supermarketLayout = new Gson().fromJson(reader, SupermarketLayout.class);
         } catch (Exception e) {
             e.printStackTrace();
             this.supermarketLayout = null;
         }
-    }
 
     private void setupToolbar(View view) {
         Toolbar toolbar = view.findViewById(R.id.toolbar);
