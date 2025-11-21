@@ -26,8 +26,8 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- 3. 地图和路径的容器 -->
-    <!-- 核心: app:layout_behavior 告诉它, 它的布局会随着 AppBarLayout 的滚动而改变 -->
+    <!-- 3. Map and path container -->
+    <!-- Core: app:layout_behavior tells this view to respond to AppBarLayout scrolling -->
     <FrameLayout
         android:id="@+id/map_container"
         android:layout_width="match_parent"
