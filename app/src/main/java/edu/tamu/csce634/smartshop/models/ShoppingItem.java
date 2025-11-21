@@ -31,6 +31,9 @@ public class ShoppingItem {
     public String getAisle() {
         return aisle;
     }
+    public String getCategory() {
+        return category;
+    }
     public boolean isDone() {
         return this.done;
     }

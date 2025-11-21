@@ -3,6 +3,7 @@ package edu.tamu.csce634.smartshop.ui.map;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,10 +59,10 @@ public class MapFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         loadSupermarketLayout();
-        setupToolbar(view); // New method for Toolbar
+        setupToolbar(view);
         setupViews(view);
         setupViewModel();
-        setupClickListeners(); // No longer needs view
+        setupClickListeners();
     }
 
     private void loadSupermarketLayout() {
@@ -84,11 +85,8 @@ public class MapFragment extends Fragment {
     }
 
     private void setupViews(View view) {
-        // Find views in the main layout
         imgMap = view.findViewById(R.id.img_map);
         pathNavigationView = view.findViewById(R.id.path_navigation_view);
-
-        // Find views inside the BottomSheet
         View bottomSheet = view.findViewById(R.id.bottom_sheet);
         tvItemName = bottomSheet.findViewById(R.id.tv_item_name);
         tvInstruction = bottomSheet.findViewById(R.id.tv_instruction);
@@ -97,7 +95,6 @@ public class MapFragment extends Fragment {
         btnNext = bottomSheet.findViewById(R.id.btn_next);
         recyclerView = bottomSheet.findViewById(R.id.rv_shopping_list);
 
-        // Configure views
         imgMap.setImageDrawable(null);
         imgMap.setBackgroundColor(Color.WHITE);
         pathNavigationView.setSupermarketLayout(this.supermarketLayout);
@@ -139,7 +136,7 @@ public class MapFragment extends Fragment {
             btnNext.setOnClickListener(v -> {
                 if (shoppingList.isEmpty()) return;
                 ShoppingItem currentItem = shoppingList.get(currentIndex);
-                if (currentItem.coordinateX != -1.0) {
+                if (currentItem.coordinateX > 0 && currentItem.coordinateY > 0) {
                     lastLocation = new PointF((float) currentItem.coordinateX, (float) currentItem.coordinateY);
                 }
                 currentIndex++;
@@ -177,7 +174,8 @@ public class MapFragment extends Fragment {
             btnCurrentItem.setText(item.getName() + " (" + (currentIndex + 1) + "/" + shoppingList.size() + ")");
         }
 
-        if (item.coordinateX == -1.0) {
+        if (item.coordinateX <= 0 || item.coordinateY <= 0) {
+            Log.e("MapFragment", "Item has invalid (zero or negative) coordinates: " + item.getName() + " (Category: " + item.getCategory() + ")");
             if (pathNavigationView != null) pathNavigationView.clearPath();
             return;
         }
@@ -213,7 +211,7 @@ public class MapFragment extends Fragment {
                 int currentPosition = holder.getAdapterPosition();
                 if (currentPosition == RecyclerView.NO_POSITION || currentPosition == currentIndex) return;
                 ShoppingItem currentItem = shoppingList.get(currentIndex);
-                if (currentItem.coordinateX != -1.0) { lastLocation = new PointF((float) currentItem.coordinateX, (float) currentItem.coordinateY); }
+                if (currentItem.coordinateX > 0 && currentItem.coordinateY > 0) { lastLocation = new PointF((float) currentItem.coordinateX, (float) currentItem.coordinateY); }
                 currentIndex = currentPosition;
                 showCurrentItem();
             });
@@ -229,4 +227,3 @@ public class MapFragment extends Fragment {
         }
     }
 }
-

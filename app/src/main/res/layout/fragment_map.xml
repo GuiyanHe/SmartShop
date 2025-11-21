@@ -31,7 +31,7 @@
     <FrameLayout
         android:id="@+id/map_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="600dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <!-- 空白背景 -->
@@ -39,6 +39,7 @@
             android:id="@+id/img_map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:scaleType="centerCrop"
             android:background="@android:color/white" />
 
         <!-- “画板”层 -->
