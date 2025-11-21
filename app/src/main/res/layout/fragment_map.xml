@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:theme="@style/Theme.SmartShop.AppBarOverlay">
 
-        <!-- 2. Toolbar: 标准的顶部工具栏 -->
+        <!-- 2. Toolbar: Standard top toolbar -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
