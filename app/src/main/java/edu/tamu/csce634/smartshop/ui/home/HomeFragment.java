@@ -56,6 +56,7 @@ public class HomeFragment extends Fragment {
         binding.buttonAddFat.setOnClickListener(v -> dailyStatsViewModel.addFat(5));
         binding.buttonAddWater.setOnClickListener(v -> dailyStatsViewModel.addWater(1));
 
+
         return binding.getRoot();
     }
 
