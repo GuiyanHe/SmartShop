@@ -34,7 +34,7 @@
         android:layout_height="600dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- 空白背景 -->
+        <!-- Blank background -->
         <ImageView
             android:id="@+id/img_map"
             android:layout_width="match_parent"
