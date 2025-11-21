@@ -2,6 +2,7 @@ package edu.tamu.csce634.smartshop.ui.map;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -26,28 +27,34 @@ import edu.tamu.csce634.smartshop.models.world.SupermarketLayout;
 
 public class PathNavigationView extends View {
 
-    // region --- Paint and Path Objects ---
+    // --- Paint objects ---
     private final Paint pathPaint;
     private final Paint markerPaint;
     private final Paint aislePaint;
+    private final Paint textPaint;
+
+    // --- Path objects ---
     private final Path fullPath = new Path();
     private final Path animatedPath = new Path();
     private final PathMeasure pathMeasure = new PathMeasure();
     private PointF currentMarkerPosition;
     private float markerRadius = 24f;
     private ValueAnimator pathAnimator;
-    private SupermarketLayout supermarketLayout;
-    // endregion
 
-    // region --- A* Pathfinding Fields ---
-    private static final int GRID_RESOLUTION_FACTOR = 1;
-    private static final int GRID_WIDTH = 40 * GRID_RESOLUTION_FACTOR;
-    private static final int GRID_HEIGHT = 60 * GRID_RESOLUTION_FACTOR;
+    // --- Data ---
+    private SupermarketLayout supermarketLayout;
+
+    // --- Destination Image ---
+    private Bitmap destinationBitmap;
+    private PointF destinationPoint;
+
+    // --- A* Fields ---
+    private static final int GRID_WIDTH = 40;
+    private static final int GRID_HEIGHT = 60;
     private Node[][] grid;
     private boolean aStarGridInitialized = false;
-    // endregion
 
-    // A* Node Class
+    // --- A* Node Class ---
     static class Node {
         int x, y;
         int g, h;
@@ -80,6 +87,7 @@ public class PathNavigationView extends View {
 
     public PathNavigationView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+
         pathPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         pathPaint.setColor(Color.parseColor("#4CAF50"));
         pathPaint.setStyle(Paint.Style.STROKE);
@@ -94,6 +102,11 @@ public class PathNavigationView extends View {
         aislePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         aislePaint.setColor(Color.parseColor("#E0E0E0"));
         aislePaint.setStyle(Paint.Style.FILL);
+
+        textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        textPaint.setColor(Color.GRAY);
+        textPaint.setTextSize(32f);
+        textPaint.setTextAlign(Paint.Align.CENTER);
 
         setupAnimator();
     }
@@ -119,6 +132,15 @@ public class PathNavigationView extends View {
     public void setSupermarketLayout(SupermarketLayout layout) {
         this.supermarketLayout = layout;
         aStarGridInitialized = false;
+        invalidate();
+    }
+
+    public void setDestinationImage(Bitmap bitmap) {
+        if (bitmap != null) {
+            this.destinationBitmap = Bitmap.createScaledBitmap(bitmap, 80, 80, false);
+        } else {
+            this.destinationBitmap = null;
+        }
         invalidate();
     }
 
@@ -163,6 +185,8 @@ public class PathNavigationView extends View {
             return;
         }
 
+        this.destinationPoint = endPointInPixels;
+
         int startGridX = (int) (startPointInPixels.x / getWidth() * GRID_WIDTH);
         int startGridY = (int) (startPointInPixels.y / getHeight() * GRID_HEIGHT);
         int endGridX = (int) (endPointInPixels.x / getWidth() * GRID_WIDTH);
@@ -196,13 +220,11 @@ public class PathNavigationView extends View {
     }
 
     private List<Node> findPath(int startX, int startY, int endX, int endY) {
-        // Ensure coordinates are within bounds
         if (startX < 0 || startX >= GRID_WIDTH || startY < 0 || startY >= GRID_HEIGHT ||
             endX < 0 || endX >= GRID_WIDTH || endY < 0 || endY >= GRID_HEIGHT) {
             return null;
         }
 
-        // --- FIX 2: Reset grid state before every run ---
         for (int x = 0; x < GRID_WIDTH; x++) {
             for (int y = 0; y < GRID_HEIGHT; y++) {
                 grid[x][y].reset();
@@ -212,13 +234,12 @@ public class PathNavigationView extends View {
         Node startNode = grid[startX][startY];
         Node endNode = grid[endX][endY];
 
-        // --- FIX 1: Handle start or end points being inside an obstacle ---
         if (startNode.isObstacle) {
             Node alternativeStartNode = findNearestValidNode(startNode);
             if (alternativeStartNode != null) {
                 startNode = alternativeStartNode;
             } else {
-                return null; // No valid path start found
+                return null;
             }
         }
 
@@ -227,7 +248,7 @@ public class PathNavigationView extends View {
             if (alternativeEndNode != null) {
                 endNode = alternativeEndNode;
             } else {
-                return null; // No valid path destination found
+                return null;
             }
         }
 
@@ -262,9 +283,9 @@ public class PathNavigationView extends View {
                     Node neighbor = grid[neighborX][neighborY];
                     if (neighbor.isObstacle || closedList[neighborX][neighborY]) continue;
 
-                    if (i != 0 && j != 0) { // Diagonal move
+                    if (i != 0 && j != 0) {
                         if (grid[currentNode.x + i][currentNode.y].isObstacle || grid[currentNode.x][currentNode.y + j].isObstacle) {
-                            continue; // Prevents cutting corners
+                            continue;
                         }
                     }
 
@@ -278,19 +299,16 @@ public class PathNavigationView extends View {
                 }
             }
         }
-        return null; // No path found
+        return null;
     }
 
     private Node findNearestValidNode(Node originalNode) {
-        // Search in an expanding spiral for the nearest non-obstacle node
         for (int radius = 1; radius < 10; radius++) {
             for (int i = -radius; i <= radius; i++) {
                 for (int j = -radius; j <= radius; j++) {
                     if (Math.abs(i) != radius && Math.abs(j) != radius) continue;
-
                     int checkX = originalNode.x + i;
                     int checkY = originalNode.y + j;
-
                     if (checkX >= 0 && checkX < GRID_WIDTH && checkY >= 0 && checkY < GRID_HEIGHT) {
                         Node candidate = grid[checkX][checkY];
                         if (!candidate.isObstacle) {
@@ -300,11 +318,11 @@ public class PathNavigationView extends View {
                 }
             }
         }
-        return null; // No valid node found nearby
+        return null;
     }
 
     private int calculateHeuristic(Node a, Node b) {
-        return 10 * (Math.abs(a.x - b.x) + Math.abs(a.y - b.y)); // Manhattan distance
+        return 10 * (Math.abs(a.x - b.x) + Math.abs(a.y - b.y));
     }
 
     private List<Node> reconstructPath(Node endNode) {
@@ -325,6 +343,8 @@ public class PathNavigationView extends View {
         fullPath.reset();
         animatedPath.reset();
         currentMarkerPosition = null;
+        setDestinationImage(null);
+        destinationPoint = null;
         invalidate();
     }
 
@@ -333,13 +353,22 @@ public class PathNavigationView extends View {
         super.onDraw(canvas);
         drawBackgroundLayout(canvas);
         canvas.drawPath(animatedPath, pathPaint);
+
+        if (destinationBitmap != null && destinationPoint != null) {
+            float bitmapX = destinationPoint.x - destinationBitmap.getWidth() / 2f;
+            float bitmapY = destinationPoint.y - destinationBitmap.getHeight() / 2f;
+            canvas.drawBitmap(destinationBitmap, bitmapX, bitmapY, null);
+        }
+
         if (currentMarkerPosition != null) {
             canvas.drawCircle(currentMarkerPosition.x, currentMarkerPosition.y, markerRadius, markerPaint);
         }
     }
 
     private void drawBackgroundLayout(Canvas canvas) {
-        if (supermarketLayout == null || supermarketLayout.aisles == null || getWidth() == 0 || getHeight() == 0) return;
+        if (supermarketLayout == null || supermarketLayout.aisles == null || getWidth() == 0 || getHeight() == 0) {
+            return;
+        }
         int viewWidth = getWidth();
         int viewHeight = getHeight();
         for (Aisle aisle : supermarketLayout.aisles) {
@@ -348,6 +377,12 @@ public class PathNavigationView extends View {
             float right = (aisle.x + aisle.width) * viewWidth;
             float bottom = (aisle.y + aisle.height) * viewHeight;
             canvas.drawRect(left, top, right, bottom, aislePaint);
+
+            String aisleName = aisle.id.replace('_', ' ');
+            float centerX = left + (right - left) / 2;
+            float centerY = top + (bottom - top) / 2;
+            float textY = centerY - ((textPaint.descent() + textPaint.ascent()) / 2);
+            canvas.drawText(aisleName, centerX, textY, textPaint);
         }
     }
 }
