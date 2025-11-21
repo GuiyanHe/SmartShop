@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.map.MapFragment">
 
-    <!-- 1. AppBarLayout: 这是一个特殊的容器，它知道如何响应滚动事件 -->
+    <!-- 1. AppBarLayout: A specialized container that responds to scrolling events -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
