@@ -9,15 +9,16 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="My Profile"
-            app:navigationIcon="@drawable/ic_arrow_back"
             android:background="?attr/colorPrimary"
-            app:titleTextColor="@android:color/white"
-            app:navigationIconTint="@android:color/white" />
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:navigationIconTint="@android:color/white"
+            app:title="My Profile"
+            app:titleTextColor="@android:color/white" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -28,25 +29,27 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp"
+            android:clipChildren="false"
             android:clipToPadding="false"
-            android:clipChildren="false">
+            android:orientation="vertical"
+            android:padding="16dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:text="Basic Info"
-                android:textSize="18sp"
-                android:textStyle="bold"
                 android:textColor="@android:color/black"
-                android:layout_marginBottom="8dp"/>
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                android:layout_marginBottom="16dp">
+                app:cardElevation="4dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -56,34 +59,39 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="16dp">
+                        android:orientation="horizontal">
+
                         <ImageView
                             android:layout_width="64dp"
                             android:layout_height="64dp"
-                            android:src="@drawable/ic_person"
+                            android:layout_marginEnd="16dp"
                             android:background="@drawable/profile_icon_background"
                             android:backgroundTint="@color/green_100"
                             android:padding="16dp"
-                            app:tint="@color/green_500"
-                            android:layout_marginEnd="16dp"/>
+                            android:src="@drawable/ic_person"
+                            app:tint="@color/green_500" />
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
+
                             <com.google.android.material.textfield.TextInputLayout
                                 android:id="@+id/layout_name"
                                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="Name">
+
                                 <com.google.android.material.textfield.TextInputEditText
                                     android:id="@+id/edit_name"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:inputType="textPersonName" />
                             </com.google.android.material.textfield.TextInputLayout>
+
                             <com.google.android.material.textfield.TextInputLayout
                                 android:id="@+id/layout_email"
                                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
@@ -91,6 +99,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:hint="Email">
+
                                 <com.google.android.material.textfield.TextInputEditText
                                     android:id="@+id/edit_email"
                                     android:layout_width="match_parent"
@@ -103,32 +112,36 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
+                        android:layout_marginBottom="8dp"
+                        android:orientation="horizontal">
+
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/layout_height"
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_marginEnd="8dp"
-                            app:suffixText="cm"
-                            android:hint="Height">
+                            android:layout_weight="1"
+                            android:hint="Height"
+                            app:suffixText="cm">
+
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/edit_height"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="number" />
                         </com.google.android.material.textfield.TextInputLayout>
+
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/layout_weight"
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_marginStart="8dp"
-                            app:suffixText="kg"
-                            android:hint="Weight">
+                            android:layout_weight="1"
+                            android:hint="Weight"
+                            app:suffixText="kg">
+
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/edit_weight"
                                 android:layout_width="match_parent"
@@ -144,19 +157,22 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:hint="Short-term Goal">
+
                         <AutoCompleteTextView
                             android:id="@+id/edit_goal"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="none"
-                            android:entries="@array/profile_goals" />
+                            android:entries="@array/profile_goals"
+                            android:inputType="none" />
                     </com.google.android.material.textfield.TextInputLayout>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/layout_store"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Store">
+
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/edit_store"
                             android:layout_width="match_parent"
@@ -169,16 +185,18 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:text="Daily Goals"
-                android:textSize="18sp"
-                android:textStyle="bold"
                 android:textColor="@android:color/black"
-                android:layout_marginBottom="8dp"/>
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="4dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -191,8 +209,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        app:suffixText="Kcal"
-                        android:hint="Calorie Goal">
+                        android:hint="Calorie Goal"
+                        app:suffixText="Kcal">
+
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/edit_calorie_goal"
                             android:layout_width="match_parent"
@@ -206,8 +225,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        app:suffixText="g"
-                        android:hint="Protein Goal">
+                        android:hint="Protein Goal"
+                        app:suffixText="g">
+
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/edit_protein_goal"
                             android:layout_width="match_parent"
@@ -221,8 +241,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        app:suffixText="g"
-                        android:hint="Fat Goal">
+                        android:hint="Fat Goal"
+                        app:suffixText="g">
+
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/edit_fat_goal"
                             android:layout_width="match_parent"
@@ -235,14 +256,325 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:suffixText="cups"
-                        android:hint="Water Goal">
+                        android:hint="Water Goal"
+                        app:suffixText="cups">
+
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/edit_water_goal"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="number" />
-                    </com.google.android.material.textfield.TextInputLayout> </LinearLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Shopping Preferences -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:text="Shopping Preferences"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Dietary Preferences 子标题 -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Dietary Preferences"
+                        android:textColor="@color/green_700"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_vegetarian"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:text="Vegetarian"
+                        android:textSize="15sp" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_vegan"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:text="Vegan"
+                        android:textSize="15sp" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_organic_only"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:text="Prefer Organic Products"
+                        android:textSize="15sp" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_gluten_free"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:text="Gluten-free"
+                        android:textSize="15sp" />
+
+                    <!-- 分隔线 -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="12dp"
+                        android:background="#E0E0E0" />
+
+                    <!-- Allergies 子标题 -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Allergies &amp; Restrictions"
+                        android:textColor="@color/green_700"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chip_group_allergies"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:singleSelection="false"
+                        app:selectionRequired="false"
+                        android:layout_marginBottom="12dp">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_allergy_nuts"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Nuts"
+                            android:checkable="true"
+                            app:chipBackgroundColor="@color/green_100"
+                            app:checkedIconVisible="true"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_allergy_shellfish"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Shellfish"
+                            android:checkable="true"
+                            app:chipBackgroundColor="@color/green_100"
+                            app:checkedIconVisible="true"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_allergy_dairy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Dairy"
+                            android:checkable="true"
+                            app:chipBackgroundColor="@color/green_100"
+                            app:checkedIconVisible="true"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_allergy_soy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Soy"
+                            android:checkable="true"
+                            app:chipBackgroundColor="@color/green_100"
+                            app:checkedIconVisible="true"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_allergy_eggs"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Eggs"
+                            android:checkable="true"
+                            app:chipBackgroundColor="@color/green_100"
+                            app:checkedIconVisible="true"/>
+                    </com.google.android.material.chip.ChipGroup>
+                    <!-- 分隔线 -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="12dp"
+                        android:background="#E0E0E0" />
+
+                    <!-- Brand Preferences 子标题 -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Favorite Brands"
+                        android:textColor="@color/green_700"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chip_group_brands"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:singleSelection="false"
+                        android:layout_marginBottom="12dp">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_brand_greenvalley"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="GreenValley"
+                            android:checkable="true"
+                            app:chipBackgroundColor="@color/green_100"
+                            app:checkedIconVisible="true"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_brand_storebrand"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="StoreBrand"
+                            android:checkable="true"
+                            app:chipBackgroundColor="@color/green_100"
+                            app:checkedIconVisible="true"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_brand_naturebest"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="NatureBest"
+                            android:checkable="true"
+                            app:chipBackgroundColor="@color/green_100"
+                            app:checkedIconVisible="true"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_brand_sunharvest"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="SunHarvest"
+                            android:checkable="true"
+                            app:chipBackgroundColor="@color/green_100"
+                            app:checkedIconVisible="true"/>
+                    </com.google.android.material.chip.ChipGroup>
+
+                    <!-- 分隔线 -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="12dp"
+                        android:background="#E0E0E0" />
+
+                    <!-- Budget Settings -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Budget"
+                        android:textColor="@color/green_700"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            android:text="Max Item Price:"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/text_max_price"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="$20.00"
+                            android:textColor="@color/green_600"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/slider_max_price"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:stepSize="1.0"
+                        android:value="20.0"
+                        android:valueFrom="5.0"
+                        android:valueTo="50.0"
+                        app:labelBehavior="gone" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_prefer_deals"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:text="Prioritize Deals &amp; Promotions"
+                        android:textSize="15sp" />
+
+                    <!-- 分隔线 -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="12dp"
+                        android:background="#E0E0E0" />
+
+                    <!-- Package Size Preference -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Preferred Package Size"
+                        android:textColor="@color/green_700"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <RadioGroup
+                        android:id="@+id/radio_group_package_size"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RadioButton
+                            android:id="@+id/radio_package_small"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
+                            android:text="Small (1-2 servings)"
+                            android:textSize="14sp" />
+
+                        <RadioButton
+                            android:id="@+id/radio_package_regular"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:padding="8dp"
+                            android:text="Regular (3-4 servings)"
+                            android:textSize="14sp" />
+
+                        <RadioButton
+                            android:id="@+id/radio_package_large"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
+                            android:text="Family Size (5+ servings)"
+                            android:textSize="14sp" />
+                    </RadioGroup>
+
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>

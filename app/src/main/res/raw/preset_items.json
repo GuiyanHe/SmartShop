@@ -1,0 +1,285 @@
+{
+  "items": [
+    {
+      "ingredientId": "ing_tofu",
+      "name": "Tofu",
+      "unit": "Oz",
+      "aisle": "Produce Aisle 4",
+      "category": "produce",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_tofu_greenvalley_8oz",
+      "imageUrl": "asset:tofu.webp"
+    },
+    {
+      "ingredientId": "ing_brown_rice",
+      "name": "Brown Rice",
+      "unit": "Oz",
+      "aisle": "Grains Aisle",
+      "category": "grains",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_brown_rice_greenvalley_16oz",
+      "imageUrl": "asset:brown_rice.webp"
+    },
+    {
+      "ingredientId": "ing_egg",
+      "name": "Egg",
+      "unit": "count",
+      "aisle": "Dairy Aisle 2",
+      "category": "dairy",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_egg_greenvalley_6ct",
+      "imageUrl": "asset:egg.webp"
+    },
+    {
+      "ingredientId": "ing_corn",
+      "name": "Corn",
+      "unit": "Oz",
+      "aisle": "Produce Aisle 2",
+      "category": "produce",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_corn_greenvalley_8oz",
+      "imageUrl": "asset:corn.webp"
+    },
+    {
+      "ingredientId": "ing_purple_cabbage",
+      "name": "Purple Cabbage",
+      "unit": "Oz",
+      "aisle": "Produce Aisle 1",
+      "category": "produce",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_purple_cabbage_greenvalley_16oz",
+      "imageUrl": "asset:purple_cabbage.webp"
+    },
+    {
+      "ingredientId": "ing_quinoa",
+      "name": "Quinoa",
+      "unit": "Oz",
+      "aisle": "Grains Aisle",
+      "category": "grains",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_quinoa_greenvalley_16oz",
+      "imageUrl": "asset:quinoa.webp"
+    },
+    {
+      "ingredientId": "ing_bell_peppers",
+      "name": "Bell Peppers",
+      "unit": "Oz",
+      "aisle": "Produce Aisle 2",
+      "category": "produce",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_bell_peppers_greenvalley_8oz",
+      "imageUrl": "asset:bell_pepper.webp"
+    },
+    {
+      "ingredientId": "ing_chickpeas",
+      "name": "Chickpeas",
+      "unit": "Oz",
+      "aisle": "Canned Goods Aisle",
+      "category": "canned_goods",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_chickpeas_greenvalley_15oz",
+      "imageUrl": "asset:chickpea.webp"
+    },
+    {
+      "ingredientId": "ing_cherry_tomatoes",
+      "name": "Cherry Tomatoes",
+      "unit": "Oz",
+      "aisle": "Produce Aisle 2",
+      "category": "produce",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_cherry_tomatoes_greenvalley_10oz",
+      "imageUrl": "asset:cherry_tomatos.webp"
+    },
+    {
+      "ingredientId": "ing_red_cabbage",
+      "name": "Red Cabbage",
+      "unit": "Oz",
+      "aisle": "Produce Aisle 1",
+      "category": "produce",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_red_cabbage_greenvalley_16oz",
+      "imageUrl": "asset:red_cabbage.webp"
+    },
+    {
+      "ingredientId": "ing_salmon",
+      "name": "Salmon",
+      "unit": "Oz",
+      "aisle": "Seafood Aisle",
+      "category": "seafood",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_salmon_greenvalley_16oz",
+      "imageUrl": "asset:salmon.webp"
+    },
+    {
+      "ingredientId": "ing_cucumber",
+      "name": "Cucumber",
+      "unit": "Oz",
+      "aisle": "Produce Aisle 2",
+      "category": "produce",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_cucumber_greenvalley_8oz",
+      "imageUrl": "asset:cucumber.webp"
+    },
+    {
+      "ingredientId": "ing_radish",
+      "name": "Radish",
+      "unit": "Oz",
+      "aisle": "Produce Aisle 2",
+      "category": "produce",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_radish_greenvalley_6oz",
+      "imageUrl": "asset:radish.webp"
+    },
+    {
+      "ingredientId": "ing_carrots",
+      "name": "Carrots",
+      "unit": "Oz",
+      "aisle": "Produce Aisle 2",
+      "category": "produce",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_carrots_greenvalley_8oz",
+      "imageUrl": "asset:carrot.webp"
+    },
+    {
+      "ingredientId": "ing_cilantro",
+      "name": "Cilantro",
+      "unit": "Oz",
+      "aisle": "Produce Aisle 1",
+      "category": "produce",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_cilantro_greenvalley_2oz",
+      "imageUrl": "asset:cilantro.webp"
+    },
+    {
+      "ingredientId": "ing_steak",
+      "name": "Steak",
+      "unit": "Oz",
+      "aisle": "Meat Aisle 1",
+      "category": "meat",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_steak_greenvalley_16oz",
+      "imageUrl": "asset:steak.webp"
+    },
+    {
+      "ingredientId": "ing_flour_tortilla",
+      "name": "Flour Tortilla",
+      "unit": "count",
+      "aisle": "Bakery Aisle 2",
+      "category": "bakery",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_flour_tortilla_greenvalley_8ct",
+      "imageUrl": "asset:flour_tortilla.webp"
+    },
+    {
+      "ingredientId": "ing_tomatoes",
+      "name": "Tomatoes",
+      "unit": "Oz",
+      "aisle": "Produce Aisle 2",
+      "category": "produce",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_tomatoes_greenvalley_8oz",
+      "imageUrl": "asset:cherry_tomatos.webp"
+    },
+    {
+      "ingredientId": "ing_queso_fresco",
+      "name": "Queso Fresco",
+      "unit": "Oz",
+      "aisle": "Dairy Aisle 5",
+      "category": "dairy",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_queso_fresco_greenvalley_8oz",
+      "imageUrl": "asset:queso_fresco.webp"
+    },
+    {
+      "ingredientId": "ing_avocado",
+      "name": "Avocado",
+      "unit": "Oz",
+      "aisle": "Produce Aisle 2",
+      "category": "produce",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_avocado_greenvalley_5oz",
+      "imageUrl": "asset:avocado.webp"
+    },
+    {
+      "ingredientId": "ing_soy_milk",
+      "name": "Soy Milk",
+      "unit": "Oz",
+      "aisle": "Dairy Alternatives Aisle 6",
+      "category": "dairy_alternatives",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_soy_milk_greenvalley_32oz",
+      "imageUrl": "asset:soy_milk.webp"
+    },
+    {
+      "ingredientId": "ing_almond_milk",
+      "name": "Almond Milk",
+      "unit": "Oz",
+      "aisle": "Dairy Alternatives Aisle 6",
+      "category": "dairy_alternatives",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_almond_milk_naturebest_32oz",
+      "imageUrl": "asset:almond_milk.webp"
+    },
+    {
+      "ingredientId": "ing_oat_milk",
+      "name": "Oat Milk",
+      "unit": "Oz",
+      "aisle": "Dairy Alternatives Aisle 6",
+      "category": "dairy_alternatives",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_oat_milk_greenvalley_32oz",
+      "imageUrl": "asset:oat_milk.webp"
+    },
+    {
+      "ingredientId": "ing_tempeh",
+      "name": "Tempeh",
+      "unit": "Oz",
+      "aisle": "Produce Aisle 4",
+      "category": "produce",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_tempeh_greenvalley_8oz",
+      "imageUrl": "asset:tempeh.webp"
+    },
+    {
+      "ingredientId": "ing_seitan",
+      "name": "Seitan",
+      "unit": "Oz",
+      "aisle": "Produce Aisle 4",
+      "category": "produce",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_seitan_naturebest_8oz",
+      "imageUrl": "asset:seitan.webp"
+    },
+    {
+      "ingredientId": "ing_flax_seed",
+      "name": "Flax Seed Meal",
+      "unit": "Oz",
+      "aisle": "Grains & Seeds Aisle",
+      "category": "grains",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_flax_seed_greenvalley_16oz",
+      "imageUrl": "asset:flax_seed.webp"
+    },
+    {
+      "ingredientId": "ing_nutritional_yeast",
+      "name": "Nutritional Yeast",
+      "unit": "Oz",
+      "aisle": "Grains & Seeds Aisle",
+      "category": "grains",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_nutritional_yeast_naturebest_4oz",
+      "imageUrl": "asset:nutritional_yeast.webp"
+    },
+    {
+      "ingredientId": "ing_corn_tortilla",
+      "name": "Corn Tortilla",
+      "unit": "count",
+      "aisle": "Bakery Aisle 2",
+      "category": "bakery",
+      "defaultQuantity": 1,
+      "defaultOptionId": "opt_corn_tortilla_greenvalley_10ct",
+      "imageUrl": "asset:corn_tortilla.webp"
+    }
+  ]
+}
+

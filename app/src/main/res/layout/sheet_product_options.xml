@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- BottomSheet 弹窗布局，显示商品替换选项 -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose a Product Option"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:paddingBottom="12dp" />
+
+    <Button
+        android:id="@+id/optionOrganic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Organic Option - $3.99" />
+
+    <Button
+        android:id="@+id/optionRegular"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Regular Option - $2.49"
+        android:layout_marginTop="8dp" />
+</LinearLayout>
