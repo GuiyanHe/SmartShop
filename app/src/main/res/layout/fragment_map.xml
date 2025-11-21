@@ -42,7 +42,7 @@
             android:scaleType="centerCrop"
             android:background="@android:color/white" />
 
-        <!-- “画板”层 -->
+        <!-- Drawing canvas layer -->
         <edu.tamu.csce634.smartshop.ui.map.PathNavigationView
             android:id="@+id/path_navigation_view"
             android:layout_width="match_parent"
