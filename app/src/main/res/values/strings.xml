@@ -3,10 +3,16 @@
     <string name="title_home">Home</string>
     <string name="title_list">List</string>
     <string name="title_recipe">Recipe</string>
+
     <string-array name="profile_goals">
         <item>Maintain</item>
         <item>Fat Loss</item>
         <item>Muscle Gain</item>
     </string-array>
+
+    <!-- Your feedback-page string -->
+    <string name="title_feedback">Feedback</string>
+
+    <!-- String added on main branch -->
     <string name="title_map">Store Map</string>
 </resources>
