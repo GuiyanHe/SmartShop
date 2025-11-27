@@ -73,6 +73,7 @@ public class MapFragment extends Fragment {
             e.printStackTrace();
             this.supermarketLayout = null;
         }
+    }
 
     private void setupToolbar(View view) {
         Toolbar toolbar = view.findViewById(R.id.toolbar);
