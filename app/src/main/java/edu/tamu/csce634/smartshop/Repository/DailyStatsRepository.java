@@ -29,7 +29,9 @@ public class DailyStatsRepository {
         int protein = sharedPrefs.getInt(KEY_CURRENT_PROTEIN, 0);
         int fat = sharedPrefs.getInt(KEY_CURRENT_FAT, 0);
         int water = sharedPrefs.getInt(KEY_CURRENT_WATER, 0);
-        dailyStatsLiveData.postValue(new DailyStats(calories, protein, fat, water));
+
+        // CHANGE: postValue -> setValue (immediate update)
+        dailyStatsLiveData.setValue(new DailyStats(calories, protein, fat, water));
     }
 
     public LiveData<DailyStats> getDailyStats() {
@@ -37,39 +39,83 @@ public class DailyStatsRepository {
     }
 
     private DailyStats getCurrentStats() {
-        return dailyStatsLiveData.getValue() != null ? dailyStatsLiveData.getValue() : DailyStats.createDefault();
+        return dailyStatsLiveData.getValue() != null
+                ? dailyStatsLiveData.getValue()
+                : DailyStats.createDefault();
     }
 
     public void addCalories(int amount) {
         DailyStats current = getCurrentStats();
         int newCalories = current.getCurrentCalories() + amount;
+
         sharedPrefs.edit().putInt(KEY_CURRENT_CALORIES, newCalories).apply();
-        dailyStatsLiveData.postValue(new DailyStats(newCalories, current.getCurrentProtein(), current.getCurrentFat(), current.getCurrentWater()));
+
+        // CHANGE
+        dailyStatsLiveData.setValue(
+                new DailyStats(
+                        newCalories,
+                        current.getCurrentProtein(),
+                        current.getCurrentFat(),
+                        current.getCurrentWater()
+                )
+        );
     }
 
     public void addProtein(int amount) {
         DailyStats current = getCurrentStats();
         int newProtein = current.getCurrentProtein() + amount;
+
         sharedPrefs.edit().putInt(KEY_CURRENT_PROTEIN, newProtein).apply();
-        dailyStatsLiveData.postValue(new DailyStats(current.getCurrentCalories(), newProtein, current.getCurrentFat(), current.getCurrentWater()));
+
+        // CHANGE
+        dailyStatsLiveData.setValue(
+                new DailyStats(
+                        current.getCurrentCalories(),
+                        newProtein,
+                        current.getCurrentFat(),
+                        current.getCurrentWater()
+                )
+        );
     }
 
     public void addFat(int amount) {
         DailyStats current = getCurrentStats();
         int newFat = current.getCurrentFat() + amount;
+
         sharedPrefs.edit().putInt(KEY_CURRENT_FAT, newFat).apply();
-        dailyStatsLiveData.postValue(new DailyStats(current.getCurrentCalories(), current.getCurrentProtein(), newFat, current.getCurrentWater()));
+
+        // CHANGE
+        dailyStatsLiveData.setValue(
+                new DailyStats(
+                        current.getCurrentCalories(),
+                        current.getCurrentProtein(),
+                        newFat,
+                        current.getCurrentWater()
+                )
+        );
     }
 
     public void addWater(int amount) {
         DailyStats current = getCurrentStats();
         int newWater = current.getCurrentWater() + amount;
+
         sharedPrefs.edit().putInt(KEY_CURRENT_WATER, newWater).apply();
-        dailyStatsLiveData.postValue(new DailyStats(current.getCurrentCalories(), current.getCurrentProtein(), current.getCurrentFat(), newWater));
+
+        // CHANGE
+        dailyStatsLiveData.setValue(
+                new DailyStats(
+                        current.getCurrentCalories(),
+                        current.getCurrentProtein(),
+                        current.getCurrentFat(),
+                        newWater
+                )
+        );
     }
 
     public void resetStats() {
         sharedPrefs.edit().clear().apply();
-        dailyStatsLiveData.postValue(DailyStats.createDefault());
+
+        // CHANGE
+        dailyStatsLiveData.setValue(DailyStats.createDefault());
     }
 }
