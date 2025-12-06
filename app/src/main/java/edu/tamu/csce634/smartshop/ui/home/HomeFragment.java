@@ -43,7 +43,7 @@ public class HomeFragment extends Fragment {
 
         // Init ViewModels
         profileViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
-        dailyStatsViewModel = new ViewModelProvider(this).get(DailyStatsViewModel.class);
+        dailyStatsViewModel = new ViewModelProvider(requireActivity()).get(DailyStatsViewModel.class);
 
         binding.imageProfile.setOnClickListener(v ->
                 NavHostFragment.findNavController(HomeFragment.this)
@@ -159,6 +159,19 @@ public class HomeFragment extends Fragment {
         binding.statWater.progressView.setProgress(waterProgress);
         binding.statWater.progressView.setProgressText(String.format(Locale.getDefault(), "%d / %d", waterCurrent, waterGoal));
         binding.statWater.progressView.setProgressTextColor(Color.BLACK);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Refresh stats from repository when returning to Home
+        DailyStats fresh = dailyStatsViewModel.getDailyStats().getValue();
+        if (fresh != null) {
+            mDailyStats = fresh;
+        }
+
+        updateStatsUI();
     }
 
     @Override
