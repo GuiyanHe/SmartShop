@@ -106,13 +106,19 @@ public class MapFragment extends Fragment {
     private void setupViewModel() {
         listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
         listViewModel.getItemList().observe(getViewLifecycleOwner(), items -> {
+            // -- Start of modification --
+            PointF entrance = new PointF(0.5f, 0.95f); // Define the entrance point
+            List<ShoppingItem> optimizedList = optimizeShoppingPath(items, entrance);
+
             shoppingList.clear();
-            if (items != null) {
-                shoppingList.addAll(items);
+            if (optimizedList != null) {
+                shoppingList.addAll(optimizedList);
             }
+            // -- End of modification --
+
             if (!shoppingList.isEmpty()) {
                 currentIndex = 0;
-                lastLocation = new PointF(0.5f, 0.95f); // Entrance
+                lastLocation = entrance; // Start from the entrance
                 showCurrentItem();
             } else {
                 handleEmptyList();
@@ -193,6 +199,59 @@ public class MapFragment extends Fragment {
             }
         });
     }
+
+    /**
+     * Calculates the Euclidean distance between two points.
+     */
+    private double calculateDistance(PointF p1, PointF p2) {
+        if (p1 == null || p2 == null) return Double.MAX_VALUE;
+        return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+    }
+
+    /**
+     * Reorders the shopping list based on the nearest neighbor algorithm.
+     * @param originalList The original, unsorted list of items.
+     * @param startPoint The starting point (e.g., the entrance).
+     * @return A new list, sorted for the shortest shopping path.
+     */
+    private List<ShoppingItem> optimizeShoppingPath(List<ShoppingItem> originalList, PointF startPoint) {
+        if (originalList == null || originalList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<ShoppingItem> remaining = new ArrayList<>(originalList);
+        List<ShoppingItem> optimized = new ArrayList<>();
+        PointF currentLocation = new PointF(startPoint.x, startPoint.y);
+
+        while (!remaining.isEmpty()) {
+            ShoppingItem nearestItem = null;
+            double minDistance = Double.MAX_VALUE;
+
+            for (ShoppingItem item : remaining) {
+                // Ensure item has valid coordinates before considering it
+                if (item.coordinateX > 0 && item.coordinateY > 0) {
+                    PointF itemLocation = new PointF((float)item.coordinateX, (float)item.coordinateY);
+                    double distance = calculateDistance(currentLocation, itemLocation);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        nearestItem = item;
+                    }
+                }
+            }
+
+            if (nearestItem != null) {
+                optimized.add(nearestItem);
+                remaining.remove(nearestItem);
+                currentLocation = new PointF((float)nearestItem.coordinateX, (float)nearestItem.coordinateY);
+            } else {
+                // If no items with valid coordinates are found, add the rest and break.
+                optimized.addAll(remaining);
+                break;
+            }
+        }
+        return optimized;
+    }
+
 
     private class ShoppingAdapter extends RecyclerView.Adapter<ShoppingAdapter.VH> {
         private final List<ShoppingItem> items;
