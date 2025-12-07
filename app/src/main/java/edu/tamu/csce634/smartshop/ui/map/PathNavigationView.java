@@ -1,5 +1,7 @@
 package edu.tamu.csce634.smartshop.ui.map;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -127,6 +129,18 @@ public class PathNavigationView extends View {
 
             invalidate();
         });
+
+        pathAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                // Snap the marker to the final destination when the animation ends
+                if (destinationPoint != null) {
+                    currentMarkerPosition = new PointF(destinationPoint.x, destinationPoint.y);
+                    invalidate();
+                }
+            }
+        });
     }
 
     public void setSupermarketLayout(SupermarketLayout layout) {
@@ -186,6 +200,22 @@ public class PathNavigationView extends View {
     public void drawPath(PointF startPointInPixels, PointF endPointInPixels) {
         if (startPointInPixels == null || endPointInPixels == null || !aStarGridInitialized || getWidth() == 0 || getHeight() == 0) {
             clearPath();
+            return;
+        }
+
+        float distance = (float) Math.sqrt(Math.pow(endPointInPixels.x - startPointInPixels.x, 2) + Math.pow(endPointInPixels.y - startPointInPixels.y, 2));
+
+        // If the destination is very close to the start, don't draw a path.
+        // Just place the marker at the destination. The threshold is slightly bigger than the marker radius.
+        if (distance < markerRadius * 1.5) {
+            this.destinationPoint = endPointInPixels;
+            this.currentMarkerPosition = new PointF(endPointInPixels.x, endPointInPixels.y);
+            fullPath.reset();
+            animatedPath.reset();
+            if (pathAnimator != null && pathAnimator.isRunning()) {
+                pathAnimator.cancel();
+            }
+            invalidate();
             return;
         }
 
